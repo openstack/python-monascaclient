@@ -1,0 +1,27 @@
+# bash completion for openstack mon
+
+_mon_opts="" # lazy init
+_mon_flags="" # lazy init
+_mon_opts_exp="" # lazy init
+_mon()
+{
+    local cur prev kbc
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    if [ "x$_mon_opts" == "x" ] ; then
+        kbc="`mon bash-completion | sed -e "s/ -h / /"`"
+        _mon_opts="`echo "$kbc" | sed -e "s/--[a-z0-9_-]*//g" -e "s/[ ][ ]*/ /g"`"
+        _mon_flags="`echo " $kbc" | sed -e "s/ [^-][^-][a-z0-9_-]*//g" -e "s/[ ][ ]*/ /g"`"
+        _mon_opts_exp="`echo $_mon_opts | sed -e "s/[ ]/|/g"`"
+    fi
+
+    if [[ " ${COMP_WORDS[@]} " =~ " "($_mon_opts_exp)" " && "$prev" != "help" ]] ; then
+        COMPREPLY=($(compgen -W "${_mon_flags}" -- ${cur}))
+    else
+        COMPREPLY=($(compgen -W "${_mon_opts}" -- ${cur}))
+    fi
+    return 0
+}
+complete -o default -o nospace -F _mon mon
