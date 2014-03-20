@@ -49,6 +49,10 @@ class MonShell(object):
                             action='store_true',
                             help=argparse.SUPPRESS)
 
+        parser.add_argument('-l', '--runlocal',
+                            action='store_true',
+                            help=argparse.SUPPRESS)
+
         parser.add_argument('--version',
                             action='version',
                             version=monclient.__version__,
@@ -155,7 +159,9 @@ class MonShell(object):
                             help=argparse.SUPPRESS)
 
         parser.add_argument('--mon-api-version',
-                            default=utils.env('MON_API_VERSION', default='2_0'),
+                            default=utils.env(
+                                'MON_API_VERSION',
+                                default='2_0'),
                             help='Defaults to env[MON_API_VERSION] or 2_0')
 
         parser.add_argument('--mon_api_version',
@@ -312,7 +318,7 @@ class MonShell(object):
         if args.os_no_client_auth:
             if not args.mon_api_url:
                 raise exc.CommandError("If you specify --os-no-client-auth"
-                                       " you must also specify a Monitoring API URL"
+                                       " you must specify a Monitoring API URL"
                                        " via either --mon-api-url or"
                                        " env[MON_API_URL]")
         else:
@@ -338,11 +344,12 @@ class MonShell(object):
             'auth_url': args.os_auth_url,
             'service_type': args.os_service_type,
             'endpoint_type': args.os_endpoint_type,
-            'insecure': args.insecure,
-            'include_pass': args.include_password
+            'insecure': args.insecure
         }
 
         endpoint = args.mon_api_url
+        if endpoint.endswith('/'):
+            endpoint = endpoint[:-1]
 
         if not args.os_no_client_auth:
             _ksclient = self._get_ksclient(**kwargs)
@@ -357,8 +364,7 @@ class MonShell(object):
                 'key_file': args.key_file,
                 'username': args.os_username,
                 'password': args.os_password,
-                'endpoint_type': args.os_endpoint_type,
-                'include_pass': args.include_password
+                'endpoint_type': args.os_endpoint_type
             }
 
             if args.os_region_name:
@@ -402,6 +408,7 @@ class MonShell(object):
 
 
 class HelpFormatter(argparse.HelpFormatter):
+
     def start_section(self, heading):
         # Title-case the headings
         heading = '%s%s' % (heading[0].upper(), heading[1:])

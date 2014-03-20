@@ -14,13 +14,14 @@
 #    under the License.
 
 from monclient.common import http
-
+from monclient.v2_0 import metrics
 
 
 class Client(object):
-    """Client for the Mon v1 API.
 
-    :param string endpoint: A user-supplied endpoint URL for the monitoring api 
+    """Client for the Mon v2_0 API.
+
+    :param string endpoint: A user-supplied endpoint URL for the monitoring api
                             service.
     :param string token: Token for authentication.
     :param integer timeout: Allows customization of the timeout for client
@@ -28,6 +29,6 @@ class Client(object):
     """
 
     def __init__(self, *args, **kwargs):
-        """Initialize a new client for the Heat v1 API."""
+        """Initialize a new http client for the mon API."""
         self.http_client = http.HTTPClient(*args, **kwargs)
-        
+        self.metrics = metrics.MetricsManager(self.http_client)
