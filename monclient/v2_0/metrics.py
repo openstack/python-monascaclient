@@ -13,7 +13,6 @@
 # manages the metrics resource
 
 from monclient.openstack.common.apiclient import base
-from monclient.openstack.common.py3kcompat import urlutils
 
 
 class Metrics(base.Resource):

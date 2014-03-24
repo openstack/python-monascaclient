@@ -18,7 +18,9 @@ verbose = 0
 
 
 class BaseException(Exception):
+
     """An error occurred."""
+
     def __init__(self, message=None):
         self.message = message
 
@@ -27,18 +29,22 @@ class BaseException(Exception):
 
 
 class CommandError(BaseException):
+
     """Invalid usage of CLI."""
 
 
 class InvalidEndpoint(BaseException):
+
     """The provided endpoint is invalid."""
 
 
 class CommunicationError(BaseException):
+
     """Unable to communicate with server."""
 
 
 class HTTPException(BaseException):
+
     """Base exception for all HTTP-derived exceptions."""
     code = 'N/A'
 
@@ -78,7 +84,6 @@ class HTTPMultipleChoices(HTTPException):
 
 
 class BadRequest(HTTPException):
-    """DEPRECATED."""
     code = 400
 
 
@@ -87,7 +92,6 @@ class HTTPBadRequest(BadRequest):
 
 
 class Unauthorized(HTTPException):
-    """DEPRECATED."""
     code = 401
 
 
@@ -96,6 +100,7 @@ class HTTPUnauthorized(Unauthorized):
 
 
 class Forbidden(HTTPException):
+
     """DEPRECATED."""
     code = 403
 
@@ -105,6 +110,7 @@ class HTTPForbidden(Forbidden):
 
 
 class NotFound(HTTPException):
+
     """DEPRECATED."""
     code = 404
 
@@ -118,6 +124,7 @@ class HTTPMethodNotAllowed(HTTPException):
 
 
 class Conflict(HTTPException):
+
     """DEPRECATED."""
     code = 409
 
@@ -127,6 +134,7 @@ class HTTPConflict(Conflict):
 
 
 class OverLimit(HTTPException):
+
     """DEPRECATED."""
     code = 413
 
@@ -137,6 +145,10 @@ class HTTPOverLimit(OverLimit):
 
 class HTTPUnsupported(HTTPException):
     code = 415
+
+
+class HTTPUnProcessable(HTTPException):
+    code = 422
 
 
 class HTTPInternalServerError(HTTPException):
@@ -152,6 +164,7 @@ class HTTPBadGateway(HTTPException):
 
 
 class ServiceUnavailable(HTTPException):
+
     """DEPRECATED."""
     code = 503
 
@@ -160,7 +173,7 @@ class HTTPServiceUnavailable(ServiceUnavailable):
     pass
 
 
-#NOTE(bcwaldon): Build a mapping of HTTP codes to corresponding exception
+# NOTE(bcwaldon): Build a mapping of HTTP codes to corresponding exception
 # classes
 _code_map = {}
 for obj_name in dir(sys.modules[__name__]):
@@ -176,10 +189,12 @@ def from_response(response):
 
 
 class NoTokenLookupException(Exception):
+
     """DEPRECATED."""
     pass
 
 
 class EndpointNotFound(Exception):
+
     """DEPRECATED."""
     pass

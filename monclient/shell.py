@@ -38,7 +38,7 @@ class MonShell(object):
         parser = argparse.ArgumentParser(
             prog='mon',
             description=__doc__.strip(),
-            epilog='See "mon-client help COMMAND" '
+            epilog='See "mon help COMMAND" '
                    'for help on a specific command.',
             add_help=False,
             formatter_class=HelpFormatter,
@@ -49,7 +49,7 @@ class MonShell(object):
                             action='store_true',
                             help=argparse.SUPPRESS)
 
-        parser.add_argument('-l', '--runlocal',
+        parser.add_argument('--runlocal',
                             action='store_true',
                             help=argparse.SUPPRESS)
 
