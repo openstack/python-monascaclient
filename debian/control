@@ -1,0 +1,15 @@
+Source: python-monclient
+Section: python
+Priority: optional
+Maintainer: HPCloud Monitoring <hpcs-mon@hp.com>
+Build-Depends: debhelper (>= 7),
+               python (>= 2.6.6-3~),
+               python-setuptools
+Standards-Version: 3.9.3
+X-Python-Version: >= 2.6
+
+Package: python-monclient
+Architecture: all
+Section: python
+Depends: ${misc:Depends}, ${python:Depends}, libpython2.7, python-pkg-resources, python-pbr, python-keystoneclient, python-yaml, python-requests, python-prettytable, python-six
+Description: CLI for Monitoring
