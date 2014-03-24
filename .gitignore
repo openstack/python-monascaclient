@@ -5,7 +5,6 @@ cover
 AUTHORS
 build
 dist
-ChangeLog
 run_tests.err.log
 .tox
 doc/source/api
