@@ -164,12 +164,12 @@ class ShellTestMonCommands(ShellBase):
             'metrics-create --value 123',
             'metrics-create',
         ]
+        _shell = monclient.shell.MonShell()
         for argstr in argstrings:
-            self.assertRaises(Exception, monclient.shell, argstr.split())
+            self.assertRaises(SystemExit, _shell.main, argstr.split())
 
     def test_good_metrics_create_subcommand(self):
         self._script_keystone_client()
-        # fakes.script_metrics_create()
 
         resp = fakes.FakeHTTPResponse(
             204,
@@ -194,3 +194,47 @@ class ShellTestMonCommands(ShellBase):
         for argstr in argstrings:
             retvalue = self.shell(argstr)
             self.assertRegexpMatches(retvalue, "^Success")
+
+    def test_bad_notifications_create_missing_args_subcommand(self):
+        argstrings = [
+            'notifications-create --name email1 --address cindy.o-neill@hp.com',
+        ]
+        _shell = monclient.shell.MonShell()
+        for argstr in argstrings:
+            self.assertRaises(SystemExit, _shell.main, argstr.split())
+
+    def test_bad_notifications_create_type_subcommand(self):
+        self._script_keystone_client()
+        argstrings = [
+            'notifications-create --name email1 --type DOG --address cindy.o-neill@hp.com',
+        ]
+        self.m.ReplayAll()
+        for argstr in argstrings:
+            retvalue = self.shell(argstr)
+            self.assertRegexpMatches(retvalue, "^Invalid type")
+
+    def test_good_notifications_create_subcommand(self):
+        self._script_keystone_client()
+
+        resp = fakes.FakeHTTPResponse(
+            201,
+            'Created',
+            {'location': 'http://no.where/v2.0/notification-methods'},
+            None)
+        http.HTTPClient.json_request(
+            'POST',
+            '/notification-methods',
+            data={'name': 'email1',
+                  'type': 'EMAIL',
+                  'address': 'john.doe@hp.com'},
+            headers={'X-Auth-Key': 'password',
+                     'X-Auth-User': 'username'}).AndReturn((resp, 'id'))
+
+        self.m.ReplayAll()
+
+        argstrings = [
+            'notifications-create --name email1 --type EMAIL --address john.doe@hp.com',
+        ]
+        for argstr in argstrings:
+            retvalue = self.shell(argstr)
+            self.assertRegexpMatches(retvalue, "id")

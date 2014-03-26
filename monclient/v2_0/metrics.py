@@ -32,5 +32,4 @@ class MetricsManager(base.BaseManager):
             headers['X-Tenant-Id'] = '1'
         resp, body = self.client.json_request('POST', '/metrics',
                                               data=kwargs, headers=headers)
-        # return body
-        return resp
+        return body

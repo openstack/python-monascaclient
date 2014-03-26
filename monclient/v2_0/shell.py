@@ -15,6 +15,7 @@
 
 from monclient.common import utils
 import monclient.exc as exc
+from monclient.openstack.common import jsonutils
 import time
 
 
@@ -55,3 +56,40 @@ def do_metrics_create(mc, args):
         raise
     else:
         print('Successfully created metric')
+
+
+@utils.arg('--name', metavar='<NOTIFICATION_NAME>',
+           help='Name of the notification to create.', required=True)
+@utils.arg('--type', metavar='<EMAIL | SMS>',
+           help='The notification type.  Types is one of [EMAIL, SMS].',
+           required=True)
+@utils.arg('--address', metavar='<ADDRESS>',
+           help='Depending on the type, a valid EMAIL or SMS Address',
+           required=True)
+def do_notifications_create(mc, args):
+    '''Create notification.'''
+    notification_types = ['EMAIL', 'SMS']
+    if args.type not in notification_types:
+        errmsg = 'Invalid type, not one of [' + \
+            ', '.join(notification_types) + ']'
+        print(errmsg)
+        return
+    fields = {}
+    fields['name'] = args.name
+    fields['type'] = args.type
+    fields['address'] = args.address
+    try:
+        notification = mc.notifications.create(args.runlocal, **fields)
+    except exc.HTTPInternalServerError as e1:
+        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
+    except exc.BadRequest as e2:
+        raise exc.CommandError('BadRequest %s' % e2.code)
+    except exc.Unauthorized as e3:
+        raise exc.CommandError('Unauthorized %s' % e3.code)
+    except exc.HTTPConflict as e4:
+        raise exc.CommandError('Conflict %s' % e4.code)
+    except Exception:
+        print('Command Failed. Please use the -d option for more details.')
+        raise
+    else:
+        print(jsonutils.dumps(notification, indent=2))

@@ -51,7 +51,7 @@ class MonShell(object):
 
         parser.add_argument('--runlocal',
                             action='store_true',
-                            help=argparse.SUPPRESS)
+                            help='test with a local mon-api (no keystone)')
 
         parser.add_argument('--version',
                             action='version',

@@ -15,6 +15,7 @@
 
 from monclient.common import http
 from monclient.v2_0 import metrics
+from monclient.v2_0 import notifications
 
 
 class Client(object):
@@ -32,3 +33,5 @@ class Client(object):
         """Initialize a new http client for the mon API."""
         self.http_client = http.HTTPClient(*args, **kwargs)
         self.metrics = metrics.MetricsManager(self.http_client)
+        self.notifications = notifications.NotificationsManager(
+            self.http_client)
