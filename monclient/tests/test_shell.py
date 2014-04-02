@@ -128,11 +128,11 @@ class ShellTestCommon(ShellBase):
 
     def test_help_on_subcommand(self):
         required = [
-            '^usage: mon metrics-create',
+            '^usage: mon metric-create',
             "(?m)^Create metric",
         ]
         argstrings = [
-            'help metrics-create',
+            'help metric-create',
         ]
         for argstr in argstrings:
             help_text = self.shell(argstr)
@@ -160,9 +160,9 @@ class ShellTestMonCommands(ShellBase):
 
     def test_bad_metrics_create_subcommand(self):
         argstrings = [
-            'metrics-create --name cindy',
-            'metrics-create --value 123',
-            'metrics-create',
+            'metric-create cindy',
+            'metric-create 123',
+            'metric-create',
         ]
         _shell = monclient.shell.MonShell()
         for argstr in argstrings:
@@ -189,7 +189,7 @@ class ShellTestMonCommands(ShellBase):
         self.m.ReplayAll()
 
         argstrings = [
-            'metrics-create --name cindy --value 123 --time 1395691090',
+            'metric-create cindy 123 --time 1395691090',
         ]
         for argstr in argstrings:
             retvalue = self.shell(argstr)
@@ -197,7 +197,7 @@ class ShellTestMonCommands(ShellBase):
 
     def test_bad_notifications_create_missing_args_subcommand(self):
         argstrings = [
-            'notifications-create --name email1 --address cindy.o-neill@hp.com',
+            'notification-create email1 cindy.o-neill@hp.com',
         ]
         _shell = monclient.shell.MonShell()
         for argstr in argstrings:
@@ -206,7 +206,7 @@ class ShellTestMonCommands(ShellBase):
     def test_bad_notifications_create_type_subcommand(self):
         self._script_keystone_client()
         argstrings = [
-            'notifications-create --name email1 --type DOG --address cindy.o-neill@hp.com',
+            'notification-create email1 DOG cindy.o-neill@hp.com',
         ]
         self.m.ReplayAll()
         for argstr in argstrings:
@@ -233,7 +233,7 @@ class ShellTestMonCommands(ShellBase):
         self.m.ReplayAll()
 
         argstrings = [
-            'notifications-create --name email1 --type EMAIL --address john.doe@hp.com',
+            'notification-create email1 EMAIL john.doe@hp.com',
         ]
         for argstr in argstrings:
             retvalue = self.shell(argstr)

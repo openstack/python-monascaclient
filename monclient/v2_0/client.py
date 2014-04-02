@@ -14,6 +14,7 @@
 #    under the License.
 
 from monclient.common import http
+from monclient.v2_0 import alarms
 from monclient.v2_0 import metrics
 from monclient.v2_0 import notifications
 
@@ -35,3 +36,4 @@ class Client(object):
         self.metrics = metrics.MetricsManager(self.http_client)
         self.notifications = notifications.NotificationsManager(
             self.http_client)
+        self.alarms = alarms.AlarmsManager(self.http_client)

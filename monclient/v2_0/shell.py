@@ -19,8 +19,8 @@ from monclient.openstack.common import jsonutils
 import time
 
 
-@utils.arg('--name', metavar='<METRIC_NAME>',
-           help='Name of the metric to create.', required=True)
+@utils.arg('name', metavar='<METRIC_NAME>',
+           help='Name of the metric to create.')
 @utils.arg('--dimensions', metavar='<KEY1=VALUE1;KEY2=VALUE2...>',
            help='key value pairs used to create the metric dimensions. '
            'This can be specified multiple times, or once with parameters '
@@ -29,12 +29,11 @@ import time
 @utils.arg('--time', metavar='<UNIX_TIMESTAMP>',
            default=time.time(), type=int,
            help='Metric timestamp. Default: current timestamp.')
-@utils.arg('--value', metavar='<METRIC_VALUE>',
+@utils.arg('value', metavar='<METRIC_VALUE>',
            default=time.time(), type=float,
-           help='Metric value.', required=True)
-def do_metrics_create(mc, args):
+           help='Metric value.')
+def do_metric_create(mc, args):
     '''Create metric.'''
-    #print("in do_metrics_create")
     fields = {}
     fields['name'] = args.name
     if args.dimensions:
@@ -42,7 +41,7 @@ def do_metrics_create(mc, args):
     fields['timestamp'] = args.time
     fields['value'] = args.value
     try:
-        mc.metrics.create(args.runlocal, **fields)
+        mc.metrics.create(args, **fields)
     except exc.HTTPInternalServerError as e1:
         raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
     except exc.BadRequest as e2:
@@ -58,15 +57,13 @@ def do_metrics_create(mc, args):
         print('Successfully created metric')
 
 
-@utils.arg('--name', metavar='<NOTIFICATION_NAME>',
-           help='Name of the notification to create.', required=True)
-@utils.arg('--type', metavar='<EMAIL | SMS>',
-           help='The notification type.  Types is one of [EMAIL, SMS].',
-           required=True)
-@utils.arg('--address', metavar='<ADDRESS>',
-           help='Depending on the type, a valid EMAIL or SMS Address',
-           required=True)
-def do_notifications_create(mc, args):
+@utils.arg('name', metavar='<NOTIFICATION_NAME>',
+           help='Name of the notification to create.')
+@utils.arg('type', metavar='<EMAIL | SMS>',
+           help='The notification type.  Types is one of [EMAIL, SMS].')
+@utils.arg('address', metavar='<ADDRESS>',
+           help='Depending on the type, a valid EMAIL or SMS Address')
+def do_notification_create(mc, args):
     '''Create notification.'''
     notification_types = ['EMAIL', 'SMS']
     if args.type not in notification_types:
@@ -79,7 +76,7 @@ def do_notifications_create(mc, args):
     fields['type'] = args.type
     fields['address'] = args.address
     try:
-        notification = mc.notifications.create(args.runlocal, **fields)
+        notification = mc.notifications.create(args, **fields)
     except exc.HTTPInternalServerError as e1:
         raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
     except exc.BadRequest as e2:
@@ -93,3 +90,187 @@ def do_notifications_create(mc, args):
         raise
     else:
         print(jsonutils.dumps(notification, indent=2))
+
+
+@utils.arg('id', metavar='<NOTIFICATION_ID>',
+           help='The ID of the notification. If not specified returns all.')
+def do_notification_show(mc, args):
+    '''Describe the notification.'''
+    fields = {}
+    fields['notification_id'] = args.id
+    try:
+        notification = mc.notifications.get(args, **fields)
+    except exc.HTTPInternalServerError as e1:
+        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
+    except exc.BadRequest as e2:
+        raise exc.CommandError('BadRequest %s' % e2.code)
+    except exc.Unauthorized as e3:
+        raise exc.CommandError('Unauthorized %s' % e3.code)
+    except exc.HTTPNotFound as e4:
+        raise exc.CommandError('Not Found %s' % e4.code)
+    except Exception:
+        print('Command Failed. Please use the -d option for more details.')
+        raise
+    else:
+        formatters = {
+            'name': utils.json_formatter,
+            'id': utils.json_formatter,
+            'type': utils.json_formatter,
+            'address': utils.json_formatter,
+            'link': utils.link_formatter,
+        }
+        utils.print_dict(notification, formatters=formatters)
+
+
+def do_notification_list(mc, args):
+    '''List notifications for this tenant.'''
+    try:
+        notification = mc.notifications.list(args)
+    except exc.HTTPInternalServerError as e1:
+        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
+    except exc.BadRequest as e2:
+        raise exc.CommandError('BadRequest %s' % e2.code)
+    except exc.Unauthorized as e3:
+        raise exc.CommandError('Unauthorized %s' % e3.code)
+    except exc.HTTPNotFound as e4:
+        raise exc.CommandError('Not Found %s' % e4.code)
+    except Exception:
+        print('Command Failed. Please use the -d option for more details.')
+        raise
+    else:
+        cols = ['name', 'id', 'type', 'address']
+        formatters = {
+            'name': lambda x: x['name'],
+            'id': lambda x: x['id'],
+            'type': lambda x: x['type'],
+            'address': lambda x: x['address'],
+        }
+        if isinstance(notification, list):
+
+            utils.print_list(
+                notification,
+                cols,
+                formatters=formatters,
+                sortby=1)
+        else:
+            notif_list = list()
+            notif_list.append(notification)
+            utils.print_list(notif_list, cols, formatters=formatters, sortby=1)
+
+
+@utils.arg('name', metavar='<ALARM_NAME>',
+           help='Name of the alarm to create.')
+@utils.arg('--description', metavar='<DESCRIPTION>',
+           help='Description of the alarm.')
+@utils.arg('expression', metavar='<EXPRESSION>',
+           help='The alarm expression to evaluate. No spaces.')
+@utils.arg('--alarm-actions', metavar='<NOTIFICATION-ID>',
+           help='The notification method to use when an alarm state is ALARM. '
+           'This param may be specified multiple times.',
+           action='append')
+@utils.arg('--ok-actions', metavar='<NOTIFICATION-ID>',
+           help='The notification method to use when an alarm state is OK. '
+           'This param may be specified multiple times.',
+           action='append')
+@utils.arg('--undetermined-actions', metavar='<NOTIFICATION-ID>',
+           help='The notification method to use when an alarm state is '
+           'UNDETERMINED. This param may be specified multiple times.',
+           action='append')
+def do_alarm_create(mc, args):
+    '''Create alarm.'''
+    fields = {}
+    fields['name'] = args.name
+    if args.description:
+        fields['description'] = args.description
+    fields['expression'] = args.expression
+    if args.alarm_actions:
+        fields['alarm_actions'] = args.alarm_actions
+    if args.ok_actions:
+        fields['ok_actions'] = args.ok_actions
+    if args.undetermined_actions:
+        fields['undetermined_actions'] = args.undetermined_actions
+    try:
+        alarm = mc.alarms.create(args, **fields)
+    except exc.HTTPInternalServerError as e1:
+        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
+    except exc.BadRequest as e2:
+        raise exc.CommandError('BadRequest %s' % e2.code)
+    except exc.Unauthorized as e3:
+        raise exc.CommandError('Unauthorized %s' % e3.code)
+    except exc.HTTPConflict as e4:
+        raise exc.CommandError('Conflict %s' % e4.code)
+    except Exception:
+        print('Command Failed. Please use the -d option for more details.')
+        raise
+    else:
+        print(jsonutils.dumps(alarm, indent=2))
+
+
+@utils.arg('id', metavar='<ALARM_ID>',
+           help='The ID of the alarm.')
+def do_alarm_show(mc, args):
+    '''Describe the alarm.'''
+    fields = {}
+    fields['alarm_id'] = args.id
+    try:
+        alarm = mc.alarms.get(args, **fields)
+    except exc.HTTPInternalServerError as e1:
+        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
+    except exc.BadRequest as e2:
+        raise exc.CommandError('BadRequest %s' % e2.code)
+    except exc.Unauthorized as e3:
+        raise exc.CommandError('Unauthorized %s' % e3.code)
+    except exc.HTTPNotFound as e4:
+        raise exc.CommandError('Not Found %s' % e4.code)
+    except Exception:
+        print('Command Failed. Please use the -d option for more details.')
+        raise
+    else:
+        # print out detail of a single alarm
+        formatters = {
+            'name': utils.json_formatter,
+            'id': utils.json_formatter,
+            'expression': utils.json_formatter,
+            'state': utils.json_formatter,
+            'enabled': utils.json_formatter,
+            'alarm_actions': utils.json_formatter,
+            'ok_actions': utils.json_formatter,
+            'undetermined_actions': utils.json_formatter,
+            'description': utils.json_formatter,
+            'links': utils.link_formatter,
+        }
+        utils.print_dict(alarm, formatters=formatters)
+
+
+def do_alarm_list(mc, args):
+    '''List alarms for this tenant.'''
+    try:
+        alarm = mc.alarms.list(args)
+    except exc.HTTPInternalServerError as e1:
+        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
+    except exc.BadRequest as e2:
+        raise exc.CommandError('BadRequest %s' % e2.code)
+    except exc.Unauthorized as e3:
+        raise exc.CommandError('Unauthorized %s' % e3.code)
+    except exc.HTTPNotFound as e4:
+        raise exc.CommandError('Not Found %s' % e4.code)
+    except Exception:
+        print('Command Failed. Please use the -d option for more details.')
+        raise
+    else:
+        cols = ['name', 'id', 'expression', 'state', 'enabled']
+        formatters = {
+            'name': lambda x: x['name'],
+            'id': lambda x: x['id'],
+            'expression': lambda x: x['expression'],
+            'state': lambda x: x['state'],
+            'enabled': lambda x: x['enabled'],
+        }
+        if isinstance(alarm, list):
+            # print the list
+            utils.print_list(alarm, cols, formatters=formatters, sortby=1)
+        else:
+            # add the dictionary to a list, so print_list works
+            alarm_list = list()
+            alarm_list.append(alarm)
+            utils.print_list(alarm_list, cols, formatters=formatters, sortby=1)

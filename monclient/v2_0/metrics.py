@@ -23,13 +23,21 @@ class Metrics(base.Resource):
 
 class MetricsManager(base.BaseManager):
     resource_class = Metrics
+    base_url = '/metrics'
 
-    def create(self, runlocal=False, **kwargs):
-        """Create a metric."""
+    def getHeaders(self, args):
         headers = self.client.credentials_headers()
-        if runlocal:
-            # temp header, used when running locally.
-            headers['X-Tenant-Id'] = '1'
-        resp, body = self.client.json_request('POST', '/metrics',
-                                              data=kwargs, headers=headers)
+        if args.runlocal:
+            # add temp header, used when running locally.
+            if args.os_tenant_id:
+                headers['X-Tenant-Id'] = args.os_tenant_id
+            else:
+                headers['X-Tenant-Id'] = '1234'
+        return headers
+
+    def create(self, args, **kwargs):
+        """Create a metric."""
+        resp, body = self.client.json_request('POST', self.base_url,
+                                              data=kwargs,
+                                              headers=self.getHeaders(args))
         return body
