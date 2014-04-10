@@ -13,7 +13,7 @@
 # manages the metrics resource
 
 from monclient.openstack.common.apiclient import base
-
+from monclient.openstack.common.py3kcompat import urlutils
 
 class Metrics(base.Resource):
 
@@ -25,7 +25,7 @@ class MetricsManager(base.BaseManager):
     resource_class = Metrics
     base_url = '/metrics'
 
-    def getHeaders(self, args):
+    def get_headers(self, args):
         headers = self.client.credentials_headers()
         if args.runlocal:
             # add temp header, used when running locally.
@@ -35,9 +35,65 @@ class MetricsManager(base.BaseManager):
                 headers['X-Tenant-Id'] = '1234'
         return headers
 
+    def get_dimensions_url_string(self, dimdict):
+        dim_list = list()
+        for k,v in dimdict.items():
+            dim_str = k + ':' + v
+            dim_list.append(dim_str)
+        return ','.join(dim_list)
+
+    def format_measurements(self, measure_list):
+        # takes list of dictionaries to format for output
+        meas_dict_list = list()
+        for mdict in measure_list:
+            meas_temp_list = list()
+            for k,v in sorted(mdict.items()):
+                meas_str = k + ':' + str(v)
+                meas_temp_list.append(meas_str)
+            this_dict_str = '{' + ','.join(meas_temp_list) + '}'
+            meas_dict_list.append(this_dict_str)
+        # returns measurement dict string with newline
+        return ',\n'.join(meas_dict_list)
+
+    def format_dimensions(self, dimdict):
+        # takes a dictionary to format for output
+        dim_list = list()
+        for k,v in dimdict.items():
+            dim_str = k + ':' + v
+            dim_list.append(dim_str)
+        return '{' + ',\n'.join(dim_list) + '}'
+
     def create(self, args, **kwargs):
         """Create a metric."""
         resp, body = self.client.json_request('POST', self.base_url,
                                               data=kwargs,
-                                              headers=self.getHeaders(args))
+                                              headers=self.get_headers(args))
+        return body
+    
+    def list(self, args, **kwargs):
+        """Get a list of metrics."""
+        url_str = self.base_url
+        if 'dimensions' in kwargs:
+            dimstr = self.get_dimensions_url_string(kwargs['dimensions'])
+            kwargs['dimensions'] = dimstr
+        
+        if kwargs:
+            url_str = url_str + '?%s' % urlutils.urlencode(kwargs,True)
+        #print url_str
+        resp, body = self.client.json_request(
+            'GET', url_str, headers=self.get_headers(args))
+        return body
+
+    def list_measurements(self, args, **kwargs):
+        """Get a list of measurements based on metric definition filters."""
+        url_str = self.base_url + '/measurements'
+        if 'dimensions' in kwargs:
+            dimstr = self.get_dimensions_url_string(kwargs['dimensions'])
+            kwargs['dimensions'] = dimstr
+        
+        if kwargs:
+            url_str = url_str + '?%s' % urlutils.urlencode(kwargs,True)
+        #print url_str
+        resp, body = self.client.json_request(
+            'GET', url_str, headers=self.get_headers(args))
         return body

@@ -15,7 +15,7 @@ class AlarmsManager(base.BaseManager):
     resource_class = Alarms
     base_url = '/alarms'
 
-    def getHeaders(self, args):
+    def get_headers(self, args):
         headers = self.client.credentials_headers()
         if args.runlocal:
             # add temp header, used when running locally.
@@ -29,18 +29,18 @@ class AlarmsManager(base.BaseManager):
         """Create an alarm."""
         resp, body = self.client.json_request('POST', self.base_url,
                                               data=kwargs,
-                                              headers=self.getHeaders(args))
+                                              headers=self.get_headers(args))
         return body
 
     def get(self, args, **kwargs):
         """Get the details for a specific alarm."""
         url_str = self.base_url + '/%s' % kwargs['alarm_id']
         resp, body = self.client.json_request('GET', url_str,
-                                              headers=self.getHeaders(args))
+                                              headers=self.get_headers(args))
         return body
 
     def list(self, args):
         """Get a list of alarms."""
         resp, body = self.client.json_request(
-            'GET', self.base_url, headers=self.getHeaders(args))
+            'GET', self.base_url, headers=self.get_headers(args))
         return body

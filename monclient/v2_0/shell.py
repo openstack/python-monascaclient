@@ -21,10 +21,9 @@ import time
 
 @utils.arg('name', metavar='<METRIC_NAME>',
            help='Name of the metric to create.')
-@utils.arg('--dimensions', metavar='<KEY1=VALUE1;KEY2=VALUE2...>',
-           help='key value pairs used to create the metric dimensions. '
-           'This can be specified multiple times, or once with parameters '
-           'separated by a semicolon.',
+@utils.arg('--dimensions', metavar='<KEY1=VALUE1>',
+           help='key value pair used to create a metric dimension. '
+           'This can be specified multiple times.',
            action='append')
 @utils.arg('--time', metavar='<UNIX_TIMESTAMP>',
            default=time.time(), type=int,
@@ -55,6 +54,99 @@ def do_metric_create(mc, args):
         raise
     else:
         print('Successfully created metric')
+
+
+@utils.arg('--name', metavar='<METRIC_NAME>',
+           help='Name of the metric to list.')
+@utils.arg('--dimensions', metavar='<KEY1=VALUE1>',
+           help='key value pair used to specify a dimension. '
+           'This can be specified multiple times.',
+           action='append')
+def do_metric_list(mc, args):
+    '''List metrics for this tenant.'''
+    fields = {}
+    if args.name:
+        fields['name']=args.name
+    if args.dimensions:
+        fields['dimensions'] = utils.format_parameters(args.dimensions)
+    try:
+        metric = mc.metrics.list(args, **fields)
+    except exc.HTTPInternalServerError as e1:
+        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
+    except exc.BadRequest as e2:
+        raise exc.CommandError('BadRequest %s' % e2.code)
+    except exc.Unauthorized as e3:
+        raise exc.CommandError('Unauthorized %s' % e3.code)
+    except exc.HTTPNotFound as e4:
+        raise exc.CommandError('Not Found %s' % e4.code)
+    except Exception:
+        print('Command Failed. Please use the -d option for more details.')
+        raise
+    else:
+        cols = ['name', 'dimensions']
+        formatters = {
+            'name': lambda x: x['name'],
+            'dimensions': lambda x: x['dimensions'],
+        }
+        if isinstance(metric, list):
+            # print the list
+            utils.print_list(metric, cols, formatters=formatters, sortby=1)
+        else:
+            # add the dictionary to a list, so print_list works
+            metric_list = list()
+            metric_list.append(metric)
+            utils.print_list(metric_list, cols, formatters=formatters, sortby=1)
+
+
+@utils.arg('name', metavar='<METRIC_NAME>',
+           help='Name of the metric to list measurements.')
+@utils.arg('--dimensions', metavar='<KEY1=VALUE1>',
+           help='key value pair used to specify a dimension. '
+           'This can be specified multiple times.',
+           action='append')
+@utils.arg('starttime', metavar='<UTC_START_TIME>',
+           help='measurements with timestamp >= UTC start time. input format: 2014-01-01T00:00:00Z.')
+@utils.arg('--endtime', metavar='<UTC_END_TIME>',
+           help='measurements with timestamp <= UTC end time input format: 2014-01-01T00:00:00Z.')
+def do_measurement_list(mc, args):
+    '''List measurements for the specified metric.'''
+    fields = {}
+    fields['name']=args.name
+    if args.dimensions:
+        fields['dimensions'] = utils.format_parameters(args.dimensions)
+    fields['start_time'] = args.starttime
+    if args.endtime:
+        fields['end_time'] = args.endtime
+    try:
+        metric = mc.metrics.list_measurements(args, **fields)
+    except exc.HTTPInternalServerError as e1:
+        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
+    except exc.BadRequest as e2:
+        raise exc.CommandError('BadRequest %s' % e2.code)
+    except exc.Unauthorized as e3:
+        raise exc.CommandError('Unauthorized %s' % e3.code)
+    except exc.HTTPNotFound as e4:
+        raise exc.CommandError('Not Found %s' % e4.code)
+    except Exception:
+        print('Command Failed. Please use the -d option for more details.')
+        raise
+    else:
+        cols = ['name', 'dimensions', 'measurements']
+        formatters = {
+            'name': lambda x: x['name'],
+            'dimensions': lambda x: mc.metrics.format_dimensions(x['dimensions']),
+            #'dimensions': lambda x: x['dimensions'],
+            #'measurements': lambda x: x['measurements'],
+            'measurements': lambda x: mc.metrics.format_measurements(x['measurements']),
+        }
+        if isinstance(metric, list):
+            # print the list
+            utils.print_list(metric, cols, formatters=formatters, sortby=2)
+        else:
+            # add the dictionary to a list, so print_list works
+            metric_list = list()
+            metric_list.append(metric)
+            utils.print_list(metric_list, cols, formatters=formatters, sortby=2)
 
 
 @utils.arg('name', metavar='<NOTIFICATION_NAME>',
