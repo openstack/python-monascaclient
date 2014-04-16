@@ -66,9 +66,12 @@ def do_metric_list(mc, args):
     '''List metrics for this tenant.'''
     fields = {}
     if args.name:
-        fields['name']=args.name
+        fields['name'] = args.name
     if args.dimensions:
         fields['dimensions'] = utils.format_parameters(args.dimensions)
+        if 'name' not in fields:
+            print('--name is required when --dimensions are specified.')
+            return
     try:
         metric = mc.metrics.list(args, **fields)
     except exc.HTTPInternalServerError as e1:
@@ -90,12 +93,16 @@ def do_metric_list(mc, args):
         }
         if isinstance(metric, list):
             # print the list
-            utils.print_list(metric, cols, formatters=formatters, sortby=1)
+            utils.print_list(metric, cols, formatters=formatters, sortby=0)
         else:
             # add the dictionary to a list, so print_list works
             metric_list = list()
             metric_list.append(metric)
-            utils.print_list(metric_list, cols, formatters=formatters, sortby=1)
+            utils.print_list(
+                metric_list,
+                cols,
+                formatters=formatters,
+                sortby=0)
 
 
 @utils.arg('name', metavar='<METRIC_NAME>',
@@ -105,13 +112,13 @@ def do_metric_list(mc, args):
            'This can be specified multiple times.',
            action='append')
 @utils.arg('starttime', metavar='<UTC_START_TIME>',
-           help='measurements with timestamp >= UTC start time. input format: 2014-01-01T00:00:00Z.')
+           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z.')
 @utils.arg('--endtime', metavar='<UTC_END_TIME>',
-           help='measurements with timestamp <= UTC end time input format: 2014-01-01T00:00:00Z.')
+           help='measurements <= UTC time. format: 2014-01-01T00:00:00Z.')
 def do_measurement_list(mc, args):
     '''List measurements for the specified metric.'''
     fields = {}
-    fields['name']=args.name
+    fields['name'] = args.name
     if args.dimensions:
         fields['dimensions'] = utils.format_parameters(args.dimensions)
     fields['start_time'] = args.starttime
@@ -134,10 +141,10 @@ def do_measurement_list(mc, args):
         cols = ['name', 'dimensions', 'measurements']
         formatters = {
             'name': lambda x: x['name'],
-            'dimensions': lambda x: mc.metrics.format_dimensions(x['dimensions']),
+            'dimensions': lambda x: mc.metrics.format_dict(x['dimensions']),
             #'dimensions': lambda x: x['dimensions'],
             #'measurements': lambda x: x['measurements'],
-            'measurements': lambda x: mc.metrics.format_measurements(x['measurements']),
+            'measurements': lambda x: mc.metrics.format_meas(x['measurements']),
         }
         if isinstance(metric, list):
             # print the list
@@ -146,7 +153,11 @@ def do_measurement_list(mc, args):
             # add the dictionary to a list, so print_list works
             metric_list = list()
             metric_list.append(metric)
-            utils.print_list(metric_list, cols, formatters=formatters, sortby=2)
+            utils.print_list(
+                metric_list,
+                cols,
+                formatters=formatters,
+                sortby=2)
 
 
 @utils.arg('name', metavar='<NOTIFICATION_NAME>',
@@ -243,11 +254,32 @@ def do_notification_list(mc, args):
                 notification,
                 cols,
                 formatters=formatters,
-                sortby=1)
+                sortby=0)
         else:
             notif_list = list()
             notif_list.append(notification)
-            utils.print_list(notif_list, cols, formatters=formatters, sortby=1)
+            utils.print_list(notif_list, cols, formatters=formatters, sortby=0)
+
+
+@utils.arg('id', metavar='<NOTIFICATION_ID>',
+           help='The ID of the notification.')
+def do_notification_delete(mc, args):
+    '''Delete notification.'''
+    fields = {}
+    fields['notification_id'] = args.id
+    try:
+        notification = mc.notifications.delete(args, **fields)
+    except exc.HTTPInternalServerError as e1:
+        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
+    except exc.Unauthorized as e3:
+        raise exc.CommandError('Unauthorized %s' % e3.code)
+    except exc.HTTPNotFound as e4:
+        raise exc.CommandError('Not Found %s' % e4.code)
+    except Exception:
+        print('Command Failed. Please use the -d option for more details.')
+        raise
+    else:
+        print('Successfully deleted notification')
 
 
 @utils.arg('name', metavar='<ALARM_NAME>',
@@ -366,3 +398,24 @@ def do_alarm_list(mc, args):
             alarm_list = list()
             alarm_list.append(alarm)
             utils.print_list(alarm_list, cols, formatters=formatters, sortby=1)
+
+
+@utils.arg('id', metavar='<ALARM_ID>',
+           help='The ID of the alarm.')
+def do_alarm_delete(mc, args):
+    '''Delete alarm.'''
+    fields = {}
+    fields['alarm_id'] = args.id
+    try:
+        alarm = mc.alarms.delete(args, **fields)
+    except exc.HTTPInternalServerError as e1:
+        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
+    except exc.Unauthorized as e3:
+        raise exc.CommandError('Unauthorized %s' % e3.code)
+    except exc.HTTPNotFound as e4:
+        raise exc.CommandError('Not Found %s' % e4.code)
+    except Exception:
+        print('Command Failed. Please use the -d option for more details.')
+        raise
+    else:
+        print('Successfully deleted alarm')

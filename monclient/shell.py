@@ -49,7 +49,7 @@ class MonShell(object):
                             action='store_true',
                             help=argparse.SUPPRESS)
 
-        parser.add_argument('--runlocal',
+        parser.add_argument('-l', '--runlocal',
                             action='store_true',
                             help='test with a local mon-api (no keystone)')
 

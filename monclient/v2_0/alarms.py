@@ -44,3 +44,10 @@ class AlarmsManager(base.BaseManager):
         resp, body = self.client.json_request(
             'GET', self.base_url, headers=self.get_headers(args))
         return body
+
+    def delete(self, args, **kwargs):
+        """Delete a specific alarm."""
+        url_str = self.base_url + '/%s' % kwargs['alarm_id']
+        resp, body = self.client.json_request('DELETE', url_str,
+                                              headers=self.get_headers(args))
+        return body
