@@ -41,7 +41,10 @@ class MonShell(object):
             epilog='See "mon help COMMAND" '
                    'for help on a specific command.',
             add_help=False,
-            formatter_class=HelpFormatter,
+            # formatter_class=HelpFormatter,
+            formatter_class=lambda prog: argparse.HelpFormatter(
+                prog,
+                max_help_position=25)
         )
 
         # Global arguments

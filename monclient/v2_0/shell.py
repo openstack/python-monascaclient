@@ -89,7 +89,7 @@ def do_metric_list(mc, args):
         cols = ['name', 'dimensions']
         formatters = {
             'name': lambda x: x['name'],
-            'dimensions': lambda x: x['dimensions'],
+            'dimensions': lambda x: mc.metrics.format_dict(x['dimensions']),
         }
         if isinstance(metric, list):
             # print the list
@@ -223,6 +223,7 @@ def do_notification_show(mc, args):
             'link': utils.link_formatter,
         }
         utils.print_dict(notification, formatters=formatters)
+        #print notification
 
 
 def do_notification_list(mc, args):
@@ -363,7 +364,8 @@ def do_alarm_show(mc, args):
             'description': utils.json_formatter,
             'links': utils.link_formatter,
         }
-        utils.print_dict(alarm, formatters=formatters)
+        #utils.print_dict(alarm, formatters=formatters)
+        print alarm
 
 
 def do_alarm_list(mc, args):
