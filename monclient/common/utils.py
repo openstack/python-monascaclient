@@ -151,7 +151,10 @@ def format_parameters(params):
     # expect multiple invocations of --parameters but fall back
     # to ; delimited if only one --parameters is specified
     if len(params) == 1:
-        params = params[0].split(';')
+        if params[0].find(';') != -1:  # found
+            params = params[0].split(';')
+        else:
+            params = params[0].split(',')
 
     parameters = {}
     for p in params:

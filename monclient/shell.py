@@ -56,6 +56,10 @@ class MonShell(object):
                             action='store_true',
                             help='test with a local mon-api (no keystone)')
 
+        parser.add_argument('-j', '--json',
+                            action='store_true',
+                            help='output raw json response')
+
         parser.add_argument('--version',
                             action='version',
                             version=monclient.__version__,

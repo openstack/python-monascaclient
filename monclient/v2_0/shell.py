@@ -21,9 +21,10 @@ import time
 
 @utils.arg('name', metavar='<METRIC_NAME>',
            help='Name of the metric to create.')
-@utils.arg('--dimensions', metavar='<KEY1=VALUE1>',
+@utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
            help='key value pair used to create a metric dimension. '
-           'This can be specified multiple times.',
+           'This can be specified multiple times, or once with parameters '
+           'separated by a comma.',
            action='append')
 @utils.arg('--time', metavar='<UNIX_TIMESTAMP>',
            default=time.time(), type=int,
@@ -58,9 +59,10 @@ def do_metric_create(mc, args):
 
 @utils.arg('--name', metavar='<METRIC_NAME>',
            help='Name of the metric to list.')
-@utils.arg('--dimensions', metavar='<KEY1=VALUE1>',
-           help='key value pair used to specify a dimension. '
-           'This can be specified multiple times.',
+@utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
+           help='key value pair used to specify a metric dimension. '
+           'This can be specified multiple times, or once with parameters '
+           'separated by a comma.',
            action='append')
 def do_metric_list(mc, args):
     '''List metrics for this tenant.'''
@@ -86,6 +88,9 @@ def do_metric_list(mc, args):
         print('Command Failed. Please use the -d option for more details.')
         raise
     else:
+        if args.json:
+            print(utils.json_formatter(metric))
+            return
         cols = ['name', 'dimensions']
         formatters = {
             'name': lambda x: x['name'],
@@ -107,9 +112,10 @@ def do_metric_list(mc, args):
 
 @utils.arg('name', metavar='<METRIC_NAME>',
            help='Name of the metric to list measurements.')
-@utils.arg('--dimensions', metavar='<KEY1=VALUE1>',
-           help='key value pair used to specify a dimension. '
-           'This can be specified multiple times.',
+@utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
+           help='key value pair used to specify a metric dimension. '
+           'This can be specified multiple times, or once with parameters '
+           'separated by a comma.',
            action='append')
 @utils.arg('starttime', metavar='<UTC_START_TIME>',
            help='measurements >= UTC time. format: 2014-01-01T00:00:00Z.')
@@ -138,6 +144,9 @@ def do_measurement_list(mc, args):
         print('Command Failed. Please use the -d option for more details.')
         raise
     else:
+        if args.json:
+            print(utils.json_formatter(metric))
+            return
         cols = ['name', 'dimensions', 'measurements']
         formatters = {
             'name': lambda x: x['name'],
@@ -213,6 +222,9 @@ def do_notification_show(mc, args):
         print('Command Failed. Please use the -d option for more details.')
         raise
     else:
+        if args.json:
+            print(utils.json_formatter(notification))
+            return
         formatters = {
             'name': utils.json_formatter,
             'id': utils.json_formatter,
@@ -221,7 +233,6 @@ def do_notification_show(mc, args):
             'links': utils.format_dictlist,
         }
         utils.print_dict(notification, formatters=formatters)
-        #print notification
 
 
 def do_notification_list(mc, args):
@@ -240,6 +251,9 @@ def do_notification_list(mc, args):
         print('Command Failed. Please use the -d option for more details.')
         raise
     else:
+        if args.json:
+            print(utils.json_formatter(notification))
+            return
         cols = ['name', 'id', 'type', 'address']
         formatters = {
             'name': lambda x: x['name'],
@@ -267,7 +281,7 @@ def do_notification_delete(mc, args):
     fields = {}
     fields['notification_id'] = args.id
     try:
-        notification = mc.notifications.delete(args, **fields)
+        mc.notifications.delete(args, **fields)
     except exc.HTTPInternalServerError as e1:
         raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
     except exc.Unauthorized as e3:
@@ -349,6 +363,9 @@ def do_alarm_show(mc, args):
         print('Command Failed. Please use the -d option for more details.')
         raise
     else:
+        if args.json:
+            print(utils.json_formatter(alarm))
+            return
         # print out detail of a single alarm
         formatters = {
             'name': utils.json_formatter,
@@ -363,7 +380,6 @@ def do_alarm_show(mc, args):
             'links': utils.format_dictlist,
         }
         utils.print_dict(alarm, formatters=formatters)
-        #print alarm
 
 
 def do_alarm_list(mc, args):
@@ -382,6 +398,9 @@ def do_alarm_list(mc, args):
         print('Command Failed. Please use the -d option for more details.')
         raise
     else:
+        if args.json:
+            print(utils.json_formatter(alarm))
+            return
         cols = ['name', 'id', 'expression', 'state', 'enabled']
         formatters = {
             'name': lambda x: x['name'],
@@ -407,7 +426,7 @@ def do_alarm_delete(mc, args):
     fields = {}
     fields['alarm_id'] = args.id
     try:
-        alarm = mc.alarms.delete(args, **fields)
+        mc.alarms.delete(args, **fields)
     except exc.HTTPInternalServerError as e1:
         raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
     except exc.Unauthorized as e3:
