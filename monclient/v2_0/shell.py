@@ -89,7 +89,7 @@ def do_metric_list(mc, args):
         cols = ['name', 'dimensions']
         formatters = {
             'name': lambda x: x['name'],
-            'dimensions': lambda x: mc.metrics.format_dict(x['dimensions']),
+            'dimensions': lambda x: utils.format_dict(x['dimensions']),
         }
         if isinstance(metric, list):
             # print the list
@@ -141,10 +141,8 @@ def do_measurement_list(mc, args):
         cols = ['name', 'dimensions', 'measurements']
         formatters = {
             'name': lambda x: x['name'],
-            'dimensions': lambda x: mc.metrics.format_dict(x['dimensions']),
-            #'dimensions': lambda x: x['dimensions'],
-            #'measurements': lambda x: x['measurements'],
-            'measurements': lambda x: mc.metrics.format_meas(x['measurements']),
+            'dimensions': lambda x: utils.format_dict(x['dimensions']),
+            'measurements': lambda x: utils.format_dictlist(x['measurements']),
         }
         if isinstance(metric, list):
             # print the list
@@ -220,7 +218,7 @@ def do_notification_show(mc, args):
             'id': utils.json_formatter,
             'type': utils.json_formatter,
             'address': utils.json_formatter,
-            'link': utils.link_formatter,
+            'links': utils.format_dictlist,
         }
         utils.print_dict(notification, formatters=formatters)
         #print notification
@@ -362,10 +360,10 @@ def do_alarm_show(mc, args):
             'ok_actions': utils.json_formatter,
             'undetermined_actions': utils.json_formatter,
             'description': utils.json_formatter,
-            'links': utils.link_formatter,
+            'links': utils.format_dictlist,
         }
-        #utils.print_dict(alarm, formatters=formatters)
-        print alarm
+        utils.print_dict(alarm, formatters=formatters)
+        #print alarm
 
 
 def do_alarm_list(mc, args):

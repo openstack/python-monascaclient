@@ -180,3 +180,26 @@ def format_output(output, format='yaml'):
     except KeyError:
         raise exc.HTTPUnsupported("The format(%s) is unsupported."
                                   % output_format)
+
+
+def format_dictlist(dict_list):
+    # takes list of dictionaries to format for output
+    string_list = list()
+    for mdict in dict_list:
+        kv_list = list()
+        for k, v in sorted(mdict.items()):
+            kv_str = k + ':' + str(v)
+            kv_list.append(kv_str)
+        # a string of comma separated k:v
+        this_dict_str = ','.join(kv_list)
+        string_list.append(this_dict_str)
+    return '\n'.join(string_list)
+
+
+def format_dict(dict):
+    # takes a dictionary to format for output
+    dstring_list = list()
+    for k, v in dict.items():
+        d_str = k + ':' + v
+        dstring_list.append(d_str)
+    return '\n'.join(dstring_list)

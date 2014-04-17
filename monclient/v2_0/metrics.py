@@ -43,27 +43,6 @@ class MetricsManager(base.BaseManager):
             dim_list.append(dim_str)
         return ','.join(dim_list)
 
-    def format_meas(self, measure_list):
-        # takes list of dictionaries to format for output
-        meas_dict_list = list()
-        for mdict in measure_list:
-            meas_temp_list = list()
-            for k, v in sorted(mdict.items()):
-                meas_str = k + ':' + str(v)
-                meas_temp_list.append(meas_str)
-            this_dict_str = '{' + ','.join(meas_temp_list) + '}'
-            meas_dict_list.append(this_dict_str)
-        # returns measurement dict string with newline
-        return ',\n'.join(meas_dict_list)
-
-    def format_dict(self, dimdict):
-        # takes a dictionary to format for output
-        dim_list = list()
-        for k, v in dimdict.items():
-            dim_str = k + ':' + v
-            dim_list.append(dim_str)
-        return '{' + ',\n'.join(dim_list) + '}'
-
     def create(self, args, **kwargs):
         """Create a metric."""
         resp, body = self.client.json_request('POST', self.base_url,
