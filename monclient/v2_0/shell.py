@@ -1,4 +1,4 @@
-# Copyright 2012 OpenStack Foundation
+# Copyright 2014 HP
 # All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -16,6 +16,7 @@
 from monclient.common import utils
 import monclient.exc as exc
 from monclient.openstack.common import jsonutils
+from monclient.openstack.common import timeutils
 import time
 
 
@@ -110,6 +111,34 @@ def do_metric_list(mc, args):
                 sortby=0)
 
 
+def format_measure_id(measurements):
+    # returns newline separated measurements id's for the id column
+    meas_string_list = list()
+    for meas in measurements:
+        meas_string = '{:10d}'.format(meas[0])
+        meas_string_list.append(meas_string)
+    return '\n'.join(meas_string_list)
+
+
+def format_measure_timestamp(measurements):
+    # returns newline separated times for the timestamp column
+    meas_string_list = list()
+    for meas in measurements:
+        #meas_string = '{:10d}'.format(meas[1])
+        meas_string = timeutils.iso8601_from_timestamp(meas[1])
+        meas_string_list.append(meas_string)
+    return '\n'.join(meas_string_list)
+
+
+def format_measure_value(measurements):
+    # reutrns newline separated values for the value column
+    meas_string_list = list()
+    for meas in measurements:
+        meas_string = '{:12.2f}'.format(meas[2])
+        meas_string_list.append(meas_string)
+    return '\n'.join(meas_string_list)
+
+
 @utils.arg('name', metavar='<METRIC_NAME>',
            help='Name of the metric to list measurements.')
 @utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
@@ -147,11 +176,13 @@ def do_measurement_list(mc, args):
         if args.json:
             print(utils.json_formatter(metric))
             return
-        cols = ['name', 'dimensions', 'measurements']
+        cols = ['name', 'dimensions', 'measurement_id', 'timestamp', 'value']
         formatters = {
             'name': lambda x: x['name'],
             'dimensions': lambda x: utils.format_dict(x['dimensions']),
-            'measurements': lambda x: utils.format_dictlist(x['measurements']),
+            'measurement_id': lambda x: format_measure_id(x['measurements']),
+            'timestamp': lambda x: format_measure_timestamp(x['measurements']),
+            'value': lambda x: format_measure_value(x['measurements']),
         }
         if isinstance(metric, list):
             # print the list
@@ -401,13 +432,13 @@ def do_alarm_list(mc, args):
         if args.json:
             print(utils.json_formatter(alarm))
             return
-        cols = ['name', 'id', 'expression', 'state', 'enabled']
+        cols = ['name', 'id', 'expression', 'state', 'actions_enabled']
         formatters = {
             'name': lambda x: x['name'],
             'id': lambda x: x['id'],
             'expression': lambda x: x['expression'],
             'state': lambda x: x['state'],
-            'enabled': lambda x: x['enabled'],
+            'actions_enabled': lambda x: x['actions_enabled'],
         }
         if isinstance(alarm, list):
             # print the list
