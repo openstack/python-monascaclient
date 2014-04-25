@@ -200,8 +200,8 @@ def do_measurement_list(mc, args):
 
 @utils.arg('name', metavar='<NOTIFICATION_NAME>',
            help='Name of the notification to create.')
-@utils.arg('type', metavar='<EMAIL | SMS>',
-           help='The notification type.  Types is one of [EMAIL, SMS].')
+@utils.arg('type', metavar='<TYPE>',
+           help='The notification type.  Type is one of [EMAIL, SMS].')
 @utils.arg('address', metavar='<ADDRESS>',
            help='Depending on the type, a valid EMAIL or SMS Address')
 def do_notification_create(mc, args):
@@ -326,6 +326,36 @@ def do_notification_delete(mc, args):
         print('Successfully deleted notification')
 
 
+@utils.arg('id', metavar='<NOTIFICATION_ID>',
+           help='The ID of the notification.')
+@utils.arg('name', metavar='<NOTIFICATION_NAME>',
+           help='Name of the notification to create.')
+@utils.arg('type', metavar='<TYPE>',
+           help='The notification type.  Type is one of [EMAIL, SMS].')
+@utils.arg('address', metavar='<ADDRESS>',
+           help='Depending on the type, a valid EMAIL or SMS Address')
+def do_notification_update(mc, args):
+    '''Update notification.'''
+    fields = {}
+    fields['notification_id'] = args.id
+    fields['name'] = args.name
+    fields['type'] = args.type
+    fields['address'] = args.address
+    try:
+        notification = mc.notifications.update(args, **fields)
+    except exc.HTTPInternalServerError as e1:
+        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
+    except exc.Unauthorized as e3:
+        raise exc.CommandError('Unauthorized %s' % e3.code)
+    except exc.HTTPNotFound as e4:
+        raise exc.CommandError('Not Found %s' % e4.code)
+    except Exception:
+        print('Command Failed. Please use the -d option for more details.')
+        raise
+    else:
+        print(jsonutils.dumps(notification, indent=2))
+
+
 @utils.arg('name', metavar='<ALARM_NAME>',
            help='Name of the alarm to create.')
 @utils.arg('--description', metavar='<DESCRIPTION>',
@@ -403,7 +433,7 @@ def do_alarm_show(mc, args):
             'id': utils.json_formatter,
             'expression': utils.json_formatter,
             'state': utils.json_formatter,
-            'enabled': utils.json_formatter,
+            'actions_enabled': utils.json_formatter,
             'alarm_actions': utils.json_formatter,
             'ok_actions': utils.json_formatter,
             'undetermined_actions': utils.json_formatter,
@@ -469,3 +499,121 @@ def do_alarm_delete(mc, args):
         raise
     else:
         print('Successfully deleted alarm')
+
+
+@utils.arg('id', metavar='<ALARM_ID>',
+           help='The ID of the alarm.')
+@utils.arg('name', metavar='<ALARM_NAME>',
+           help='Name of the alarm to create.')
+@utils.arg('--description', metavar='<DESCRIPTION>',
+           help='Description of the alarm.')
+@utils.arg('expression', metavar='<EXPRESSION>',
+           help='The alarm expression to evaluate. No spaces.')
+@utils.arg('--alarm-actions', metavar='<NOTIFICATION-ID>',
+           help='The notification method to use when an alarm state is ALARM. '
+           'This param may be specified multiple times.',
+           action='append')
+@utils.arg('--ok-actions', metavar='<NOTIFICATION-ID>',
+           help='The notification method to use when an alarm state is OK. '
+           'This param may be specified multiple times.',
+           action='append')
+@utils.arg('--undetermined-actions', metavar='<NOTIFICATION-ID>',
+           help='The notification method to use when an alarm state is '
+           'UNDETERMINED. This param may be specified multiple times.',
+           action='append')
+@utils.arg('enabled', metavar='<ACTIONS-ENABLED>',
+           help='The actions_enabled boolean is one of [true,false]')
+@utils.arg('state', metavar='<STATE>',
+           help='The alarm state. State is one of [UNDETERMINED,ALARM,OK]')
+def do_alarm_update(mc, args):
+    '''Update the alarm.'''
+    fields = {}
+    fields['alarm_id'] = args.id
+    fields['name'] = args.name
+    if args.description:
+        fields['description'] = args.description
+    fields['expression'] = args.expression
+    if args.alarm_actions:
+        fields['alarm_actions'] = args.alarm_actions
+    if args.ok_actions:
+        fields['ok_actions'] = args.ok_actions
+    if args.undetermined_actions:
+        fields['undetermined_actions'] = args.undetermined_actions
+    fields['actions_enabled'] = args.enabled
+    fields['state'] = args.state
+    try:
+        alarm = mc.alarms.update(args, **fields)
+    except exc.HTTPInternalServerError as e1:
+        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
+    except exc.BadRequest as e2:
+        raise exc.CommandError('BadRequest %s' % e2.code)
+    except exc.Unauthorized as e3:
+        raise exc.CommandError('Unauthorized %s' % e3.code)
+    except exc.HTTPNotFound as e4:
+        raise exc.CommandError('Not Found %s' % e4.code)
+    except Exception:
+        print('Command Failed. Please use the -d option for more details.')
+        raise
+    else:
+        print(jsonutils.dumps(alarm, indent=2))
+
+
+@utils.arg('id', metavar='<ALARM_ID>',
+           help='The ID of the alarm.')
+@utils.arg('--name', metavar='<ALARM_NAME>',
+           help='Name of the alarm to create.')
+@utils.arg('--description', metavar='<DESCRIPTION>',
+           help='Description of the alarm.')
+@utils.arg('--expression', metavar='<EXPRESSION>',
+           help='The alarm expression to evaluate. No spaces.')
+@utils.arg('--alarm-actions', metavar='<NOTIFICATION-ID>',
+           help='The notification method to use when an alarm state is ALARM. '
+           'This param may be specified multiple times.',
+           action='append')
+@utils.arg('--ok-actions', metavar='<NOTIFICATION-ID>',
+           help='The notification method to use when an alarm state is OK. '
+           'This param may be specified multiple times.',
+           action='append')
+@utils.arg('--undetermined-actions', metavar='<NOTIFICATION-ID>',
+           help='The notification method to use when an alarm state is '
+           'UNDETERMINED. This param may be specified multiple times.',
+           action='append')
+@utils.arg('--enabled', metavar='<ACTIONS-ENABLED>',
+           help='The actions_enabled boolean is one of [true,false]')
+@utils.arg('--state', metavar='<STATE>',
+           help='The alarm state. State is one of [UNDETERMINED,ALARM,OK]')
+def do_alarm_patch(mc, args):
+    '''Patch the alarm.'''
+    fields = {}
+    fields['alarm_id'] = args.id
+    if args.name:
+        fields['name'] = args.name
+    if args.description:
+        fields['description'] = args.description
+    if args.expression:
+        fields['expression'] = args.expression
+    if args.alarm_actions:
+        fields['alarm_actions'] = args.alarm_actions
+    if args.ok_actions:
+        fields['ok_actions'] = args.ok_actions
+    if args.undetermined_actions:
+        fields['undetermined_actions'] = args.undetermined_actions
+    if args.enabled:
+        fields['actions_enabled'] = args.enabled
+    if args.state:
+        fields['state'] = args.state
+    try:
+        alarm = mc.alarms.patch(args, **fields)
+    except exc.HTTPInternalServerError as e1:
+        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
+    except exc.BadRequest as e2:
+        raise exc.CommandError('BadRequest %s' % e2.code)
+    except exc.Unauthorized as e3:
+        raise exc.CommandError('Unauthorized %s' % e3.code)
+    except exc.HTTPNotFound as e4:
+        raise exc.CommandError('Not Found %s' % e4.code)
+    except Exception:
+        print('Command Failed. Please use the -d option for more details.')
+        raise
+    else:
+        print(jsonutils.dumps(alarm, indent=2))

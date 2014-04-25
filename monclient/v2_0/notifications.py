@@ -51,3 +51,13 @@ class NotificationsManager(base.BaseManager):
         resp, body = self.client.json_request(
             'DELETE', url_str, headers=self.get_headers(args))
         return body
+
+    def update(self, args, **kwargs):
+        """Update a notification."""
+        url_str = self.base_url + '/%s' % kwargs['notification_id']
+        del kwargs['notification_id']
+        resp, body = self.client.json_request(
+            'PUT', url_str,
+            data=kwargs,
+            headers=self.get_headers(args))
+        return body

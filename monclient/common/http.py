@@ -1,4 +1,4 @@
-# Copyright 2012 OpenStack Foundation
+# Copyright HP 2014
 # All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -214,7 +214,11 @@ class HTTPClient(object):
 
     def json_request(self, method, url, **kwargs):
         kwargs.setdefault('headers', {})
-        kwargs['headers'].setdefault('Content-Type', 'application/json')
+        if method == "PATCH":
+            kwargs['headers'].setdefault('Content-Type',
+                                         'application/json-patch+json')
+        else:
+            kwargs['headers'].setdefault('Content-Type', 'application/json')
         kwargs['headers'].setdefault('Accept', 'application/json')
 
         if 'data' in kwargs:

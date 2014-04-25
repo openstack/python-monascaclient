@@ -51,3 +51,21 @@ class AlarmsManager(base.BaseManager):
         resp, body = self.client.json_request('DELETE', url_str,
                                               headers=self.get_headers(args))
         return body
+
+    def update(self, args, **kwargs):
+        """Update a specific alarm."""
+        url_str = self.base_url + '/%s' % kwargs['alarm_id']
+        del kwargs['alarm_id']
+        resp, body = self.client.json_request('PUT', url_str,
+                                              data=kwargs,
+                                              headers=self.get_headers(args))
+        return body
+
+    def patch(self, args, **kwargs):
+        """Patch a specific alarm."""
+        url_str = self.base_url + '/%s' % kwargs['alarm_id']
+        del kwargs['alarm_id']
+        resp, body = self.client.json_request('PATCH', url_str,
+                                              data=kwargs,
+                                              headers=self.get_headers(args))
+        return body
