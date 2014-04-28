@@ -16,7 +16,6 @@
 from monclient.common import utils
 import monclient.exc as exc
 from monclient.openstack.common import jsonutils
-from monclient.openstack.common import timeutils
 import time
 
 
@@ -124,9 +123,7 @@ def format_measure_timestamp(measurements):
     # returns newline separated times for the timestamp column
     meas_string_list = list()
     for meas in measurements:
-        #meas_string = '{:10d}'.format(meas[1])
-        meas_string = timeutils.iso8601_from_timestamp(meas[1])
-        meas_string_list.append(meas_string)
+        meas_string_list.append(str(meas[1]))
     return '\n'.join(meas_string_list)
 
 
@@ -617,3 +614,46 @@ def do_alarm_patch(mc, args):
         raise
     else:
         print(jsonutils.dumps(alarm, indent=2))
+
+
+@utils.arg('id', metavar='<ALARM_ID>',
+           help='The ID of the alarm.')
+def do_alarm_history(mc, args):
+    '''List alarm state history.'''
+    fields = {}
+    fields['alarm_id'] = args.id
+    try:
+        alarm = mc.alarms.history(args, **fields)
+    except exc.HTTPInternalServerError as e1:
+        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
+    except exc.BadRequest as e2:
+        raise exc.CommandError('BadRequest %s' % e2.code)
+    except exc.Unauthorized as e3:
+        raise exc.CommandError('Unauthorized %s' % e3.code)
+    except exc.HTTPNotFound as e4:
+        raise exc.CommandError('Not Found %s' % e4.code)
+    except Exception:
+        print('Command Failed. Please use the -d option for more details.')
+        raise
+    else:
+        if args.json:
+            print(utils.json_formatter(alarm))
+            return
+        cols = ['alarm_id', 'new_state', 'old_state', 'timestamp', 'reason',
+                'reason_data']
+        formatters = {
+            'alarm_id': lambda x: x['alarm_id'],
+            'old_state': lambda x: x['old_state'],
+            'new_state': lambda x: x['new_state'],
+            'timestamp': lambda x: x['timestamp'],
+            'reason': lambda x: x['reason'],
+            'reason_data': lambda x: x['reason_data'],
+        }
+        if isinstance(alarm, list):
+            # print the list
+            utils.print_list(alarm, cols, formatters=formatters, sortby=1)
+        else:
+            # add the dictionary to a list, so print_list works
+            alarm_list = list()
+            alarm_list.append(alarm)
+            utils.print_list(alarm_list, cols, formatters=formatters, sortby=1)

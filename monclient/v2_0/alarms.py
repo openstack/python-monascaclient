@@ -69,3 +69,11 @@ class AlarmsManager(base.BaseManager):
                                               data=kwargs,
                                               headers=self.get_headers(args))
         return body
+
+    def history(self, args, **kwargs):
+        """History of a specific alarm."""
+        url_str = self.base_url + '/%s/state-history' % kwargs['alarm_id']
+        del kwargs['alarm_id']
+        resp, body = self.client.json_request('GET', url_str,
+                                              headers=self.get_headers(args))
+        return body
