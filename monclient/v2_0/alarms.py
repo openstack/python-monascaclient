@@ -2,6 +2,7 @@
 Created on Mar 31, 2014
 
 '''
+from monclient.common import mon_manager
 from monclient.openstack.common.apiclient import base
 
 
@@ -11,69 +12,66 @@ class Alarms(base.Resource):
         return "<Alarms %s>" % self._info
 
 
-class AlarmsManager(base.BaseManager):
+class AlarmsManager(mon_manager.MonManager):
     resource_class = Alarms
     base_url = '/alarms'
 
-    def get_headers(self, args):
-        headers = self.client.credentials_headers()
-        if args.runlocal:
-            # add temp header, used when running locally.
-            if args.os_tenant_id:
-                headers['X-Tenant-Id'] = args.os_tenant_id
-            else:
-                headers['X-Tenant-Id'] = '1234'
-        return headers
-
-    def create(self, args, **kwargs):
+    def create(self, **kwargs):
         """Create an alarm."""
+        newheaders = self.get_headers()
         resp, body = self.client.json_request('POST', self.base_url,
                                               data=kwargs,
-                                              headers=self.get_headers(args))
+                                              headers=newheaders)
         return body
 
-    def get(self, args, **kwargs):
+    def get(self, **kwargs):
         """Get the details for a specific alarm."""
+        newheaders = self.get_headers()
         url_str = self.base_url + '/%s' % kwargs['alarm_id']
         resp, body = self.client.json_request('GET', url_str,
-                                              headers=self.get_headers(args))
+                                              headers=newheaders)
         return body
 
-    def list(self, args):
+    def list(self):
         """Get a list of alarms."""
+        newheaders = self.get_headers()
         resp, body = self.client.json_request(
-            'GET', self.base_url, headers=self.get_headers(args))
+            'GET', self.base_url, headers=newheaders)
         return body
 
-    def delete(self, args, **kwargs):
+    def delete(self, **kwargs):
         """Delete a specific alarm."""
+        newheaders = self.get_headers()
         url_str = self.base_url + '/%s' % kwargs['alarm_id']
         resp, body = self.client.json_request('DELETE', url_str,
-                                              headers=self.get_headers(args))
-        return body
+                                              headers=newheaders)
+        return resp
 
-    def update(self, args, **kwargs):
+    def update(self, **kwargs):
         """Update a specific alarm."""
+        newheaders = self.get_headers()
         url_str = self.base_url + '/%s' % kwargs['alarm_id']
         del kwargs['alarm_id']
         resp, body = self.client.json_request('PUT', url_str,
                                               data=kwargs,
-                                              headers=self.get_headers(args))
+                                              headers=newheaders)
         return body
 
-    def patch(self, args, **kwargs):
+    def patch(self, **kwargs):
         """Patch a specific alarm."""
+        newheaders = self.get_headers()
         url_str = self.base_url + '/%s' % kwargs['alarm_id']
         del kwargs['alarm_id']
         resp, body = self.client.json_request('PATCH', url_str,
                                               data=kwargs,
-                                              headers=self.get_headers(args))
+                                              headers=newheaders)
         return body
 
-    def history(self, args, **kwargs):
+    def history(self, **kwargs):
         """History of a specific alarm."""
+        newheaders = self.get_headers()
         url_str = self.base_url + '/%s/state-history' % kwargs['alarm_id']
         del kwargs['alarm_id']
         resp, body = self.client.json_request('GET', url_str,
-                                              headers=self.get_headers(args))
+                                              headers=newheaders)
         return body

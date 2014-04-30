@@ -30,7 +30,7 @@ import time
            default=time.time(), type=int,
            help='Metric timestamp. Default: current timestamp.')
 @utils.arg('value', metavar='<METRIC_VALUE>',
-           default=time.time(), type=float,
+           type=float,
            help='Metric value.')
 def do_metric_create(mc, args):
     '''Create metric.'''
@@ -41,7 +41,7 @@ def do_metric_create(mc, args):
     fields['timestamp'] = args.time
     fields['value'] = args.value
     try:
-        mc.metrics.create(args, **fields)
+        mc.metrics.create(**fields)
     except exc.HTTPInternalServerError as e1:
         raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
     except exc.BadRequest as e2:
@@ -75,7 +75,7 @@ def do_metric_list(mc, args):
             print('--name is required when --dimensions are specified.')
             return
     try:
-        metric = mc.metrics.list(args, **fields)
+        metric = mc.metrics.list(**fields)
     except exc.HTTPInternalServerError as e1:
         raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
     except exc.BadRequest as e2:
@@ -157,7 +157,7 @@ def do_measurement_list(mc, args):
     if args.endtime:
         fields['end_time'] = args.endtime
     try:
-        metric = mc.metrics.list_measurements(args, **fields)
+        metric = mc.metrics.list_measurements(**fields)
     except exc.HTTPInternalServerError as e1:
         raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
     except exc.BadRequest as e2:
@@ -214,7 +214,7 @@ def do_notification_create(mc, args):
     fields['type'] = args.type
     fields['address'] = args.address
     try:
-        notification = mc.notifications.create(args, **fields)
+        notification = mc.notifications.create(**fields)
     except exc.HTTPInternalServerError as e1:
         raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
     except exc.BadRequest as e2:
@@ -237,7 +237,7 @@ def do_notification_show(mc, args):
     fields = {}
     fields['notification_id'] = args.id
     try:
-        notification = mc.notifications.get(args, **fields)
+        notification = mc.notifications.get(**fields)
     except exc.HTTPInternalServerError as e1:
         raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
     except exc.BadRequest as e2:
@@ -266,7 +266,7 @@ def do_notification_show(mc, args):
 def do_notification_list(mc, args):
     '''List notifications for this tenant.'''
     try:
-        notification = mc.notifications.list(args)
+        notification = mc.notifications.list()
     except exc.HTTPInternalServerError as e1:
         raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
     except exc.BadRequest as e2:
@@ -309,7 +309,7 @@ def do_notification_delete(mc, args):
     fields = {}
     fields['notification_id'] = args.id
     try:
-        mc.notifications.delete(args, **fields)
+        mc.notifications.delete(**fields)
     except exc.HTTPInternalServerError as e1:
         raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
     except exc.Unauthorized as e3:
@@ -339,7 +339,7 @@ def do_notification_update(mc, args):
     fields['type'] = args.type
     fields['address'] = args.address
     try:
-        notification = mc.notifications.update(args, **fields)
+        notification = mc.notifications.update(**fields)
     except exc.HTTPInternalServerError as e1:
         raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
     except exc.Unauthorized as e3:
@@ -385,7 +385,7 @@ def do_alarm_create(mc, args):
     if args.undetermined_actions:
         fields['undetermined_actions'] = args.undetermined_actions
     try:
-        alarm = mc.alarms.create(args, **fields)
+        alarm = mc.alarms.create(**fields)
     except exc.HTTPInternalServerError as e1:
         raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
     except exc.BadRequest as e2:
@@ -408,7 +408,7 @@ def do_alarm_show(mc, args):
     fields = {}
     fields['alarm_id'] = args.id
     try:
-        alarm = mc.alarms.get(args, **fields)
+        alarm = mc.alarms.get(**fields)
     except exc.HTTPInternalServerError as e1:
         raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
     except exc.BadRequest as e2:
@@ -443,7 +443,7 @@ def do_alarm_show(mc, args):
 def do_alarm_list(mc, args):
     '''List alarms for this tenant.'''
     try:
-        alarm = mc.alarms.list(args)
+        alarm = mc.alarms.list()
     except exc.HTTPInternalServerError as e1:
         raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
     except exc.BadRequest as e2:
@@ -484,7 +484,7 @@ def do_alarm_delete(mc, args):
     fields = {}
     fields['alarm_id'] = args.id
     try:
-        mc.alarms.delete(args, **fields)
+        mc.alarms.delete(**fields)
     except exc.HTTPInternalServerError as e1:
         raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
     except exc.Unauthorized as e3:
@@ -539,7 +539,7 @@ def do_alarm_update(mc, args):
     fields['actions_enabled'] = args.enabled
     fields['state'] = args.state
     try:
-        alarm = mc.alarms.update(args, **fields)
+        alarm = mc.alarms.update(**fields)
     except exc.HTTPInternalServerError as e1:
         raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
     except exc.BadRequest as e2:
@@ -600,7 +600,7 @@ def do_alarm_patch(mc, args):
     if args.state:
         fields['state'] = args.state
     try:
-        alarm = mc.alarms.patch(args, **fields)
+        alarm = mc.alarms.patch(**fields)
     except exc.HTTPInternalServerError as e1:
         raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
     except exc.BadRequest as e2:
@@ -623,7 +623,7 @@ def do_alarm_history(mc, args):
     fields = {}
     fields['alarm_id'] = args.id
     try:
-        alarm = mc.alarms.history(args, **fields)
+        alarm = mc.alarms.history(**fields)
     except exc.HTTPInternalServerError as e1:
         raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
     except exc.BadRequest as e2:
