@@ -10,15 +10,7 @@ api_version = '2_0'
 # init kwargs.  Refer to monclient.shell.py to see possible args when
 # using keystone, they differ slightly.
 kwargs = {
-    'username': '',
-    'password': '',
-    'token': '12345678',
-    'tenant_id': '87247213431361',
-    'tenant_name': '',
-    'auth_url': '',
-    'service_type': '',
-    'endpoint_type': '',
-    'insecure': False
+    'token': '12345678'
 }
 
 # construct the mon client
