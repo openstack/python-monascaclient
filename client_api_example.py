@@ -1,17 +1,18 @@
 from monclient import client
+import monclient.exc as exc
 import time
 
-# init endpoint - use either keystone to get it, or user input endpoint
-# reference monclient.shell.py for how to use keystone.
+# In order to use the python api directly, you must first obtain an
+# auth token and identify which endpoint you wish to speak to.
 endpoint = 'http://192.168.10.4:8080/v2.0'
 
+# The api version of mon-api
 api_version = '2_0'
 
-# init kwargs.  Refer to monclient.shell.py to see possible args when
-# using keystone, they differ slightly.
-kwargs = {
-    'token': '12345678'
-}
+# There are other kwarg options (ca files) used for http request.
+# Refer to monclient.shell.py for other kwargs supported.
+kwargs = {}
+kwargs['token'] = '12345678'
 
 # construct the mon client
 mon_client = client.Client(api_version, endpoint, **kwargs)
@@ -26,10 +27,13 @@ fields['name'] = 'cindy1'
 fields['dimensions'] = dimensions
 fields['timestamp'] = time.time()
 fields['value'] = 222.333
-resp = mon_client.metrics.create(**fields)
-# throws an exception if it fails
-print(resp)
-print('Successfully created metric')
+try:
+    resp = mon_client.metrics.create(**fields)
+except exc.HTTPException as he:
+    print('HTTPException code=%s message=%s' % (he.code, he.message))
+else:
+    print(resp)
+    print('Successfully created metric')
 
 
 # metric-list
@@ -40,6 +44,9 @@ if name:
     fields['name'] = name
 if dimensions:
     fields['dimensions'] = dimensions
-body = mon_client.metrics.list(**fields)
-# throws an exception if it fails
-print(body)
+try:
+    body = mon_client.metrics.list(**fields)
+except exc.HTTPException as he:
+    print('HTTPException code=%s message=%s' % (he.code, he.message))
+else:
+    print(body)

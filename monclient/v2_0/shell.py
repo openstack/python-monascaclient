@@ -42,17 +42,10 @@ def do_metric_create(mc, args):
     fields['value'] = args.value
     try:
         mc.metrics.create(**fields)
-    except exc.HTTPInternalServerError as e1:
-        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
-    except exc.BadRequest as e2:
-        raise exc.CommandError('BadRequest %s' % e2.code)
-    except exc.Unauthorized as e3:
-        raise exc.CommandError('Unauthorized %s' % e3.code)
-    except exc.HTTPUnProcessable as e4:
-        raise exc.CommandError('UnprocessableEntity %s' % e4.code)
-    except Exception:
-        print('Command Failed. Please use the -d option for more details.')
-        raise
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
     else:
         print('Successfully created metric')
 
@@ -76,17 +69,10 @@ def do_metric_list(mc, args):
             return
     try:
         metric = mc.metrics.list(**fields)
-    except exc.HTTPInternalServerError as e1:
-        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
-    except exc.BadRequest as e2:
-        raise exc.CommandError('BadRequest %s' % e2.code)
-    except exc.Unauthorized as e3:
-        raise exc.CommandError('Unauthorized %s' % e3.code)
-    except exc.HTTPNotFound as e4:
-        raise exc.CommandError('Not Found %s' % e4.code)
-    except Exception:
-        print('Command Failed. Please use the -d option for more details.')
-        raise
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
     else:
         if args.json:
             print(utils.json_formatter(metric))
@@ -158,17 +144,10 @@ def do_measurement_list(mc, args):
         fields['end_time'] = args.endtime
     try:
         metric = mc.metrics.list_measurements(**fields)
-    except exc.HTTPInternalServerError as e1:
-        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
-    except exc.BadRequest as e2:
-        raise exc.CommandError('BadRequest %s' % e2.code)
-    except exc.Unauthorized as e3:
-        raise exc.CommandError('Unauthorized %s' % e3.code)
-    except exc.HTTPNotFound as e4:
-        raise exc.CommandError('Not Found %s' % e4.code)
-    except Exception:
-        print('Command Failed. Please use the -d option for more details.')
-        raise
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
     else:
         if args.json:
             print(utils.json_formatter(metric))
@@ -215,17 +194,10 @@ def do_notification_create(mc, args):
     fields['address'] = args.address
     try:
         notification = mc.notifications.create(**fields)
-    except exc.HTTPInternalServerError as e1:
-        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
-    except exc.BadRequest as e2:
-        raise exc.CommandError('BadRequest %s' % e2.code)
-    except exc.Unauthorized as e3:
-        raise exc.CommandError('Unauthorized %s' % e3.code)
-    except exc.HTTPConflict as e4:
-        raise exc.CommandError('Conflict %s' % e4.code)
-    except Exception:
-        print('Command Failed. Please use the -d option for more details.')
-        raise
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
     else:
         print(jsonutils.dumps(notification, indent=2))
 
@@ -238,17 +210,10 @@ def do_notification_show(mc, args):
     fields['notification_id'] = args.id
     try:
         notification = mc.notifications.get(**fields)
-    except exc.HTTPInternalServerError as e1:
-        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
-    except exc.BadRequest as e2:
-        raise exc.CommandError('BadRequest %s' % e2.code)
-    except exc.Unauthorized as e3:
-        raise exc.CommandError('Unauthorized %s' % e3.code)
-    except exc.HTTPNotFound as e4:
-        raise exc.CommandError('Not Found %s' % e4.code)
-    except Exception:
-        print('Command Failed. Please use the -d option for more details.')
-        raise
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
     else:
         if args.json:
             print(utils.json_formatter(notification))
@@ -267,17 +232,10 @@ def do_notification_list(mc, args):
     '''List notifications for this tenant.'''
     try:
         notification = mc.notifications.list()
-    except exc.HTTPInternalServerError as e1:
-        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
-    except exc.BadRequest as e2:
-        raise exc.CommandError('BadRequest %s' % e2.code)
-    except exc.Unauthorized as e3:
-        raise exc.CommandError('Unauthorized %s' % e3.code)
-    except exc.HTTPNotFound as e4:
-        raise exc.CommandError('Not Found %s' % e4.code)
-    except Exception:
-        print('Command Failed. Please use the -d option for more details.')
-        raise
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
     else:
         if args.json:
             print(utils.json_formatter(notification))
@@ -310,15 +268,10 @@ def do_notification_delete(mc, args):
     fields['notification_id'] = args.id
     try:
         mc.notifications.delete(**fields)
-    except exc.HTTPInternalServerError as e1:
-        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
-    except exc.Unauthorized as e3:
-        raise exc.CommandError('Unauthorized %s' % e3.code)
-    except exc.HTTPNotFound as e4:
-        raise exc.CommandError('Not Found %s' % e4.code)
-    except Exception:
-        print('Command Failed. Please use the -d option for more details.')
-        raise
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
     else:
         print('Successfully deleted notification')
 
@@ -340,15 +293,10 @@ def do_notification_update(mc, args):
     fields['address'] = args.address
     try:
         notification = mc.notifications.update(**fields)
-    except exc.HTTPInternalServerError as e1:
-        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
-    except exc.Unauthorized as e3:
-        raise exc.CommandError('Unauthorized %s' % e3.code)
-    except exc.HTTPNotFound as e4:
-        raise exc.CommandError('Not Found %s' % e4.code)
-    except Exception:
-        print('Command Failed. Please use the -d option for more details.')
-        raise
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
     else:
         print(jsonutils.dumps(notification, indent=2))
 
@@ -386,17 +334,10 @@ def do_alarm_create(mc, args):
         fields['undetermined_actions'] = args.undetermined_actions
     try:
         alarm = mc.alarms.create(**fields)
-    except exc.HTTPInternalServerError as e1:
-        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
-    except exc.BadRequest as e2:
-        raise exc.CommandError('BadRequest %s' % e2.code)
-    except exc.Unauthorized as e3:
-        raise exc.CommandError('Unauthorized %s' % e3.code)
-    except exc.HTTPConflict as e4:
-        raise exc.CommandError('Conflict %s' % e4.code)
-    except Exception:
-        print('Command Failed. Please use the -d option for more details.')
-        raise
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
     else:
         print(jsonutils.dumps(alarm, indent=2))
 
@@ -409,17 +350,10 @@ def do_alarm_show(mc, args):
     fields['alarm_id'] = args.id
     try:
         alarm = mc.alarms.get(**fields)
-    except exc.HTTPInternalServerError as e1:
-        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
-    except exc.BadRequest as e2:
-        raise exc.CommandError('BadRequest %s' % e2.code)
-    except exc.Unauthorized as e3:
-        raise exc.CommandError('Unauthorized %s' % e3.code)
-    except exc.HTTPNotFound as e4:
-        raise exc.CommandError('Not Found %s' % e4.code)
-    except Exception:
-        print('Command Failed. Please use the -d option for more details.')
-        raise
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
     else:
         if args.json:
             print(utils.json_formatter(alarm))
@@ -444,17 +378,10 @@ def do_alarm_list(mc, args):
     '''List alarms for this tenant.'''
     try:
         alarm = mc.alarms.list()
-    except exc.HTTPInternalServerError as e1:
-        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
-    except exc.BadRequest as e2:
-        raise exc.CommandError('BadRequest %s' % e2.code)
-    except exc.Unauthorized as e3:
-        raise exc.CommandError('Unauthorized %s' % e3.code)
-    except exc.HTTPNotFound as e4:
-        raise exc.CommandError('Not Found %s' % e4.code)
-    except Exception:
-        print('Command Failed. Please use the -d option for more details.')
-        raise
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
     else:
         if args.json:
             print(utils.json_formatter(alarm))
@@ -485,15 +412,10 @@ def do_alarm_delete(mc, args):
     fields['alarm_id'] = args.id
     try:
         mc.alarms.delete(**fields)
-    except exc.HTTPInternalServerError as e1:
-        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
-    except exc.Unauthorized as e3:
-        raise exc.CommandError('Unauthorized %s' % e3.code)
-    except exc.HTTPNotFound as e4:
-        raise exc.CommandError('Not Found %s' % e4.code)
-    except Exception:
-        print('Command Failed. Please use the -d option for more details.')
-        raise
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
     else:
         print('Successfully deleted alarm')
 
@@ -540,17 +462,10 @@ def do_alarm_update(mc, args):
     fields['state'] = args.state
     try:
         alarm = mc.alarms.update(**fields)
-    except exc.HTTPInternalServerError as e1:
-        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
-    except exc.BadRequest as e2:
-        raise exc.CommandError('BadRequest %s' % e2.code)
-    except exc.Unauthorized as e3:
-        raise exc.CommandError('Unauthorized %s' % e3.code)
-    except exc.HTTPNotFound as e4:
-        raise exc.CommandError('Not Found %s' % e4.code)
-    except Exception:
-        print('Command Failed. Please use the -d option for more details.')
-        raise
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
     else:
         print(jsonutils.dumps(alarm, indent=2))
 
@@ -601,17 +516,10 @@ def do_alarm_patch(mc, args):
         fields['state'] = args.state
     try:
         alarm = mc.alarms.patch(**fields)
-    except exc.HTTPInternalServerError as e1:
-        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
-    except exc.BadRequest as e2:
-        raise exc.CommandError('BadRequest %s' % e2.code)
-    except exc.Unauthorized as e3:
-        raise exc.CommandError('Unauthorized %s' % e3.code)
-    except exc.HTTPNotFound as e4:
-        raise exc.CommandError('Not Found %s' % e4.code)
-    except Exception:
-        print('Command Failed. Please use the -d option for more details.')
-        raise
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
     else:
         print(jsonutils.dumps(alarm, indent=2))
 
@@ -624,17 +532,10 @@ def do_alarm_history(mc, args):
     fields['alarm_id'] = args.id
     try:
         alarm = mc.alarms.history(**fields)
-    except exc.HTTPInternalServerError as e1:
-        raise exc.CommandError('HTTPInternalServerError %s' % e1.code)
-    except exc.BadRequest as e2:
-        raise exc.CommandError('BadRequest %s' % e2.code)
-    except exc.Unauthorized as e3:
-        raise exc.CommandError('Unauthorized %s' % e3.code)
-    except exc.HTTPNotFound as e4:
-        raise exc.CommandError('Not Found %s' % e4.code)
-    except Exception:
-        print('Command Failed. Please use the -d option for more details.')
-        raise
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
     else:
         if args.json:
             print(utils.json_formatter(alarm))
