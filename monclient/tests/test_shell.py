@@ -162,7 +162,7 @@ class ShellTestMonCommands(ShellBase):
 
     def test_bad_metrics_create_subcommand(self):
         argstrings = [
-            'metric-create cindy',
+            'metric-create metric1',
             'metric-create 123',
             'metric-create',
         ]
@@ -182,7 +182,7 @@ class ShellTestMonCommands(ShellBase):
             'POST',
             '/metrics',
             data={'timestamp': 1395691090,
-                  'name': 'cindy',
+                  'name': 'metric1',
                   'value': 123.0},
             headers={'X-Auth-Key': 'password',
                      'X-Auth-User': 'username'}).AndReturn((resp,
@@ -191,7 +191,7 @@ class ShellTestMonCommands(ShellBase):
         self.m.ReplayAll()
 
         argstrings = [
-            'metric-create cindy 123 --time 1395691090',
+            'metric-create metric1 123 --time 1395691090',
         ]
         for argstr in argstrings:
             retvalue = self.shell(argstr)
@@ -199,7 +199,7 @@ class ShellTestMonCommands(ShellBase):
 
     def test_bad_notifications_create_missing_args_subcommand(self):
         argstrings = [
-            'notification-create email1 cindy.o-neill@hp.com',
+            'notification-create email1 metric1@hp.com',
         ]
         _shell = monclient.shell.MonShell()
         for argstr in argstrings:
@@ -208,7 +208,7 @@ class ShellTestMonCommands(ShellBase):
     def test_bad_notifications_create_type_subcommand(self):
         self._script_keystone_client()
         argstrings = [
-            'notification-create email1 DOG cindy.o-neill@hp.com',
+            'notification-create email1 DOG metric1@hp.com',
         ]
         self.m.ReplayAll()
         for argstr in argstrings:

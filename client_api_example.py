@@ -23,7 +23,7 @@ mon_client = client.Client(api_version, endpoint, **kwargs)
 # post a metric
 dimensions = {'instance_id': '12345', 'service': 'hello'}
 fields = {}
-fields['name'] = 'cindy1'
+fields['name'] = 'metric1'
 fields['dimensions'] = dimensions
 fields['timestamp'] = time.time()
 fields['value'] = 222.333
@@ -37,7 +37,7 @@ else:
 
 
 # metric-list
-name = 'cindy1'
+name = 'metric1'
 dimensions = None
 fields = {}
 if name:
