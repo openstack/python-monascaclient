@@ -374,10 +374,18 @@ def do_alarm_show(mc, args):
         utils.print_dict(alarm, formatters=formatters)
 
 
+@utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
+           help='key value pair used to specify a metric dimension. '
+           'This can be specified multiple times, or once with parameters '
+           'separated by a comma.',
+           action='append')
 def do_alarm_list(mc, args):
     '''List alarms for this tenant.'''
+    fields = {}
+    if args.dimensions:
+        fields['dimensions'] = utils.format_parameters(args.dimensions)
     try:
-        alarm = mc.alarms.list()
+        alarm = mc.alarms.list(**fields)
     except exc.HTTPException as he:
         raise exc.CommandError(
             'HTTPException code=%s message=%s' %

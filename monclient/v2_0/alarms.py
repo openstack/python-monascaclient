@@ -15,6 +15,7 @@
 
 from monclient.common import mon_manager
 from monclient.openstack.common.apiclient import base
+from monclient.openstack.common.py3kcompat import urlutils
 
 
 class Alarms(base.Resource):
@@ -43,11 +44,19 @@ class AlarmsManager(mon_manager.MonManager):
                                               headers=newheaders)
         return body
 
-    def list(self):
+    def list(self, **kwargs):
         """Get a list of alarms."""
+        url_str = self.base_url
         newheaders = self.get_headers()
+        if 'dimensions' in kwargs:
+            dimstr = self.get_dimensions_url_string(kwargs['dimensions'])
+            kwargs['dimensions'] = dimstr
+
+        if kwargs:
+            url_str = url_str + '?%s' % urlutils.urlencode(kwargs, True)
+        # print url_str
         resp, body = self.client.json_request(
-            'GET', self.base_url, headers=newheaders)
+            'GET', url_str, headers=newheaders)
         return body
 
     def delete(self, **kwargs):

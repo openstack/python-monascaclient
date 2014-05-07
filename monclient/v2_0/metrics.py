@@ -28,13 +28,6 @@ class MetricsManager(mon_manager.MonManager):
     resource_class = Metrics
     base_url = '/metrics'
 
-    def get_dimensions_url_string(self, dimdict):
-        dim_list = list()
-        for k, v in dimdict.items():
-            dim_str = k + ':' + v
-            dim_list.append(dim_str)
-        return ','.join(dim_list)
-
     def create(self, **kwargs):
         """Create a metric."""
         newheaders = self.get_headers()
