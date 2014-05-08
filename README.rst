@@ -255,10 +255,10 @@ identify the monitoring api endpoint.
 The api_version matches the version of the Monitoring API.  Currently it is 'v2_0'.
 
 When calling the commands, refer to monclient.v2_0.shell.py 'do_<command>'
-to see the required and optional fields for each command. 
+to see the required and optional fields for each command.
 
-.. code-block:: python
-  
+Refer to this example in python-monclient/client_api_example.py::
+    
   from monclient import client
   import monclient.exc as exc
   import time
@@ -287,7 +287,7 @@ to see the required and optional fields for each command.
   else:
       print(resp)
 
-Refer to this example in python-monclient/client_api_example.py
+
 
 License
 -------
