@@ -1,0 +1,29 @@
+CHANGES
+=======
+
+1.0.0
+-----
+
+* Modified README.rst
+* Improved the README.rst
+* alarm-list supports optional dimensions
+* Removed personal info from example and tests
+* Updated setup.cfg
+* Added HP copyright and Apache 2.0 license header. Added HACKING.rst and LICENSE file
+* Simplified exception handling by catching HTTPException
+* Updated client_api_example.py
+* removed runlocal args from resource commands, added example for api
+* support for alarm-history, fixed timestamp format measurement-list
+* Support for PUT,PATCH alarms, PUT notification-methods
+* Fixed measurement-list, alarm-list
+* added -j,--json output parameter, supported multi-dimensions in single parameter
+* Improved dict and dictlist formatting - put this in utils.py
+* fixed help formatting. metric-list formatting changed
+* added -l option, pep8 spacing
+* Latest changes to clean up the list commands
+* list and show implemented for alarms and notifications
+* Notification create working
+* Initial debian package setup
+* Unit tests working
+* metrics-create working
+* Initial monclient files. Help, and versioning is working
