@@ -15,3 +15,4 @@ monclient/versioninfo
 .testrepository
 .pydevproject
 .project
+.idea

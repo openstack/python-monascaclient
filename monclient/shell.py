@@ -61,7 +61,7 @@ class MonShell(object):
 
         parser.add_argument('--version',
                             action='version',
-                            version=monclient.__version__,
+                            version='1.0.0',
                             help="Shows the client version and exits.")
 
         parser.add_argument('-d', '--debug',
