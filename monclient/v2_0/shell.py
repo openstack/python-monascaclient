@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 from monclient.common import utils
 import monclient.exc as exc
 from monclient.openstack.common import jsonutils
@@ -40,6 +41,23 @@ def do_metric_create(mc, args):
         fields['dimensions'] = utils.format_parameters(args.dimensions)
     fields['timestamp'] = args.time
     fields['value'] = args.value
+    try:
+        mc.metrics.create(**fields)
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
+    else:
+        print('Successfully created metric')
+
+
+@utils.arg('jsonbody', metavar='<JSON_BODY>',
+           type=json.loads,
+           help='The raw JSON body in single quotes. See api doc.')
+def do_metric_create_raw(mc, args):
+    '''Create metric from raw json body.'''
+    fields = {}
+    fields['jsonbody'] = args.jsonbody
     try:
         mc.metrics.create(**fields)
     except exc.HTTPException as he:

@@ -31,9 +31,14 @@ class MetricsManager(mon_manager.MonManager):
     def create(self, **kwargs):
         """Create a metric."""
         newheaders = self.get_headers()
-        resp, body = self.client.json_request('POST', self.base_url,
-                                              data=kwargs,
-                                              headers=newheaders)
+        if 'jsonbody' in kwargs:
+            resp, body = self.client.json_request('POST', self.base_url,
+                                                  data=kwargs['jsonbody'],
+                                                  headers=newheaders)
+        else:
+            resp, body = self.client.json_request('POST', self.base_url,
+                                                  data=kwargs,
+                                                  headers=newheaders)
         return resp
 
     def list(self, **kwargs):
