@@ -1,6 +1,13 @@
 CHANGES
 =======
 
+1.0.1
+-----
+
+* new metric-create-raw command to support raw json body
+* Temporary fix for version problems in the egg/wheel
+* Added ChangeLog and .idea to the .gitignore
+
 1.0.0
 -----
 
