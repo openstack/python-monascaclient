@@ -186,6 +186,23 @@ def format_output(output, format='yaml'):
                                   % output_format)
 
 
+def format_dimensions(dict):
+    return ('dimensions: {\n' + format_dict(dict) + '\n}')
+
+
+def format_expression_data(dict):
+    # takes an dictionary containing a dict
+    string_list = list()
+    for k, v in dict.items():
+        if k == 'dimensions':
+            dim_str = format_dimensions(v)
+            string_list.append(dim_str)
+        else:
+            d_str = k + ': ' + str(v)
+            string_list.append(d_str)
+    return '\n'.join(string_list)
+
+
 def format_dictlist(dict_list):
     # takes list of dictionaries to format for output
     string_list = list()
@@ -204,6 +221,6 @@ def format_dict(dict):
     # takes a dictionary to format for output
     dstring_list = list()
     for k, v in dict.items():
-        d_str = k + ':' + v
+        d_str = k + ': ' + str(v)
         dstring_list.append(d_str)
     return '\n'.join(dstring_list)

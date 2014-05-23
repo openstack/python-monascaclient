@@ -325,6 +325,8 @@ def do_notification_update(mc, args):
            help='Description of the alarm.')
 @utils.arg('expression', metavar='<EXPRESSION>',
            help='The alarm expression to evaluate. No spaces.')
+@utils.arg('--severity', metavar='<SEVERITY>',
+           help='Severity is one of [LOW, MEDIUM, HIGH, CRITICAL].')
 @utils.arg('--alarm-actions', metavar='<NOTIFICATION-ID>',
            help='The notification method to use when an alarm state is ALARM. '
            'This param may be specified multiple times.',
@@ -350,6 +352,14 @@ def do_alarm_create(mc, args):
         fields['ok_actions'] = args.ok_actions
     if args.undetermined_actions:
         fields['undetermined_actions'] = args.undetermined_actions
+    if args.severity:
+        severity_types = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
+        if args.severity not in severity_types:
+            errmsg = 'Invalid severity, not one of [' + \
+                ', '.join(severity_types) + ']'
+            print(errmsg)
+            return
+        fields['severity'] = args.severity
     try:
         alarm = mc.alarms.create(**fields)
     except exc.HTTPException as he:
@@ -381,10 +391,12 @@ def do_alarm_show(mc, args):
             'name': utils.json_formatter,
             'id': utils.json_formatter,
             'expression': utils.json_formatter,
+            'expression_data': utils.format_expression_data,
             'state': utils.json_formatter,
             'actions_enabled': utils.json_formatter,
             'alarm_actions': utils.json_formatter,
             'ok_actions': utils.json_formatter,
+            'severity': utils.json_formatter,
             'undetermined_actions': utils.json_formatter,
             'description': utils.json_formatter,
             'links': utils.format_dictlist,
@@ -397,11 +409,21 @@ def do_alarm_show(mc, args):
            'This can be specified multiple times, or once with parameters '
            'separated by a comma.',
            action='append')
+@utils.arg('--state', metavar='<STATE>',
+           help='STATE is one of [UNDETERMINED, OK, ALARM].')
 def do_alarm_list(mc, args):
     '''List alarms for this tenant.'''
     fields = {}
     if args.dimensions:
         fields['dimensions'] = utils.format_parameters(args.dimensions)
+    if args.state:
+        state_types = ['UNDETERMINED', 'OK', 'ALARM']
+        if args.state not in state_types:
+            errmsg = 'Invalid state, not one of [' + \
+                ', '.join(state_types) + ']'
+            print(errmsg)
+            return
+        fields['state'] = args.state
     try:
         alarm = mc.alarms.list(**fields)
     except exc.HTTPException as he:
@@ -470,6 +492,8 @@ def do_alarm_delete(mc, args):
            help='The actions_enabled boolean is one of [true,false]')
 @utils.arg('state', metavar='<STATE>',
            help='The alarm state. State is one of [UNDETERMINED,ALARM,OK]')
+@utils.arg('--severity', metavar='<SEVERITY>',
+           help='Severity is one of [LOW, MEDIUM, HIGH, CRITICAL].')
 def do_alarm_update(mc, args):
     '''Update the alarm.'''
     fields = {}
@@ -486,6 +510,14 @@ def do_alarm_update(mc, args):
         fields['undetermined_actions'] = args.undetermined_actions
     fields['actions_enabled'] = args.enabled
     fields['state'] = args.state
+    if args.severity:
+        severity_types = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
+        if args.severity not in severity_types:
+            errmsg = 'Invalid severity, not one of [' + \
+                ', '.join(severity_types) + ']'
+            print(errmsg)
+            return
+        fields['severity'] = args.severity
     try:
         alarm = mc.alarms.update(**fields)
     except exc.HTTPException as he:
@@ -520,6 +552,8 @@ def do_alarm_update(mc, args):
            help='The actions_enabled boolean is one of [true,false]')
 @utils.arg('--state', metavar='<STATE>',
            help='The alarm state. State is one of [UNDETERMINED,ALARM,OK]')
+@utils.arg('--severity', metavar='<SEVERITY>',
+           help='Severity is one of [LOW, MEDIUM, HIGH, CRITICAL].')
 def do_alarm_patch(mc, args):
     '''Patch the alarm.'''
     fields = {}
@@ -540,6 +574,14 @@ def do_alarm_patch(mc, args):
         fields['actions_enabled'] = args.enabled
     if args.state:
         fields['state'] = args.state
+    if args.severity:
+        severity_types = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
+        if args.severity not in severity_types:
+            errmsg = 'Invalid severity, not one of [' + \
+                ', '.join(severity_types) + ']'
+            print(errmsg)
+            return
+        fields['severity'] = args.severity
     try:
         alarm = mc.alarms.patch(**fields)
     except exc.HTTPException as he:

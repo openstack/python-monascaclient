@@ -14,13 +14,14 @@ Ubuntu Install
 --------------
 Requires:
   - pip - version >= 1.4.  python get-pip.py
-  - git - sudo apt-get install git-core
   
-Install Steps:
-  - git clone or copy the python-monclient distribution to the server
-  - cd python-monclient
+Install It:
+  - sudo pip install python-monclient
+  
+Alternative Manual Install Steps:
+  - cd to your python-monclient repo
   - sudo pip install -r requirements.txt
-  - sudo python setup.py install
+  - python setup.py install 
 
 Command-line API
 ----------------
