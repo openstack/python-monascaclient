@@ -52,7 +52,7 @@ It is easiest to source them first and then use the CLI.
 
 When token and endpoint are known::
   
-  export OS_AUTH_TOKEN=12345678
+  export OS_AUTH_TOKEN=XXX
   export MON_API_URL=http://192.168.10.4:8080/v2.0/
 
 When using Keystone to obtain the token and endpoint::
@@ -63,11 +63,13 @@ When using Keystone to obtain the token and endpoint::
   export OS_AUTH_URL=
   export OS_REGION_NAME=
 
-When using Jahmon Vagrant Environment for test - no Keystone::
+When using Vagrant Environment for test which doesn't use Keystone::
   
-  export OS_AUTH_TOKEN=12345678  (this will be treated as your tenant id by the api)
+  export OS_AUTH_TOKEN=82510970543135
   export OS_NO_CLIENT_AUTH=1
   export MON_API_URL=http://192.168.10.4:8080/v2.0/
+
+The Monitoring API will treat the auth token as the tenant ID when Keystone is not enabled, which is the case for the Vagrant develpment environment.
 
 You'll find complete documentation on the shell by running
 ``mon help``::
