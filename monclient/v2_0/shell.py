@@ -140,6 +140,29 @@ def format_measure_value(measurements):
     return '\n'.join(meas_string_list)
 
 
+def format_statistic_timestamp(statistics, columns, name):
+    # returns newline separated times for the timestamp column
+    time_index = 0
+    if statistics:
+        time_index = columns.index(name)
+    time_list = list()
+    for timestamp in statistics:
+        time_list.append(str(timestamp[time_index]))
+    return '\n'.join(time_list)
+
+
+def format_statistic_value(statistics, columns, stat_type):
+    # find the index for column name
+    stat_index = 0
+    if statistics:
+        stat_index = columns.index(stat_type)
+    value_list = list()
+    for stat in statistics:
+        value_str = '{:12.2f}'.format(stat[stat_index])
+        value_list.append(value_str)
+    return '\n'.join(value_list)
+
+
 @utils.arg('name', metavar='<METRIC_NAME>',
            help='Name of the metric to list measurements.')
 @utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
@@ -192,6 +215,94 @@ def do_measurement_list(mc, args):
                 sortby=2)
 
 
+@utils.arg('name', metavar='<METRIC_NAME>',
+           help='Name of the metric to report measurement statistics.')
+@utils.arg('statistics', metavar='<STATISTICS>',
+           help='Statistics is one or more (separated by commas) of '
+           '[AVG, MIN, MAX, COUNT, SUM].')
+@utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
+           help='key value pair used to specify a metric dimension. '
+           'This can be specified multiple times, or once with parameters '
+           'separated by a comma.',
+           action='append')
+@utils.arg('starttime', metavar='<UTC_START_TIME>',
+           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z.')
+@utils.arg('--endtime', metavar='<UTC_END_TIME>',
+           help='measurements <= UTC time. format: 2014-01-01T00:00:00Z.')
+@utils.arg('--period', metavar='<PERIOD>',
+           help='number of seconds per interval (default is 300)')
+def do_metric_statistics(mc, args):
+    '''List measurement statistics for the specified metric.'''
+    statistic_types = ['AVG', 'MIN', 'MAX', 'COUNT', 'SUM']
+    statlist = args.statistics.split(',')
+    for stat in statlist:
+        if stat.upper() not in statistic_types:
+            errmsg = 'Invalid type, not one of [' + \
+                ', '.join(statistic_types) + ']'
+            print(errmsg)
+            return
+    fields = {}
+    fields['name'] = args.name
+    if args.dimensions:
+        fields['dimensions'] = utils.format_parameters(args.dimensions)
+    fields['start_time'] = args.starttime
+    if args.endtime:
+        fields['end_time'] = args.endtime
+    if args.period:
+        fields['period'] = args.period
+    fields['statistics'] = args.statistics
+    try:
+        metric = mc.metrics.list_statistics(**fields)
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
+    else:
+        if args.json:
+            print(utils.json_formatter(metric))
+            return
+        cols = ['name', 'dimensions']
+        # add dynamic column names
+        if metric:
+            column_names = metric[0]['columns']
+            for name in column_names:
+                cols.append(name)
+        else:
+            # when empty set, added so the print_list sortby doesn't throw an
+            # exception
+            cols.append('timestamp')
+
+        formatters = {
+            'name': lambda x: x['name'],
+            'dimensions': lambda x: utils.format_dict(x['dimensions']),
+            'timestamp': lambda x:
+            format_statistic_timestamp(x['statistics'], x['columns'],
+            'timestamp'),
+            'avg': lambda x:
+            format_statistic_value(x['statistics'], x['columns'], 'avg'),
+            'min': lambda x:
+            format_statistic_value(x['statistics'], x['columns'], 'min'),
+            'max': lambda x:
+            format_statistic_value(x['statistics'], x['columns'], 'max'),
+            'count': lambda x:
+            format_statistic_value(x['statistics'], x['columns'], 'count'),
+            'sum': lambda x:
+            format_statistic_value(x['statistics'], x['columns'], 'sum'),
+        }
+        if isinstance(metric, list):
+            # print the list
+            utils.print_list(metric, cols, formatters=formatters, sortby=2)
+        else:
+            # add the dictionary to a list, so print_list works
+            metric_list = list()
+            metric_list.append(metric)
+            utils.print_list(
+                metric_list,
+                cols,
+                formatters=formatters,
+                sortby=2)
+
+
 @utils.arg('name', metavar='<NOTIFICATION_NAME>',
            help='Name of the notification to create.')
 @utils.arg('type', metavar='<TYPE>',
@@ -201,7 +312,7 @@ def do_measurement_list(mc, args):
 def do_notification_create(mc, args):
     '''Create notification.'''
     notification_types = ['EMAIL', 'SMS']
-    if args.type not in notification_types:
+    if args.type.upper() not in notification_types:
         errmsg = 'Invalid type, not one of [' + \
             ', '.join(notification_types) + ']'
         print(errmsg)

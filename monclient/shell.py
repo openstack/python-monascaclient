@@ -26,7 +26,6 @@ import sys
 
 from keystoneclient.v2_0 import client as ksclient
 
-import monclient
 from monclient import client as mon_client
 from monclient.common import utils
 from monclient import exc

@@ -70,3 +70,18 @@ class MetricsManager(mon_manager.MonManager):
         resp, body = self.client.json_request(
             'GET', url_str, headers=newheaders)
         return body
+
+    def list_statistics(self, **kwargs):
+        """Get a list of measurement statistics based on metric def filters."""
+        url_str = self.base_url + '/statistics'
+        newheaders = self.get_headers()
+        if 'dimensions' in kwargs:
+            dimstr = self.get_dimensions_url_string(kwargs['dimensions'])
+            kwargs['dimensions'] = dimstr
+
+        if kwargs:
+            url_str = url_str + '?%s' % urlutils.urlencode(kwargs, True)
+        # print url_str
+        resp, body = self.client.json_request(
+            'GET', url_str, headers=newheaders)
+        return body
