@@ -98,7 +98,9 @@ You'll find complete documentation on the shell by running
       alarm-update         Update the alarm.
       measurement-list     List measurements for the specified metric.
       metric-create        Create metric.
+      metric-create-raw    Create metric from raw json body.
       metric-list          List metrics for this tenant.
+      metric-statistics    List measurement statistics for the specified metric.
       notification-create  Create notification.
       notification-delete  Delete notification.
       notification-list    List notifications for this tenant.
@@ -223,8 +225,8 @@ Note: this is not meant to be a complete list.
 alarm-create::
   
   mon alarm-create cpu1alarm 'cpu1>10'
-  mon alarm-create cpu2alarm
-  mon alarm-create cindyalarm1 'avg(metric1{instance_id=123)>=10' --description 'avg greater than thresh' --alarm-actions 5651406c-447d-40bd-b868-b2b3e6b59e32
+  mon alarm-create cpu2alarm 'cpu1>99' --severity HIGH
+  mon alarm-create test1alarm1 'avg(metric1{instance_id=123)>=10' --severity CRITICAL --description 'avg greater than thresh' --alarm-actions 5651406c-447d-40bd-b868-b2b3e6b59e32
 
 alarm-list::
   
@@ -233,14 +235,40 @@ alarm-list::
   | name        | id                                   | expression                         | state        | actions_enabled |
   +-------------+--------------------------------------+------------------------------------+--------------+-----------------+
   | cpu1alarm   | 67b9f4cc-3d57-4c6c-848c-555d0b3a8579 | cpu1>10                            | UNDETERMINED | True            |
-  | cpu2alarm   | 9e6b9fad-ef1b-4030-beab-10678bcc758a | cpu1>10                            | UNDETERMINED | True            |
-  | cindyalarm1 | c81e1d40-2115-4557-96f4-eda6b8823fd6 | avg(metric1{instance_id=123}) >= 10| UNDETERMINED | True            |
+  | cpu2alarm   | 9e6b9fad-ef1b-4030-beab-10678bcc758a | cpu1>99                            | UNDETERMINED | True            |
+  | test1alarm1 | c81e1d40-2115-4557-96f4-eda6b8823fd6 | avg(metric1{instance_id=123}) >= 10| UNDETERMINED | True            |
   +-------------+--------------------------------------+------------------------------------+--------------+-----------------+
 
 alarm-show::
   
   mon alarm-show c81e1d40-2115-4557-96f4-eda6b8823fd6
-  (output not shown for now - changing schema)
+  +----------------------+----------------------------------------------------------------------------------------------------+
+  | Property             | Value                                                                                              |
+  +----------------------+----------------------------------------------------------------------------------------------------+
+  | actions_enabled      | true                                                                                               |
+  | alarm_actions        | [                                                                                                  |
+  |                      |   "5651406c-447d-40bd-b868-b2b3e6b59e32"                                                           |
+  |                      | ]                                                                                                  |
+  | description          | "avg greater than thresh"                                                                          |
+  | expression           | "avg(metric1{instance_id=123})>=10"                                                                |
+  | expression_data      | function: AVG                                                                                      |
+  |                      | metric_name: metric1                                                                               |
+  |                      | period: 60                                                                                         |
+  |                      | threshold: 10.0                                                                                    |
+  |                      | periods: 1                                                                                         |
+  |                      | operator: GTE                                                                                      |
+  |                      | dimensions: {                                                                                      |
+  |                      | instance_id: 123                                                                                   |
+  |                      | }                                                                                                  |
+  | id                   | "c81e1d40-2115-4557-96f4-eda6b8823fd6"                                                             |
+  | links                | href:http://192.168.10.4:8080/v2.0/alarms/c81e1d40-2115-4557-96f4-eda6b8823fd6,rel:self            |
+  |                      | href:http://192.168.10.4:8080/v2.0/alarms/c81e1d40-2115-4557-96f4-eda6b8823fd6/history,rel:history |
+  | name                 | "test1alarm1"                                                                                      |
+  | ok_actions           | []                                                                                                 |
+  | severity             | "CRITICAL"                                                                                         |
+  | state                | "UNDETERMINED"                                                                                     |
+  | undetermined_actions | []                                                                                                 |
+  +----------------------+----------------------------------------------------------------------------------------------------+
 
 alarm-patch::
   
