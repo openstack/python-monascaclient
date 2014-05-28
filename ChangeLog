@@ -1,6 +1,13 @@
 CHANGES
 =======
 
+1.0.2
+-----
+
+* Added severity to alarm-create, alarm-patch, alarm-update
+* New metric-statistics command
+* Modified README.rst
+
 1.0.1
 -----
 
