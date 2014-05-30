@@ -1,12 +1,20 @@
 CHANGES
 =======
 
+1.0.3
+-----
+
+* Add babel as a dependency
+
 1.0.2
 -----
 
-* Added severity to alarm-create, alarm-patch, alarm-update
-* New metric-statistics command
-* Modified README.rst
+* Updated version info
+* Updated README
+* Added metric-statistics command
+* Modified the auth token to match dev env
+* Added severity to alarm commands, Added alarm-list by state option
+* 1.0.1 changelog
 
 1.0.1
 -----
