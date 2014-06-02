@@ -1,6 +1,12 @@
 CHANGES
 =======
 
+1.0.4
+-----
+* Fixed alarm-patch enabled parm
+* Fixed alarm-update enabled parm
+* Better error checking for alarm state
+
 1.0.3
 -----
 

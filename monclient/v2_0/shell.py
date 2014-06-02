@@ -619,8 +619,22 @@ def do_alarm_update(mc, args):
         fields['ok_actions'] = args.ok_actions
     if args.undetermined_actions:
         fields['undetermined_actions'] = args.undetermined_actions
-    fields['actions_enabled'] = args.enabled
-    fields['state'] = args.state
+    enabled_types = ['True','true','False','false']
+    if args.enabled:
+        if args.enabled not in enabled_types:
+            errmsg = 'Invalid value, not one of [' + \
+                ', '.join(enabled_types) + ']'
+            print(errmsg)
+            return
+        fields['actions_enabled'] = args.enabled in ['true','True']
+    state_types = ['UNDETERMINED','ALARM','OK']
+    if args.state:
+        if args.state not in state_types:
+            errmsg = 'Invalid state, not one of [' + \
+                    ', '.join(state_types) + ']'
+            print(errmsg)
+            return   
+        fields['state'] = args.state
     if args.severity:
         severity_types = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
         if args.severity not in severity_types:
@@ -681,9 +695,21 @@ def do_alarm_patch(mc, args):
         fields['ok_actions'] = args.ok_actions
     if args.undetermined_actions:
         fields['undetermined_actions'] = args.undetermined_actions
+    enabled_types = ['True','true','False','false']
     if args.enabled:
-        fields['actions_enabled'] = args.enabled
+        if args.enabled not in enabled_types:
+            errmsg = 'Invalid value, not one of [' + \
+                ', '.join(enabled_types) + ']'
+            print(errmsg)
+            return
+        fields['actions_enabled'] = args.enabled in ['true','True']
+    state_types = ['UNDETERMINED','ALARM','OK']
     if args.state:
+        if args.state not in state_types:
+            errmsg = 'Invalid state, not one of [' + \
+                    ', '.join(state_types) + ']'
+            print(errmsg)
+            return   
         fields['state'] = args.state
     if args.severity:
         severity_types = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
