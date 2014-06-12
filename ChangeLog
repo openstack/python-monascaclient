@@ -1,6 +1,13 @@
 CHANGES
 =======
 
+1.0.5
+-----
+* Fixed ordering by timestamp for measurement-list
+* Fixed ordering by timestamp for alarm-history
+* defined constants for more DRYness
+* renamed enabled parm to actions-enabled for alarm update & patch
+
 1.0.4
 -----
 * Fixed alarm-patch enabled parm

@@ -20,6 +20,15 @@ from monclient.openstack.common import jsonutils
 import time
 
 
+# Alarm valid types
+severity_types = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
+state_types = ['UNDETERMINED', 'ALARM', 'OK']
+enabled_types = ['True', 'true', 'False', 'false']
+
+# Notification valid types
+notification_types = ['EMAIL', 'SMS']
+
+
 @utils.arg('name', metavar='<METRIC_NAME>',
            help='Name of the metric to create.')
 @utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
@@ -203,7 +212,7 @@ def do_measurement_list(mc, args):
         }
         if isinstance(metric, list):
             # print the list
-            utils.print_list(metric, cols, formatters=formatters, sortby=2)
+            utils.print_list(metric, cols, formatters=formatters, sortby=3)
         else:
             # add the dictionary to a list, so print_list works
             metric_list = list()
@@ -212,7 +221,7 @@ def do_measurement_list(mc, args):
                 metric_list,
                 cols,
                 formatters=formatters,
-                sortby=2)
+                sortby=3)
 
 
 @utils.arg('name', metavar='<METRIC_NAME>',
@@ -277,7 +286,7 @@ def do_metric_statistics(mc, args):
             'dimensions': lambda x: utils.format_dict(x['dimensions']),
             'timestamp': lambda x:
             format_statistic_timestamp(x['statistics'], x['columns'],
-            'timestamp'),
+                                       'timestamp'),
             'avg': lambda x:
             format_statistic_value(x['statistics'], x['columns'], 'avg'),
             'min': lambda x:
@@ -311,7 +320,6 @@ def do_metric_statistics(mc, args):
            help='Depending on the type, a valid EMAIL or SMS Address')
 def do_notification_create(mc, args):
     '''Create notification.'''
-    notification_types = ['EMAIL', 'SMS']
     if args.type.upper() not in notification_types:
         errmsg = 'Invalid type, not one of [' + \
             ', '.join(notification_types) + ']'
@@ -418,6 +426,11 @@ def do_notification_update(mc, args):
     fields = {}
     fields['notification_id'] = args.id
     fields['name'] = args.name
+    if args.type.upper() not in notification_types:
+        errmsg = 'Invalid type, not one of [' + \
+                 ', '.join(state_types) + ']'
+        print(errmsg)
+        return
     fields['type'] = args.type
     fields['address'] = args.address
     try:
@@ -464,8 +477,7 @@ def do_alarm_create(mc, args):
     if args.undetermined_actions:
         fields['undetermined_actions'] = args.undetermined_actions
     if args.severity:
-        severity_types = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
-        if args.severity not in severity_types:
+        if args.severity.upper() not in severity_types:
             errmsg = 'Invalid severity, not one of [' + \
                 ', '.join(severity_types) + ']'
             print(errmsg)
@@ -528,8 +540,7 @@ def do_alarm_list(mc, args):
     if args.dimensions:
         fields['dimensions'] = utils.format_parameters(args.dimensions)
     if args.state:
-        state_types = ['UNDETERMINED', 'OK', 'ALARM']
-        if args.state not in state_types:
+        if args.state.upper() not in state_types:
             errmsg = 'Invalid state, not one of [' + \
                 ', '.join(state_types) + ']'
             print(errmsg)
@@ -599,8 +610,8 @@ def do_alarm_delete(mc, args):
            help='The notification method to use when an alarm state is '
            'UNDETERMINED. This param may be specified multiple times.',
            action='append')
-@utils.arg('enabled', metavar='<ACTIONS-ENABLED>',
-           help='The actions_enabled boolean is one of [true,false]')
+@utils.arg('actions-enabled', metavar='<ACTIONS-ENABLED>',
+           help='The actions-enabled boolean is one of [true,false]')
 @utils.arg('state', metavar='<STATE>',
            help='The alarm state. State is one of [UNDETERMINED,ALARM,OK]')
 @utils.arg('--severity', metavar='<SEVERITY>',
@@ -619,25 +630,22 @@ def do_alarm_update(mc, args):
         fields['ok_actions'] = args.ok_actions
     if args.undetermined_actions:
         fields['undetermined_actions'] = args.undetermined_actions
-    enabled_types = ['True','true','False','false']
-    if args.enabled:
-        if args.enabled not in enabled_types:
+    if args.actions_enabled:
+        if args.actions_enabled not in enabled_types:
             errmsg = 'Invalid value, not one of [' + \
                 ', '.join(enabled_types) + ']'
             print(errmsg)
             return
-        fields['actions_enabled'] = args.enabled in ['true','True']
-    state_types = ['UNDETERMINED','ALARM','OK']
+        fields['actions_enabled'] = args.actions_enabled in ['true', 'True']
     if args.state:
-        if args.state not in state_types:
+        if args.state.upper() not in state_types:
             errmsg = 'Invalid state, not one of [' + \
-                    ', '.join(state_types) + ']'
+                ', '.join(state_types) + ']'
             print(errmsg)
-            return   
+            return
         fields['state'] = args.state
     if args.severity:
-        severity_types = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
-        if args.severity not in severity_types:
+        if args.severity.upper() not in severity_types:
             errmsg = 'Invalid severity, not one of [' + \
                 ', '.join(severity_types) + ']'
             print(errmsg)
@@ -673,8 +681,8 @@ def do_alarm_update(mc, args):
            help='The notification method to use when an alarm state is '
            'UNDETERMINED. This param may be specified multiple times.',
            action='append')
-@utils.arg('--enabled', metavar='<ACTIONS-ENABLED>',
-           help='The actions_enabled boolean is one of [true,false]')
+@utils.arg('--actions-enabled', metavar='<ACTIONS-ENABLED>',
+           help='The actions-enabled boolean is one of [true,false]')
 @utils.arg('--state', metavar='<STATE>',
            help='The alarm state. State is one of [UNDETERMINED,ALARM,OK]')
 @utils.arg('--severity', metavar='<SEVERITY>',
@@ -695,25 +703,22 @@ def do_alarm_patch(mc, args):
         fields['ok_actions'] = args.ok_actions
     if args.undetermined_actions:
         fields['undetermined_actions'] = args.undetermined_actions
-    enabled_types = ['True','true','False','false']
-    if args.enabled:
-        if args.enabled not in enabled_types:
+    if args.actions_enabled:
+        if args.actions_enabled not in enabled_types:
             errmsg = 'Invalid value, not one of [' + \
                 ', '.join(enabled_types) + ']'
             print(errmsg)
             return
-        fields['actions_enabled'] = args.enabled in ['true','True']
-    state_types = ['UNDETERMINED','ALARM','OK']
+        fields['actions_enabled'] = args.actions_enabled in ['true', 'True']
     if args.state:
-        if args.state not in state_types:
+        if args.state.upper() not in state_types:
             errmsg = 'Invalid state, not one of [' + \
-                    ', '.join(state_types) + ']'
+                ', '.join(state_types) + ']'
             print(errmsg)
-            return   
+            return
         fields['state'] = args.state
     if args.severity:
-        severity_types = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
-        if args.severity not in severity_types:
+        if args.severity.upper() not in severity_types:
             errmsg = 'Invalid severity, not one of [' + \
                 ', '.join(severity_types) + ']'
             print(errmsg)
@@ -757,9 +762,9 @@ def do_alarm_history(mc, args):
         }
         if isinstance(alarm, list):
             # print the list
-            utils.print_list(alarm, cols, formatters=formatters, sortby=1)
+            utils.print_list(alarm, cols, formatters=formatters, sortby=3)
         else:
             # add the dictionary to a list, so print_list works
             alarm_list = list()
             alarm_list.append(alarm)
-            utils.print_list(alarm_list, cols, formatters=formatters, sortby=1)
+            utils.print_list(alarm_list, cols, formatters=formatters, sortby=3)
