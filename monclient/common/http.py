@@ -137,7 +137,7 @@ class HTTPClient(object):
             kwargs['headers'].setdefault('X-Auth-Url', self.auth_url)
         if self.region_name:
             kwargs['headers'].setdefault('X-Region-Name', self.region_name)
-        if self.include_pass and not 'X-Auth-Key' in kwargs['headers']:
+        if self.include_pass and 'X-Auth-Key' not in kwargs['headers']:
             kwargs['headers'].update(self.credentials_headers())
 
         self.log_curl_request(method, url, kwargs)
@@ -176,7 +176,7 @@ class HTTPClient(object):
 
         self.log_http_response(resp)
 
-        if not 'X-Auth-Key' in kwargs['headers'] and \
+        if 'X-Auth-Key' not in kwargs['headers'] and \
                 (resp.status_code == 401 or
                  (resp.status_code == 500 and "(HTTP 401)" in resp.content)):
             raise exc.HTTPUnauthorized("Authentication failed. Please try"

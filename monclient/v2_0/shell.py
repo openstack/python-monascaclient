@@ -277,8 +277,7 @@ def do_metric_statistics(mc, args):
             for name in column_names:
                 cols.append(name)
         else:
-            # when empty set, added so the print_list sortby doesn't throw an
-            # exception
+            # when empty set, print_list needs a col
             cols.append('timestamp')
 
         formatters = {
