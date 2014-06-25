@@ -157,6 +157,14 @@ You'll find complete documentation on the shell by running
   See "mon help COMMAND" for help on a specific command.
 
 
+Bash Completion
+~~~~~~~~~~~~~~~
+Basic command tab completion can be enabled by sourcing the bash completion script.
+::
+  
+  source /usr/local/share/mon.bash_completion
+
+
 Metrics Examples
 ~~~~~~~~~~~~~~~~
 Note: this is not meant to be a complete list.
