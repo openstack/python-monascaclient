@@ -1,12 +1,12 @@
 # Hacking already pins down pep8, pyflakes and flake8
-tox>=1.6,<1.7
-hacking>=0.8.0,<0.9
+#tox>=1.6,<1.7
 coverage>=3.6
 discover
 fixtures>=0.3.14
+hacking>=0.8.0,<0.9
 mock>=1.0
 mox3>=0.7.0
 sphinx>=1.1.2,<1.2
-testscenarios>=0.4
 testrepository>=0.0.18
+testscenarios>=0.4
 testtools>=0.9.34

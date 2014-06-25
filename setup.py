@@ -1,5 +1,5 @@
-from setuptools import setup
+import setuptools
 
-setup(
+setuptools.setup(
     setup_requires=['pbr'],
     pbr=True)

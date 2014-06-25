@@ -24,4 +24,4 @@ _mon()
     fi
     return 0
 }
-complete -o default -o nospace -F _mon mon
+complete -o default -F _mon mon
