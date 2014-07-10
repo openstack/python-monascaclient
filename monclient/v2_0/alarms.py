@@ -95,3 +95,16 @@ class AlarmsManager(mon_manager.MonManager):
         resp, body = self.client.json_request('GET', url_str,
                                               headers=newheaders)
         return body
+
+    def history_list(self, **kwargs):
+        """History list of alarm state."""
+        url_str = self.base_url + '/state-history/'
+        newheaders = self.get_headers()
+        if 'dimensions' in kwargs:
+            dimstr = self.get_dimensions_url_string(kwargs['dimensions'])
+            kwargs['dimensions'] = dimstr
+        if kwargs:
+            url_str = url_str + '?%s' % urlutils.urlencode(kwargs, True)
+        resp, body = self.client.json_request('GET', url_str,
+                                              headers=newheaders)
+        return body

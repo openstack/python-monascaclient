@@ -91,7 +91,8 @@ You'll find complete documentation on the shell by running
     <subcommand>
       alarm-create         Create alarm.
       alarm-delete         Delete alarm.
-      alarm-history        List alarm state history.
+      alarm-history        Alarm state history.
+      alarm-history-list   List alarms state history.
       alarm-list           List alarms for this tenant.
       alarm-patch          Patch the alarm.
       alarm-show           Describe the alarm.

@@ -80,6 +80,9 @@ class HTTPClient(object):
             else:
                 self.verify_cert = kwargs.get('ca_file', get_system_ca_file())
 
+    def replace_token(self, token):
+        self.auth_token = token
+
     def log_curl_request(self, method, url, kwargs):
         curl = ['curl -i -X %s' % method]
 

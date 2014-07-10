@@ -37,3 +37,6 @@ class Client(object):
         self.notifications = notifications.NotificationsManager(
             self.http_client)
         self.alarms = alarms.AlarmsManager(self.http_client)
+
+    def replace_token(self, token):
+        self.http_client.replace_token(token)

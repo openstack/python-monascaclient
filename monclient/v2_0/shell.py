@@ -127,7 +127,8 @@ def format_measure_id(measurements):
     # returns newline separated measurements id's for the id column
     meas_string_list = list()
     for meas in measurements:
-        meas_string = '{:10d}'.format(meas[0])
+        #meas_string = '{:10d}'.format(meas[0])
+        meas_string = '{:20d}'.format(meas[0])
         meas_string_list.append(meas_string)
     return '\n'.join(meas_string_list)
 
@@ -415,7 +416,7 @@ def do_notification_delete(mc, args):
 @utils.arg('id', metavar='<NOTIFICATION_ID>',
            help='The ID of the notification.')
 @utils.arg('name', metavar='<NOTIFICATION_NAME>',
-           help='Name of the notification to create.')
+           help='Name of the notification.')
 @utils.arg('type', metavar='<TYPE>',
            help='The notification type.  Type is one of [EMAIL, SMS].')
 @utils.arg('address', metavar='<ADDRESS>',
@@ -526,6 +527,8 @@ def do_alarm_show(mc, args):
         utils.print_dict(alarm, formatters=formatters)
 
 
+@utils.arg('--name', metavar='<ALARM_NAME>',
+           help='Name of the alarm.')
 @utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
            help='key value pair used to specify a metric dimension. '
            'This can be specified multiple times, or once with parameters '
@@ -536,6 +539,8 @@ def do_alarm_show(mc, args):
 def do_alarm_list(mc, args):
     '''List alarms for this tenant.'''
     fields = {}
+    if args.name:
+        fields['name'] = args.name
     if args.dimensions:
         fields['dimensions'] = utils.format_parameters(args.dimensions)
     if args.state:
@@ -592,7 +597,7 @@ def do_alarm_delete(mc, args):
 @utils.arg('id', metavar='<ALARM_ID>',
            help='The ID of the alarm.')
 @utils.arg('name', metavar='<ALARM_NAME>',
-           help='Name of the alarm to create.')
+           help='Name of the alarm.')
 @utils.arg('--description', metavar='<DESCRIPTION>',
            help='Description of the alarm.')
 @utils.arg('expression', metavar='<EXPRESSION>',
@@ -663,7 +668,7 @@ def do_alarm_update(mc, args):
 @utils.arg('id', metavar='<ALARM_ID>',
            help='The ID of the alarm.')
 @utils.arg('--name', metavar='<ALARM_NAME>',
-           help='Name of the alarm to create.')
+           help='Name of the alarm.')
 @utils.arg('--description', metavar='<DESCRIPTION>',
            help='Description of the alarm.')
 @utils.arg('--expression', metavar='<EXPRESSION>',
@@ -736,7 +741,7 @@ def do_alarm_patch(mc, args):
 @utils.arg('id', metavar='<ALARM_ID>',
            help='The ID of the alarm.')
 def do_alarm_history(mc, args):
-    '''List alarm state history.'''
+    '''Alarm state history.'''
     fields = {}
     fields['alarm_id'] = args.id
     try:
@@ -767,3 +772,51 @@ def do_alarm_history(mc, args):
             alarm_list = list()
             alarm_list.append(alarm)
             utils.print_list(alarm_list, cols, formatters=formatters, sortby=3)
+
+
+@utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
+           help='key value pair used to specify a metric dimension. '
+           'This can be specified multiple times, or once with parameters '
+           'separated by a comma.',
+           action='append')
+@utils.arg('--starttime', metavar='<UTC_START_TIME>',
+           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z.')
+@utils.arg('--endtime', metavar='<UTC_END_TIME>',
+           help='measurements <= UTC time. format: 2014-01-01T00:00:00Z.')
+def do_alarm_history_list(mc, args):
+    '''List alarms state history.'''
+    fields = {}
+    if args.dimensions:
+        fields['dimensions'] = utils.format_parameters(args.dimensions)
+    if args.starttime:
+        fields['start_time'] = args.starttime
+    if args.endtime:
+        fields['end_time'] = args.endtime
+    try:
+        alarm = mc.alarms.history_list(**fields)
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
+    else:
+        if args.json:
+            print(utils.json_formatter(alarm))
+            return
+        cols = ['alarm_id', 'new_state', 'old_state', 'reason',
+                'reason_data', 'timestamp']
+        formatters = {
+            'alarm_id': lambda x: x['alarm_id'],
+            'old_state': lambda x: x['old_state'],
+            'new_state': lambda x: x['new_state'],
+            'reason': lambda x: x['reason'],
+            'reason_data': lambda x: x['reason_data'],
+            'timestamp': lambda x: x['timestamp'],
+        }
+        if isinstance(alarm, list):
+            # print the list
+            utils.print_list(alarm, cols, formatters=formatters, sortby=5)
+        else:
+            # add the dictionary to a list, so print_list works
+            alarm_list = list()
+            alarm_list.append(alarm)
+            utils.print_list(alarm_list, cols, formatters=formatters, sortby=5)

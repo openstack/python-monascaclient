@@ -29,10 +29,14 @@ api_version = '2_0'
 # There are other kwarg options (ca files) used for http request.
 # Refer to monclient.shell.py for other kwargs supported.
 kwargs = {}
-kwargs['token'] = '12345678'
 
+kwargs['token'] = 'Mehi789blahblahblah'
 # construct the mon client
 mon_client = client.Client(api_version, endpoint, **kwargs)
+
+# simulating token expired, call replace_token after initial construction
+token = 'MIIPtAYJKoZIhvcNAQcCoIIPpTCCD6ECAQblahblahblah'
+mon_client.replace_token(token)
 
 # you can reference the monclient.v2_0.shell.py
 # do_commands for command fields
