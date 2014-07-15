@@ -21,15 +21,15 @@ import socket
 import requests
 import six
 
-from monclient import exc
-from monclient.openstack.common import jsonutils
-from monclient.openstack.common.py3kcompat import urlutils
-from monclient.openstack.common import strutils
+from monascaclient import exc
+from monascaclient.openstack.common import jsonutils
+from monascaclient.openstack.common.py3kcompat import urlutils
+from monascaclient.openstack.common import strutils
 
 LOG = logging.getLogger(__name__)
 if not LOG.handlers:
     LOG.addHandler(logging.StreamHandler())
-USER_AGENT = 'python-monclient'
+USER_AGENT = 'python-monascaclient'
 CHUNKSIZE = 1024 * 64  # 64kB
 
 
@@ -185,7 +185,7 @@ class HTTPClient(object):
             raise exc.HTTPUnauthorized("Authentication failed. Please try"
                                        " again with option "
                                        "--include-password or export "
-                                       "MON_INCLUDE_PASSWORD=1\n%s"
+                                       "MONASCA_INCLUDE_PASSWORD=1\n%s"
                                        % resp.content)
         elif 400 <= resp.status_code < 600:
             raise exc.from_response(resp)

@@ -14,9 +14,9 @@
 # limitations under the License.
 
 import json
-from monclient.common import utils
-import monclient.exc as exc
-from monclient.openstack.common import jsonutils
+from monascaclient.common import utils
+import monascaclient.exc as exc
+from monascaclient.openstack.common import jsonutils
 import time
 
 
@@ -614,7 +614,7 @@ def do_alarm_delete(mc, args):
            help='The notification method to use when an alarm state is '
            'UNDETERMINED. This param may be specified multiple times.',
            action='append')
-@utils.arg('actions-enabled', metavar='<ACTIONS-ENABLED>',
+@utils.arg('actions_enabled', metavar='<ACTIONS-ENABLED>',
            help='The actions-enabled boolean is one of [true,false]')
 @utils.arg('state', metavar='<STATE>',
            help='The alarm state. State is one of [UNDETERMINED,ALARM,OK]')

@@ -13,6 +13,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = ['Client']
+from monascaclient.openstack.common.apiclient import base
 
-from monclient.v2_0.client import Client
+
+class MonascaManager(base.BaseManager):
+
+    def __init__(self, client, **kwargs):
+        super(MonascaManager, self).__init__(client)
+
+    def get_headers(self):
+        headers = self.client.credentials_headers()
+        return headers
+
+    def get_dimensions_url_string(self, dimdict):
+        dim_list = list()
+        for k, v in dimdict.items():
+            dim_str = k + ':' + v
+            dim_list.append(dim_str)
+        return ','.join(dim_list)

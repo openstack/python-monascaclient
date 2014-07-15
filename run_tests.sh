@@ -4,7 +4,7 @@ BASE_DIR=`dirname $0`
 
 function usage {
     echo "Usage: $0 [OPTION]..."
-    echo "Run monclient test suite(s)"
+    echo "Run monascaclient test suite(s)"
     echo ""
     echo "  -V, --virtual-env        Use virtualenv.  Install automatically if not present."
     echo "                           (Default is to run tests in local environment)"
@@ -49,7 +49,7 @@ function run_tests {
       if [ "$args" = "" ]; then
         # Default to running all tests if specific test is not
         # provided.
-        testrargs="discover ./monclient/tests"
+        testrargs="discover ./monascaclient/tests"
       fi
       ${wrapper} python -m testtools.run $args $testrargs
 

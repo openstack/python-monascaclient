@@ -15,7 +15,7 @@
 
 import sys
 
-from monclient.openstack.common import jsonutils
+from monascaclient.openstack.common import jsonutils
 
 verbose = 0
 
@@ -80,7 +80,7 @@ class HTTPMultipleChoices(HTTPException):
     code = 300
 
     def __str__(self):
-        self.details = ("Requested version of Mon API is not"
+        self.details = ("Requested version of Monasca API is not"
                         "available.")
         return "%s (HTTP %s) %s" % (self.__class__.__name__, self.code,
                                     self.details)

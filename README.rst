@@ -1,11 +1,11 @@
-Python bindings to the Monitoring API
+Python bindings to the Monasca API
 =======================================
 
-This is a client library for Monitoring built to interface with the Monitoring API. It
-provides a Python API (the ``monclient`` module) and a command-line tool
-(``mon``).
+This is a client library for Monasca built to interface with the Monasca API. It
+provides a Python API (the ``monascaclient`` module) and a command-line tool
+(``monasca``).
 
-The Monitoring Client was written using the OpenStack Heat Python client as a framework. 
+The Monasca Client was written using the OpenStack Heat Python client as a framework. 
 
 .. contents:: Contents:
    :local:
@@ -16,32 +16,32 @@ Requires:
   - pip - version >= 1.4.  python get-pip.py
   
 Install It:
-  - sudo pip install python-monclient
+  - sudo pip install python-monascaclient
   
 Alternative Manual Install Steps:
-  - cd to your python-monclient repo
+  - cd to your python-monascaclient repo
   - sudo pip install -r requirements.txt
   - python setup.py install 
 
 Command-line API
 ----------------
-Installing this distribution gets you a shell command, ``mon``, that you
+Installing this distribution gets you a shell command, ``monasca``, that you
 can use to interact with the Monitoring API server.
 
 Usage:
-  mon
+  monasca
 
-  mon help
+  monasca help
 
-  mon help <command>
+  monasca help <command>
   
-  mon -j <command>
+  monasca -j <command>
   
     This outputs the results in jason format.  Normally output is in table format.
   
 
-The monclient CLI needs the Monitoring API endpoint url and the OS_AUTH_TOKEN to pass to the 
-Monitoring API RESTful interface.  This is provided through environment or CLI 
+The monascaclient CLI needs the Monasca API endpoint url and the OS_AUTH_TOKEN to pass to the 
+Monasca API RESTful interface.  This is provided through environment or CLI 
 parameters.
 
 Environmental Variables
@@ -53,7 +53,7 @@ It is easiest to source them first and then use the CLI.
 When token and endpoint are known::
   
   export OS_AUTH_TOKEN=XXX
-  export MON_API_URL=http://192.168.10.4:8080/v2.0/
+  export MONASCA_API_URL=http://192.168.10.4:8080/v2.0/
 
 When using Keystone to obtain the token and endpoint::
   
@@ -63,29 +63,29 @@ When using Keystone to obtain the token and endpoint::
   export OS_AUTH_URL=
   export OS_REGION_NAME=
 
-When using Vagrant Environment for test which doesn't use Keystone::
+When using Vagrant Environment with middleware disabled::
   
   export OS_AUTH_TOKEN=82510970543135
   export OS_NO_CLIENT_AUTH=1
-  export MON_API_URL=http://192.168.10.4:8080/v2.0/
+  export MONASCA_API_URL=http://192.168.10.4:8080/v2.0/
 
-The Monitoring API will treat the auth token as the tenant ID when Keystone is not enabled, which is the case for the Vagrant develpment environment.
+The Monasca API will treat the auth token as the tenant ID when Keystone is not enabled.
 
 You'll find complete documentation on the shell by running
-``mon help``::
+``monasca help``::
   
-  usage: mon [-j] [--version] [-d] [-v] [-k] [--cert-file CERT_FILE]
+  usage: monasca [-j] [--version] [-d] [-v] [-k] [--cert-file CERT_FILE]
              [--key-file KEY_FILE] [--ca-file CA_FILE] [--timeout TIMEOUT]
              [--os-username OS_USERNAME] [--os-password OS_PASSWORD]
              [--os-tenant-id OS_TENANT_ID] [--os-tenant-name OS_TENANT_NAME]
              [--os-auth-url OS_AUTH_URL] [--os-region-name OS_REGION_NAME]
              [--os-auth-token OS_AUTH_TOKEN] [--os-no-client-auth]
-             [--mon-api-url MON_API_URL] [--mon-api-version MON_API_VERSION]
+             [--mon-api-url MONASCA_API_URL] [--mon-api-version MONASCA_API_VERSION]
              [--os-service-type OS_SERVICE_TYPE]
              [--os-endpoint-type OS_ENDPOINT_TYPE]
              <subcommand> ...
 
-  Command-line interface to the mon-client API.
+  Command-line interface to the monasca-client API.
   
   positional arguments:
     <subcommand>
@@ -114,7 +114,7 @@ You'll find complete documentation on the shell by running
   optional arguments:
     -j, --json             output raw json response
     --version              Shows the client version and exits.
-    -d, --debug            Defaults to env[MON_DEBUG].
+    -d, --debug            Defaults to env[MONASCA_DEBUG].
     -v, --verbose          Print more verbose output.
     -k, --insecure         Explicitly allow the client to perform "insecure" SSL
                            (https) requests. The server's certificate will not
@@ -146,10 +146,10 @@ You'll find complete documentation on the shell by running
                            Defaults to env[OS_AUTH_TOKEN].
     --os-no-client-auth    Do not contact keystone for a token. Defaults to
                            env[OS_NO_CLIENT_AUTH].
-    --mon-api-url MON_API_URL
-                           Defaults to env[MON_API_URL].
-    --mon-api-version MON_API_VERSION
-                           Defaults to env[MON_API_VERSION] or 2_0
+    --mon-api-url MONASCA_API_URL
+                           Defaults to env[MONASCA_API_URL].
+    --mon-api-version MONASCA_API_VERSION
+                           Defaults to env[MONASCA_API_VERSION] or 2_0
     --os-service-type OS_SERVICE_TYPE
                            Defaults to env[OS_SERVICE_TYPE].
     --os-endpoint-type OS_ENDPOINT_TYPE
@@ -163,7 +163,7 @@ Bash Completion
 Basic command tab completion can be enabled by sourcing the bash completion script.
 ::
   
-  source /usr/local/share/mon.bash_completion
+  source /usr/local/share/monasca.bash_completion
 
 
 Metrics Examples
@@ -172,14 +172,14 @@ Note: this is not meant to be a complete list.
 
 metric-create::
   
-  mon metric-create cpu1 123.40
-  mon metric-create metric1 1234.56 --dimensions instance_id=123,service=ourservice
-  mon metric-create metric1 2222.22 --dimensions instance_id=123,service=ourservice
-  mon metric-create metric1 3333.33 --dimensions instance_id=222,service=ourservice
+  monasca metric-create cpu1 123.40
+  monasca metric-create metric1 1234.56 --dimensions instance_id=123,service=ourservice
+  monasca metric-create metric1 2222.22 --dimensions instance_id=123,service=ourservice
+  monasca metric-create metric1 3333.33 --dimensions instance_id=222,service=ourservice
 
 metric-list::
   
-  mon metric-list
+  monasca metric-list
   +---------+--------------------+
   | name    | dimensions         |
   +---------+--------------------+
@@ -190,7 +190,7 @@ metric-list::
 
 measurement-list::
   
-  mon measurement-list metric1 2014-01-01T00:00:00Z
+  monasca measurement-list metric1 2014-01-01T00:00:00Z
   +---------+--------------------+----------------+----------------------+--------------+
   | name    | dimensions         | measurement_id | timestamp            | value        |
   +---------+--------------------+----------------+----------------------+--------------+
@@ -200,7 +200,7 @@ measurement-list::
   |         | service:ourservice |                |                      |              |
   +---------+--------------------+----------------+----------------------+--------------+
   
-  mon measurement-list metric1 2014-01-01T00:00:00Z --dimensions instance_id=123
+  monasca measurement-list metric1 2014-01-01T00:00:00Z --dimensions instance_id=123
   +---------+--------------------+----------------+----------------------+--------------+
   | name    | dimensions         | measurement_id | timestamp            | value        |
   +---------+--------------------+----------------+----------------------+--------------+
@@ -215,11 +215,11 @@ Note: this is not meant to be a complete list.
 
 notification-create::
   
-  mon notification-create cindyemail1 EMAIL cindy.employee@hp.com
+  monasca notification-create cindyemail1 EMAIL cindy.employee@hp.com
 
 notification-list::
   
-  mon notification-list
+  monasca notification-list
   +---------------+--------------------------------------+-------+----------------------+
   | name          | id                                   | type  | address              |
   +---------------+--------------------------------------+-------+----------------------+
@@ -233,13 +233,13 @@ Note: this is not meant to be a complete list.
 
 alarm-create::
   
-  mon alarm-create cpu1alarm 'cpu1>10'
-  mon alarm-create cpu2alarm 'cpu1>99' --severity HIGH
-  mon alarm-create test1alarm1 'avg(metric1{instance_id=123)>=10' --severity CRITICAL --description 'avg greater than thresh' --alarm-actions 5651406c-447d-40bd-b868-b2b3e6b59e32
+  monasca alarm-create cpu1alarm 'cpu1>10'
+  monasca alarm-create cpu2alarm 'cpu1>99' --severity HIGH
+  monasca alarm-create test1alarm1 'avg(metric1{instance_id=123)>=10' --severity CRITICAL --description 'avg greater than thresh' --alarm-actions 5651406c-447d-40bd-b868-b2b3e6b59e32
 
 alarm-list::
   
-  mon alarm-list
+  monasca alarm-list
   +-------------+--------------------------------------+------------------------------------+--------------+-----------------+
   | name        | id                                   | expression                         | state        | actions_enabled |
   +-------------+--------------------------------------+------------------------------------+--------------+-----------------+
@@ -250,7 +250,7 @@ alarm-list::
 
 alarm-show::
   
-  mon alarm-show c81e1d40-2115-4557-96f4-eda6b8823fd6
+  monasca alarm-show c81e1d40-2115-4557-96f4-eda6b8823fd6
   +----------------------+----------------------------------------------------------------------------------------------------+
   | Property             | Value                                                                                              |
   +----------------------+----------------------------------------------------------------------------------------------------+
@@ -281,7 +281,7 @@ alarm-show::
 
 alarm-patch::
   
-  mon alarm-patch c81e1d40-2115-4557-96f4-eda6b8823fd6 --state OK
+  monasca alarm-patch c81e1d40-2115-4557-96f4-eda6b8823fd6 --state OK
 
 
 Python API
@@ -290,17 +290,17 @@ Python API
 There's also a complete Python API.
 
 In order to use the python api directly, you must first obtain an auth token and 
-identify the monitoring api endpoint.
+identify the monasca api endpoint.
 
-The api_version matches the version of the Monitoring API.  Currently it is 'v2_0'.
+The api_version matches the version of the Monasca API.  Currently it is 'v2_0'.
 
-When calling the commands, refer to monclient.v2_0.shell.py 'do_<command>'
+When calling the commands, refer to monascaclient.v2_0.shell.py 'do_<command>'
 to see the required and optional fields for each command.
 
-Refer to this example in python-monclient/client_api_example.py::
+Refer to this example in python-monascaclient/client_api_example.py::
     
-  from monclient import client
-  import monclient.exc as exc
+  from monascaclient import client
+  import monascaclient.exc as exc
   import time
    
   api_version = '2_0'
@@ -310,7 +310,7 @@ Refer to this example in python-monclient/client_api_example.py::
   }
    
   # construct the mon client
-  mon_client = client.Client(api_version, endpoint, **kwargs)
+  monasca_client = client.Client(api_version, endpoint, **kwargs)
    
   # call the metric-create command
   dimensions = {'instance_id': '12345', 'service': 'hello'}
@@ -320,7 +320,7 @@ Refer to this example in python-monclient/client_api_example.py::
   fields['timestamp'] = time.time()
   fields['value'] = 222.333
   try:
-      resp = mon_client.metrics.create(**fields)
+      resp = monasca_client.metrics.create(**fields)
   except exc.HTTPException as he:
       print(he.code)
       print(he.message)

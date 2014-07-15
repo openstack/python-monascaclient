@@ -28,9 +28,9 @@ import copy
 
 import six
 
-from monclient.openstack.common.apiclient import exceptions
-from monclient.openstack.common.py3kcompat import urlutils
-from monclient.openstack.common import strutils
+from monascaclient.openstack.common.apiclient import exceptions
+from monascaclient.openstack.common.py3kcompat import urlutils
+from monascaclient.openstack.common import strutils
 
 
 def getid(obj):

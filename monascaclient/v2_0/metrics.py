@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from monclient.common import mon_manager
-from monclient.openstack.common.apiclient import base
-from monclient.openstack.common.py3kcompat import urlutils
+from monascaclient.common import monasca_manager
+from monascaclient.openstack.common.apiclient import base
+from monascaclient.openstack.common.py3kcompat import urlutils
 
 
 class Metrics(base.Resource):
@@ -24,7 +24,7 @@ class Metrics(base.Resource):
         return "<Metrics %s>" % self._info
 
 
-class MetricsManager(mon_manager.MonManager):
+class MetricsManager(monasca_manager.MonascaManager):
     resource_class = Metrics
     base_url = '/metrics'
 

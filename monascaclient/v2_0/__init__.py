@@ -13,10 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from monclient.common import utils
+__all__ = ['Client']
 
-
-def Client(version, *args, **kwargs):
-    module = utils.import_versioned_module(version, 'client')
-    client_class = getattr(module, 'Client')
-    return client_class(*args, **kwargs)
+from monascaclient.v2_0.client import Client

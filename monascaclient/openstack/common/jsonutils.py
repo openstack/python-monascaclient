@@ -48,9 +48,9 @@ except ImportError:
 
 import six
 
-from monclient.openstack.common import gettextutils
-from monclient.openstack.common import importutils
-from monclient.openstack.common import timeutils
+from monascaclient.openstack.common import gettextutils
+from monascaclient.openstack.common import importutils
+from monascaclient.openstack.common import timeutils
 
 netaddr = importutils.try_import("netaddr")
 

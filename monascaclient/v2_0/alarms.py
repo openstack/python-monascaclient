@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from monclient.common import mon_manager
-from monclient.openstack.common.apiclient import base
-from monclient.openstack.common.py3kcompat import urlutils
+from monascaclient.common import monasca_manager
+from monascaclient.openstack.common.apiclient import base
+from monascaclient.openstack.common.py3kcompat import urlutils
 
 
 class Alarms(base.Resource):
@@ -24,7 +24,7 @@ class Alarms(base.Resource):
         return "<Alarms %s>" % self._info
 
 
-class AlarmsManager(mon_manager.MonManager):
+class AlarmsManager(monasca_manager.MonascaManager):
     resource_class = Alarms
     base_url = '/alarms'
 

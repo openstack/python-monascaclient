@@ -13,17 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from monclient.common import http
-from monclient.v2_0 import alarms
-from monclient.v2_0 import metrics
-from monclient.v2_0 import notifications
+from monascaclient.common import http
+from monascaclient.v2_0 import alarms
+from monascaclient.v2_0 import metrics
+from monascaclient.v2_0 import notifications
 
 
 class Client(object):
 
-    """Client for the Mon v2_0 API.
+    """Client for the Monasca v2_0 API.
 
-    :param string endpoint: A user-supplied endpoint URL for the monitoring api
+    :param string endpoint: A user-supplied endpoint URL for the monasca api
                             service.
     :param string token: Token for authentication.
     :param integer timeout: Allows customization of the timeout for client
@@ -31,7 +31,7 @@ class Client(object):
     """
 
     def __init__(self, *args, **kwargs):
-        """Initialize a new http client for the mon API."""
+        """Initialize a new http client for the monasca API."""
         self.http_client = http.HTTPClient(*args, **kwargs)
         self.metrics = metrics.MetricsManager(self.http_client)
         self.notifications = notifications.NotificationsManager(

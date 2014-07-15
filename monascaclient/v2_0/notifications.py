@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from monclient.common import mon_manager
-from monclient.openstack.common.apiclient import base
+from monascaclient.common import monasca_manager
+from monascaclient.openstack.common.apiclient import base
 
 
 class Notifications(base.Resource):
@@ -23,7 +23,7 @@ class Notifications(base.Resource):
         return "<Notifications %s>" % self._info
 
 
-class NotificationsManager(mon_manager.MonManager):
+class NotificationsManager(monasca_manager.MonascaManager):
     resource_class = Notifications
     base_url = '/notification-methods'
 

@@ -14,7 +14,7 @@
 # limitations under the License.
 
 """
-Command-line interface to the mon-client API.
+Command-line interface to the monasca-client API.
 """
 
 from __future__ import print_function
@@ -26,21 +26,21 @@ import sys
 
 from keystoneclient.v2_0 import client as ksclient
 
-from monclient import client as mon_client
-from monclient.common import utils
-from monclient import exc
-from monclient.openstack.common import strutils
+from monascaclient import client as monasca_client
+from monascaclient.common import utils
+from monascaclient import exc
+from monascaclient.openstack.common import strutils
 
 logger = logging.getLogger(__name__)
 
 
-class MonShell(object):
+class MonascaShell(object):
 
     def get_base_parser(self):
         parser = argparse.ArgumentParser(
-            prog='mon',
+            prog='monasca',
             description=__doc__.strip(),
-            epilog='See "mon help COMMAND" '
+            epilog='See "monasca help COMMAND" '
                    'for help on a specific command.',
             add_help=False,
             # formatter_class=HelpFormatter,
@@ -64,9 +64,9 @@ class MonShell(object):
                             help="Shows the client version and exits.")
 
         parser.add_argument('-d', '--debug',
-                            default=bool(utils.env('MON_DEBUG')),
+                            default=bool(utils.env('MONASCA_DEBUG')),
                             action='store_true',
-                            help='Defaults to env[MON_DEBUG].')
+                            help='Defaults to env[MONASCA_DEBUG].')
 
         parser.add_argument('-v', '--verbose',
                             default=False, action="store_true",
@@ -156,20 +156,20 @@ class MonShell(object):
                             help="Do not contact keystone for a token. "
                                  "Defaults to env[OS_NO_CLIENT_AUTH].")
 
-        parser.add_argument('--mon-api-url',
-                            default=utils.env('MON_API_URL'),
-                            help='Defaults to env[MON_API_URL].')
+        parser.add_argument('--monasca-api-url',
+                            default=utils.env('MONASCA_API_URL'),
+                            help='Defaults to env[MONASCA_API_URL].')
 
-        parser.add_argument('--mon_api_url',
+        parser.add_argument('--monasca_api_url',
                             help=argparse.SUPPRESS)
 
-        parser.add_argument('--mon-api-version',
+        parser.add_argument('--monasca-api-version',
                             default=utils.env(
-                                'MON_API_VERSION',
+                                'MONASCA_API_VERSION',
                                 default='2_0'),
-                            help='Defaults to env[MON_API_VERSION] or 2_0')
+                            help='Defaults to env[MONASCA_API_VERSION] or 2_0')
 
-        parser.add_argument('--mon_api_version',
+        parser.add_argument('--monasca_api_version',
                             help=argparse.SUPPRESS)
 
         parser.add_argument('--os-service-type',
@@ -287,7 +287,7 @@ class MonShell(object):
         self._setup_verbose(options.verbose)
 
         # build available subcommands based on version
-        api_version = options.mon_api_version
+        api_version = options.monasca_api_version
         subcommand_parser = self.get_subcommand_parser(api_version)
         self.parser = subcommand_parser
 
@@ -321,11 +321,11 @@ class MonShell(object):
                                    " env[OS_AUTH_TOKEN]")
 
         if args.os_no_client_auth:
-            if not args.mon_api_url:
+            if not args.monasca_api_url:
                 raise exc.CommandError("If you specify --os-no-client-auth"
-                                       " you must specify a Monitoring API URL"
-                                       " via either --mon-api-url or"
-                                       " env[MON_API_URL]")
+                                       " you must specify a Monasca API URL"
+                                       " via either --monasca-api-url or"
+                                       " env[MONASCA_API_URL]")
         else:
             # Tenant name or ID is needed to make keystoneclient retrieve a
             # service catalog, it's not required if os_no_client_auth is
@@ -352,7 +352,7 @@ class MonShell(object):
             'insecure': args.insecure
         }
 
-        endpoint = args.mon_api_url
+        endpoint = args.monasca_api_url
         if endpoint.endswith('/'):
             endpoint = endpoint[:-1]
 
@@ -378,14 +378,14 @@ class MonShell(object):
             if not endpoint:
                 endpoint = self._get_endpoint(_ksclient, **kwargs)
 
-        client = mon_client.Client(api_version, endpoint, **kwargs)
+        client = monasca_client.Client(api_version, endpoint, **kwargs)
 
         args.func(client, args)
 
     def do_bash_completion(self, args):
         """Prints all of the commands and options to stdout.
 
-        The mon.bash_completion script doesn't have to hard code them.
+        The monasca.bash_completion script doesn't have to hard code them.
         """
         commands = set()
         options = set()
@@ -425,7 +425,7 @@ def main(args=None):
         if args is None:
             args = sys.argv[1:]
 
-        MonShell().main(args)
+        MonascaShell().main(args)
     except Exception as e:
         if '--debug' in args or '-d' in args:
             raise

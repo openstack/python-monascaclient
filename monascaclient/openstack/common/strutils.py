@@ -23,7 +23,7 @@ import unicodedata
 
 import six
 
-from monclient.openstack.common.gettextutils import _  # noqa
+from monascaclient.openstack.common.gettextutils import _  # noqa
 
 
 # Used for looking up extensions of text

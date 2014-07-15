@@ -13,32 +13,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" An example using monclient via the Python API """
+""" An example using monascaclient via the Python API """
 
-from monclient import client
-import monclient.exc as exc
+from monascaclient import client
+import monascaclient.exc as exc
 import time
 
 # In order to use the python api directly, you must first obtain an
 # auth token and identify which endpoint you wish to speak to.
 endpoint = 'http://192.168.10.4:8080/v2.0'
 
-# The api version of mon-api
+# The api version of monasca-api
 api_version = '2_0'
 
 # There are other kwarg options (ca files) used for http request.
-# Refer to monclient.shell.py for other kwargs supported.
+# Refer to monascaclient.shell.py for other kwargs supported.
 kwargs = {}
 
 kwargs['token'] = 'Mehi789blahblahblah'
-# construct the mon client
-mon_client = client.Client(api_version, endpoint, **kwargs)
+# construct the monasca client
+monasca_client = client.Client(api_version, endpoint, **kwargs)
 
 # simulating token expired, call replace_token after initial construction
 token = 'MIIPtAYJKoZIhvcNAQcCoIIPpTCCD6ECAQblahblahblah'
-mon_client.replace_token(token)
+monasca_client.replace_token(token)
 
-# you can reference the monclient.v2_0.shell.py
+# you can reference the monascaclient.v2_0.shell.py
 # do_commands for command fields
 
 # post a metric
@@ -49,7 +49,7 @@ fields['dimensions'] = dimensions
 fields['timestamp'] = time.time()
 fields['value'] = 222.333
 try:
-    resp = mon_client.metrics.create(**fields)
+    resp = monasca_client.metrics.create(**fields)
 except exc.HTTPException as he:
     print('HTTPException code=%s message=%s' % (he.code, he.message))
 else:
@@ -66,7 +66,7 @@ if name:
 if dimensions:
     fields['dimensions'] = dimensions
 try:
-    body = mon_client.metrics.list(**fields)
+    body = monasca_client.metrics.list(**fields)
 except exc.HTTPException as he:
     print('HTTPException code=%s message=%s' % (he.code, he.message))
 else:

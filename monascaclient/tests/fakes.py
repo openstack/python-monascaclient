@@ -14,7 +14,7 @@
 # limitations under the License.
 
 from keystoneclient.v2_0 import client as ksclient
-from monclient.openstack.common import jsonutils
+from monascaclient.openstack.common import jsonutils
 
 
 def script_keystone_client(token=None):
@@ -36,7 +36,7 @@ def fake_headers():
     return {'X-Auth-Token': 'abcd1234',
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'User-Agent': 'python-monclient'}
+            'User-Agent': 'python-monascaclient'}
 
 
 class FakeServiceCatalog():

@@ -21,10 +21,10 @@ import fixtures
 import testtools
 
 from keystoneclient.v2_0 import client as ksclient
-from monclient.common import http
-from monclient import exc
-import monclient.shell
-from monclient.tests import fakes
+from monascaclient.common import http
+from monascaclient import exc
+import monascaclient.shell
+from monascaclient.tests import fakes
 from mox3 import mox
 
 
@@ -34,7 +34,7 @@ class TestCase(testtools.TestCase):
         client_env = ('OS_USERNAME', 'OS_PASSWORD', 'OS_TENANT_ID',
                       'OS_TENANT_NAME', 'OS_AUTH_URL', 'OS_REGION_NAME',
                       'OS_AUTH_TOKEN', 'OS_NO_CLIENT_AUTH', 'OS_SERVICE_TYPE',
-                      'OS_ENDPOINT_TYPE', 'MON_API_URL')
+                      'OS_ENDPOINT_TYPE', 'MONASCA_API_URL')
 
         for key in client_env:
             self.useFixture(
@@ -54,7 +54,7 @@ class TestCase(testtools.TestCase):
     def shell_error(self, argstr, error_match):
         orig = sys.stderr
         sys.stderr = six.StringIO()
-        _shell = monclient.shell.MonShell()
+        _shell = monascaclient.shell.MonascaShell()
         e = self.assertRaises(Exception, _shell.main, argstr.split())
         self.assertRegexpMatches(e.__str__(), error_match)
         err = sys.stderr.getvalue()
@@ -84,7 +84,7 @@ class ShellBase(TestCase):
         orig = sys.stdout
         try:
             sys.stdout = six.StringIO()
-            _shell = monclient.shell.MonShell()
+            _shell = monascaclient.shell.MonascaShell()
             _shell.main(argstr.split())
             self.subcommands = _shell.subcommands.keys()
         except SystemExit:
@@ -108,8 +108,8 @@ class ShellTestCommon(ShellBase):
 
     def test_help(self):
         required = [
-            '^usage: mon',
-            '(?m)^See "mon help COMMAND" for help on a specific command',
+            '^usage: monasca',
+            '(?m)^See "monasca help COMMAND" for help on a specific command',
         ]
         for argstr in ['--help', 'help']:
             help_text = self.shell(argstr)
@@ -118,7 +118,7 @@ class ShellTestCommon(ShellBase):
 
     def test_command_help(self):
         output = self.shell('help help')
-        self.assertIn('usage: mon help [<subcommand>]', output)
+        self.assertIn('usage: monasca help [<subcommand>]', output)
         subcommands = list(self.subcommands)
         for command in subcommands:
             if command.replace('_', '-') == 'bash-completion':
@@ -126,11 +126,11 @@ class ShellTestCommon(ShellBase):
             output1 = self.shell('help %s' % command)
             output2 = self.shell('%s --help' % command)
             self.assertEqual(output1, output2)
-            self.assertRegexpMatches(output1, '^usage: mon %s' % command)
+            self.assertRegexpMatches(output1, '^usage: monasca %s' % command)
 
     def test_help_on_subcommand(self):
         required = [
-            '^usage: mon metric-create',
+            '^usage: monasca metric-create',
             "(?m)^Create metric",
         ]
         argstrings = [
@@ -142,10 +142,10 @@ class ShellTestCommon(ShellBase):
                 self.assertRegexpMatches(help_text, r)
 
 
-class ShellTestMonCommands(ShellBase):
+class ShellTestMonascaCommands(ShellBase):
 
     def setUp(self):
-        super(ShellTestMonCommands, self).setUp()
+        super(ShellTestMonascaCommands, self).setUp()
         self._set_fake_env()
 
     def _set_fake_env(self):
@@ -166,7 +166,7 @@ class ShellTestMonCommands(ShellBase):
             'metric-create 123',
             'metric-create',
         ]
-        _shell = monclient.shell.MonShell()
+        _shell = monascaclient.shell.MonascaShell()
         for argstr in argstrings:
             self.assertRaises(SystemExit, _shell.main, argstr.split())
 
@@ -201,7 +201,7 @@ class ShellTestMonCommands(ShellBase):
         argstrings = [
             'notification-create email1 metric1@hp.com',
         ]
-        _shell = monclient.shell.MonShell()
+        _shell = monascaclient.shell.MonascaShell()
         for argstr in argstrings:
             self.assertRaises(SystemExit, _shell.main, argstr.split())
 

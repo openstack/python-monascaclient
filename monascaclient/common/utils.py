@@ -22,9 +22,9 @@ import textwrap
 import uuid
 import yaml
 
-from monclient import exc
-from monclient.openstack.common import importutils
-from monclient.openstack.common import jsonutils
+from monascaclient import exc
+from monascaclient.openstack.common import importutils
+from monascaclient.openstack.common import jsonutils
 
 supported_formats = {
     "json": lambda x: jsonutils.dumps(x, indent=2),
@@ -131,7 +131,7 @@ def env(*vars, **kwargs):
 
 
 def import_versioned_module(version, submodule=None):
-    module = 'monclient.v%s' % version
+    module = 'monascaclient.v%s' % version
     if submodule:
         module = '.'.join((module, submodule))
     return importutils.import_module(module)
