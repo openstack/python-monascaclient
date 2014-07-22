@@ -17,7 +17,6 @@ from __future__ import print_function
 
 import os
 import prettytable
-import re
 import sys
 import textwrap
 import uuid
@@ -202,40 +201,6 @@ def format_expression_data(dict):
             d_str = k + ': ' + str(v)
             string_list.append(d_str)
     return '\n'.join(string_list)
-
-
-def transform_dim(dimstr):
-    """Quotes the dimension values."""
-    string_list = list()
-    kvlist = dimstr.split(',')
-    for s in kvlist:
-        kvpair = s.split('=')
-        key = kvpair[0].strip()
-        value = kvpair[1].strip()
-        new_kvpair = ""
-        # quote the value when not already quoted
-        if '"' in value:
-            new_kvpair = key + "=" + value
-        else:
-            new_kvpair = key + '="' + (value) + '"'
-        string_list.append(new_kvpair)
-    return (','.join(string_list))
-
-
-def transform_expression(expression):
-    """Quotes dimension values if expression contains dimensions."""
-    if '{' in expression:
-        newexpression = ""
-        splitstrs = re.split('({.+?})+', expression)
-        for substr in splitstrs:
-            if '{' in substr:
-                match = re.findall('{(.+)}', substr)
-                if match:
-                    substr = '{' + transform_dim(match[0]) + '}'
-            newexpression = newexpression + substr
-        return newexpression
-    else:
-        return expression
 
 
 def format_dictlist(dict_list):

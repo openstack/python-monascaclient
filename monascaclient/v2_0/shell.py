@@ -469,7 +469,7 @@ def do_alarm_create(mc, args):
     fields['name'] = args.name
     if args.description:
         fields['description'] = args.description
-    fields['expression'] = utils.transform_expression(args.expression)
+    fields['expression'] = args.expression
     if args.alarm_actions:
         fields['alarm_actions'] = args.alarm_actions
     if args.ok_actions:
@@ -542,8 +542,7 @@ def do_alarm_list(mc, args):
     if args.name:
         fields['name'] = args.name
     if args.dimensions:
-        quoted_dimstr = utils.transform_dim(','.join(args.dimensions))
-        fields['dimensions'] = utils.format_parameters(quoted_dimstr.split(','))
+        fields['dimensions'] = utils.format_parameters(args.dimensions)
     if args.state:
         if args.state.upper() not in state_types:
             errmsg = 'Invalid state, not one of [' + \
@@ -628,7 +627,7 @@ def do_alarm_update(mc, args):
     fields['name'] = args.name
     if args.description:
         fields['description'] = args.description
-    fields['expression'] = utils.transform_expression(args.expression)
+    fields['expression'] = args.expression
     if args.alarm_actions:
         fields['alarm_actions'] = args.alarm_actions
     if args.ok_actions:
@@ -701,7 +700,7 @@ def do_alarm_patch(mc, args):
     if args.description:
         fields['description'] = args.description
     if args.expression:
-        fields['expression'] = utils.transform_expression(args.expression)
+        fields['expression'] = args.expression
     if args.alarm_actions:
         fields['alarm_actions'] = args.alarm_actions
     if args.ok_actions:
@@ -788,8 +787,7 @@ def do_alarm_history_list(mc, args):
     '''List alarms state history.'''
     fields = {}
     if args.dimensions:
-        quoted_dimstr = utils.transform_dim(','.join(args.dimensions))
-        fields['dimensions'] = utils.format_parameters(quoted_dimstr.split(','))
+        fields['dimensions'] = utils.format_parameters(args.dimensions)
     if args.starttime:
         fields['start_time'] = args.starttime
     if args.endtime:
