@@ -21,10 +21,10 @@ from __future__ import print_function
 
 import argparse
 import logging
-import six
 import sys
 
 from keystoneclient.v2_0 import client as ksclient
+import six
 
 from monascaclient import client as monasca_client
 from monascaclient.common import utils

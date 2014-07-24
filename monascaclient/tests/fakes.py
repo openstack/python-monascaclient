@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from keystoneclient.v2_0 import client as ksclient
+
 from monascaclient.openstack.common import jsonutils
 
 

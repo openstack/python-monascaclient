@@ -16,10 +16,11 @@
 from __future__ import print_function
 
 import os
-import prettytable
 import sys
 import textwrap
 import uuid
+
+import prettytable
 import yaml
 
 from monascaclient import exc

@@ -14,10 +14,11 @@
 # limitations under the License.
 
 import json
+import time
+
 from monascaclient.common import utils
 import monascaclient.exc as exc
 from monascaclient.openstack.common import jsonutils
-import time
 
 
 # Alarm valid types
@@ -127,7 +128,7 @@ def format_measure_id(measurements):
     # returns newline separated measurements id's for the id column
     meas_string_list = list()
     for meas in measurements:
-        #meas_string = '{:10d}'.format(meas[0])
+        # meas_string = '{:10d}'.format(meas[0])
         meas_string = '{:20d}'.format(meas[0])
         meas_string_list.append(meas_string)
     return '\n'.join(meas_string_list)

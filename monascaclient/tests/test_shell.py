@@ -14,18 +14,18 @@
 # limitations under the License.
 
 import re
-import six
 import sys
 
 import fixtures
+from keystoneclient.v2_0 import client as ksclient
+from mox3 import mox
+import six
 import testtools
 
-from keystoneclient.v2_0 import client as ksclient
 from monascaclient.common import http
 from monascaclient import exc
 import monascaclient.shell
 from monascaclient.tests import fakes
-from mox3 import mox
 
 
 class TestCase(testtools.TestCase):
@@ -55,7 +55,7 @@ class TestCase(testtools.TestCase):
         orig = sys.stderr
         sys.stderr = six.StringIO()
         _shell = monascaclient.shell.MonascaShell()
-        e = self.assertRaises(Exception, _shell.main, argstr.split())
+        e = self.assertRaises(Exception, _shell.main, argstr.split())  # noqa
         self.assertRegexpMatches(e.__str__(), error_match)
         err = sys.stderr.getvalue()
         sys.stderr.close()
