@@ -1,42 +1,28 @@
 CHANGES
 =======
 
-1.0.5
+1.0.1
 -----
+* Update requirements matching global
+* bump hacking to 0.9.x series
+* use pbr.version, changelog updated
 
+1.0.0
+-----
+* renamed monclient to monascaclient
+* add gitreview
+* bash completion script and README
+* pep8 changes
 * fixed timestamp ordering in measurement-list, alarm-history. renamed enabled to actions-enabled
-
-1.0.4
------
-
 * Fixed enabled parms for alarm-patch, alarm-update
-* 1.0.3
-
-1.0.3
------
-
 * Add babel as a dependency
-
-1.0.2
------
-
-* Updated version info
 * Updated README
 * Added metric-statistics command
 * Modified the auth token to match dev env
 * Added severity to alarm commands, Added alarm-list by state option
-* 1.0.1 changelog
-
-1.0.1
------
-
 * new metric-create-raw command to support raw json body
 * Temporary fix for version problems in the egg/wheel
 * Added ChangeLog and .idea to the .gitignore
-
-1.0.0
------
-
 * Modified README.rst
 * Improved the README.rst
 * alarm-list supports optional dimensions

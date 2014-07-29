@@ -26,10 +26,12 @@ import sys
 from keystoneclient.v2_0 import client as ksclient
 import six
 
+import monascaclient
 from monascaclient import client as monasca_client
 from monascaclient.common import utils
 from monascaclient import exc
 from monascaclient.openstack.common import strutils
+
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +62,7 @@ class MonascaShell(object):
 
         parser.add_argument('--version',
                             action='version',
-                            version='1.0.4',
+                            version=monascaclient.__version__,
                             help="Shows the client version and exits.")
 
         parser.add_argument('-d', '--debug',
