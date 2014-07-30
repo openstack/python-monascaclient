@@ -7,7 +7,7 @@
 # well. We should probably sort those on the egg-name, rather than the
 # full line.
 
-function check_file() {
+function check_file {
     typeset f=$1
 
     # We don't care about comment lines.
@@ -20,11 +20,9 @@ function check_file() {
 }
 
 exit_code=0
-for filename in $@
-do
+for filename in $@; do
     check_file $filename
-    if [ $? -ne 0 ]
-    then
+    if [ $? -ne 0 ]; then
         echo "Please list requirements in $filename in alphabetical order" 1>&2
         exit_code=1
     fi

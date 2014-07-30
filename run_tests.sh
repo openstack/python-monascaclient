@@ -45,18 +45,18 @@ function run_tests {
     echo 'Running tests'
 
     if [ $debug -eq 1 ]; then
-      echo "Debugging..."
-      if [ "$args" = "" ]; then
-        # Default to running all tests if specific test is not
-        # provided.
-        testrargs="discover ./monascaclient/tests"
-      fi
-      ${wrapper} python -m testtools.run $args $testrargs
+        echo "Debugging..."
+        if [ "$args" = "" ]; then
+            # Default to running all tests if specific test is not
+            # provided.
+            testrargs="discover ./monascaclient/tests"
+        fi
+        ${wrapper} python -m testtools.run $args $testrargs
 
-      # Short circuit because all of the testr and coverage stuff
-      # below does not make sense when running testtools.run for
-      # debugging purposes.
-      return $?
+        # Short circuit because all of the testr and coverage stuff
+        # below does not make sense when running testtools.run for
+        # debugging purposes.
+        return $?
     fi
 
     # Just run the test suites in current environment
@@ -82,8 +82,7 @@ else
     done
 fi
 
-if [ "$no_venv" == 0 ]
-then
+if [ "$no_venv" == 0 ]; then
     # Remove the virtual environment if --force used
     if [ "$force" == 1 ]; then
         echo "Cleaning virtualenv..."
