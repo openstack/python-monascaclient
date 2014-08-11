@@ -119,7 +119,7 @@ class HTTPClient(object):
         if resp.content:
             content = resp.content
             if isinstance(content, six.binary_type):
-                content = content.decode()
+                content = content.decode('utf-8', 'strict')
             dump.extend([content, ''])
         LOG.debug('\n'.join(dump))
 

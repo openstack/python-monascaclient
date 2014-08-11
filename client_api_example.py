@@ -35,14 +35,14 @@ kwargs['token'] = 'Mehi789blahblahblah'
 monasca_client = client.Client(api_version, endpoint, **kwargs)
 
 # simulating token expired, call replace_token after initial construction
-token = 'MIIPtAYJKoZIhvcNAQcCoIIPpTCCD6ECAQblahblahblah'
+token = '172ebe22ec204257a958409e333b1695'
 monasca_client.replace_token(token)
 
 # you can reference the monascaclient.v2_0.shell.py
 # do_commands for command fields
 
 # post a metric
-dimensions = {'instance_id': '12345', 'service': 'hello'}
+dimensions = {'instance_id': '12345', 'service': 'nova'}
 fields = {}
 fields['name'] = 'metric1'
 fields['dimensions'] = dimensions
@@ -56,6 +56,23 @@ else:
     print(resp)
     print('Successfully created metric')
 
+# post a metric with a unicode service name
+dimensions = {'instance_id': '12345', 'service': u'\u76db\u5927'}
+fields = {}
+fields['name'] = 'metric1'
+fields['dimensions'] = dimensions
+fields['timestamp'] = time.time()
+fields['value'] = 222.333
+try:
+    resp = monasca_client.metrics.create(**fields)
+except exc.HTTPException as he:
+    print('HTTPException code=%s message=%s' % (he.code, he.message))
+else:
+    print(resp)
+    print('Successfully created metric')
+
+print ('Giving the DB time to update...')
+time.sleep(10)
 
 # metric-list
 name = 'metric1'

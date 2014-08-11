@@ -15,6 +15,7 @@
 
 from __future__ import print_function
 
+import numbers
 import os
 import sys
 import textwrap
@@ -48,7 +49,7 @@ def link_formatter(links):
 
 
 def json_formatter(js):
-    return jsonutils.dumps(js, indent=2)
+    return jsonutils.dumps(js, indent=2, ensure_ascii=False)
 
 
 def text_wrap_formatter(d):
@@ -199,7 +200,10 @@ def format_expression_data(dict):
             dim_str = format_dimensions(v)
             string_list.append(dim_str)
         else:
-            d_str = k + ': ' + str(v)
+            if isinstance(v, numbers.Number):
+                d_str = k + ': ' + str(v)
+            else:
+                d_str = k + ': ' + v
             string_list.append(d_str)
     return '\n'.join(string_list)
 
@@ -222,6 +226,9 @@ def format_dict(dict):
     # takes a dictionary to format for output
     dstring_list = list()
     for k, v in dict.items():
-        d_str = k + ': ' + str(v)
+        if isinstance(v, numbers.Number):
+            d_str = k + ': ' + str(v)
+        else:
+            d_str = k + ': ' + v
         dstring_list.append(d_str)
     return '\n'.join(dstring_list)
