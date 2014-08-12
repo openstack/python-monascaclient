@@ -35,7 +35,9 @@ notification_types = ['EMAIL', 'SMS']
 @utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
            help='key value pair used to create a metric dimension. '
            'This can be specified multiple times, or once with parameters '
-           'separated by a comma.',
+           'separated by a comma. '
+           'Dimensions need quoting when they contain special chars [&,(,),{,},>,<] '
+           'that confuse the CLI parser.',
            action='append')
 @utils.arg('--time', metavar='<UNIX_TIMESTAMP>',
            default=time.time(), type=int,
@@ -83,7 +85,9 @@ def do_metric_create_raw(mc, args):
 @utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
            help='key value pair used to specify a metric dimension. '
            'This can be specified multiple times, or once with parameters '
-           'separated by a comma.',
+           'separated by a comma. '
+           'Dimensions need quoting when they contain special chars [&,(,),{,},>,<] '
+           'that confuse the CLI parser.',
            action='append')
 def do_metric_list(mc, args):
     '''List metrics for this tenant.'''
@@ -179,7 +183,9 @@ def format_statistic_value(statistics, columns, stat_type):
 @utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
            help='key value pair used to specify a metric dimension. '
            'This can be specified multiple times, or once with parameters '
-           'separated by a comma.',
+           'separated by a comma. '
+           'Dimensions need quoting when they contain special chars [&,(,),{,},>,<] '
+           'that confuse the CLI parser.',
            action='append')
 @utils.arg('starttime', metavar='<UTC_START_TIME>',
            help='measurements >= UTC time. format: 2014-01-01T00:00:00Z.')
@@ -234,7 +240,9 @@ def do_measurement_list(mc, args):
 @utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
            help='key value pair used to specify a metric dimension. '
            'This can be specified multiple times, or once with parameters '
-           'separated by a comma.',
+           'separated by a comma. '
+           'Dimensions need quoting when they contain special chars [&,(,),{,},>,<] '
+           'that confuse the CLI parser.',
            action='append')
 @utils.arg('starttime', metavar='<UTC_START_TIME>',
            help='measurements >= UTC time. format: 2014-01-01T00:00:00Z.')
@@ -449,7 +457,7 @@ def do_notification_update(mc, args):
 @utils.arg('--description', metavar='<DESCRIPTION>',
            help='Description of the alarm.')
 @utils.arg('expression', metavar='<EXPRESSION>',
-           help='The alarm expression to evaluate. No spaces.')
+           help='The alarm expression to evaluate. Quoted.')
 @utils.arg('--severity', metavar='<SEVERITY>',
            help='Severity is one of [LOW, MEDIUM, HIGH, CRITICAL].')
 @utils.arg('--alarm-actions', metavar='<NOTIFICATION-ID>',
@@ -533,7 +541,9 @@ def do_alarm_show(mc, args):
 @utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
            help='key value pair used to specify a metric dimension. '
            'This can be specified multiple times, or once with parameters '
-           'separated by a comma.',
+           'separated by a comma. '
+           'Dimensions need quoting when they contain special chars [&,(,),{,},>,<] '
+           'that confuse the CLI parser.',
            action='append')
 @utils.arg('--state', metavar='<STATE>',
            help='STATE is one of [UNDETERMINED, OK, ALARM].')
@@ -602,7 +612,7 @@ def do_alarm_delete(mc, args):
 @utils.arg('--description', metavar='<DESCRIPTION>',
            help='Description of the alarm.')
 @utils.arg('expression', metavar='<EXPRESSION>',
-           help='The alarm expression to evaluate. No spaces.')
+           help='The alarm expression to evaluate. Quoted.')
 @utils.arg('--alarm-actions', metavar='<NOTIFICATION-ID>',
            help='The notification method to use when an alarm state is ALARM. '
            'This param may be specified multiple times.',
@@ -673,7 +683,7 @@ def do_alarm_update(mc, args):
 @utils.arg('--description', metavar='<DESCRIPTION>',
            help='Description of the alarm.')
 @utils.arg('--expression', metavar='<EXPRESSION>',
-           help='The alarm expression to evaluate. No spaces.')
+           help='The alarm expression to evaluate. Quoted.')
 @utils.arg('--alarm-actions', metavar='<NOTIFICATION-ID>',
            help='The notification method to use when an alarm state is ALARM. '
            'This param may be specified multiple times.',
@@ -778,7 +788,9 @@ def do_alarm_history(mc, args):
 @utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
            help='key value pair used to specify a metric dimension. '
            'This can be specified multiple times, or once with parameters '
-           'separated by a comma.',
+           'separated by a comma. '
+           'Dimensions need quoting when they contain special chars [&,(,),{,},>,<] '
+           'that confuse the CLI parser.',
            action='append')
 @utils.arg('--starttime', metavar='<UTC_START_TIME>',
            help='measurements >= UTC time. format: 2014-01-01T00:00:00Z.')
