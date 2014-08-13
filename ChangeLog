@@ -1,6 +1,12 @@
 CHANGES
 =======
 
+1.0.2
+-----
+* supports unicode
+* help for dimensions mentions need for quoting
+* fix several bashate issues
+
 1.0.1
 -----
 * Update requirements matching global
