@@ -54,6 +54,8 @@ def get_system_ca_file():
 class HTTPClient(object):
 
     def __init__(self, endpoint, **kwargs):
+        if endpoint.endswith('/'):
+            endpoint = endpoint[:-1]
         self.endpoint = endpoint
         self.auth_url = kwargs.get('auth_url')
         self.auth_token = kwargs.get('token')

@@ -268,7 +268,7 @@ class MonascaShell(object):
                 filter_value=kwargs.get('region_name'),
                 endpoint_type=kwargs.get('endpoint_type') or 'publicURL')
         return client.service_catalog.url_for(
-            service_type=kwargs.get('service_type') or 'orchestration',
+            service_type=kwargs.get('service_type') or 'monitoring',
             endpoint_type=kwargs.get('endpoint_type') or 'publicURL')
 
     def _setup_logging(self, debug):
@@ -355,8 +355,6 @@ class MonascaShell(object):
         }
 
         endpoint = args.monasca_api_url
-        if endpoint.endswith('/'):
-            endpoint = endpoint[:-1]
 
         if not args.os_no_client_auth:
             _ksclient = self._get_ksclient(**kwargs)
