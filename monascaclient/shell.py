@@ -24,13 +24,11 @@ import logging
 import sys
 
 from keystoneclient.v2_0 import client as ksclient
-import six
 
 import monascaclient
 from monascaclient import client as monasca_client
 from monascaclient.common import utils
 from monascaclient import exc
-from monascaclient.openstack.common import strutils
 
 
 logger = logging.getLogger(__name__)
@@ -430,7 +428,7 @@ def main(args=None):
         if '--debug' in args or '-d' in args:
             raise
         else:
-            print(strutils.safe_encode(six.text_type(e)), file=sys.stderr)
+            print(e, file=sys.stderr)
         sys.exit(1)
 
 if __name__ == "__main__":
