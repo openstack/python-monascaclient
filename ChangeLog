@@ -4,6 +4,8 @@ CHANGES
 1.0.3
 -----
 * use keystone endpoint when api url is not input
+* fixed unicode decode problem when printing exception
+* added optional cross tenant_id parameter to metric POST
 
 1.0.2
 -----

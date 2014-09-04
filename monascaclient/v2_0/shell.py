@@ -42,6 +42,8 @@ notification_types = ['EMAIL', 'SMS']
 @utils.arg('--time', metavar='<UNIX_TIMESTAMP>',
            default=time.time(), type=int,
            help='Metric timestamp. Default: current timestamp.')
+@utils.arg('--tenant_id', metavar='<CROSS_TENANT_ID>',
+           help='The tenant you want to post the metric for.')
 @utils.arg('value', metavar='<METRIC_VALUE>',
            type=float,
            help='Metric value.')
@@ -53,6 +55,8 @@ def do_metric_create(mc, args):
         fields['dimensions'] = utils.format_parameters(args.dimensions)
     fields['timestamp'] = args.time
     fields['value'] = args.value
+    if args.tenant_id:
+        fields['tenant_id'] = args.tenant_id
     try:
         mc.metrics.create(**fields)
     except exc.HTTPException as he:

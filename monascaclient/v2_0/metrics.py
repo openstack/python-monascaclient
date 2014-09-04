@@ -30,13 +30,17 @@ class MetricsManager(monasca_manager.MonascaManager):
 
     def create(self, **kwargs):
         """Create a metric."""
+        url_str = self.base_url
         newheaders = self.get_headers()
+        if 'tenant_id' in kwargs:
+            url_str = url_str + '?tenant_id=%s' % kwargs['tenant_id']
+            del kwargs['tenant_id']
         if 'jsonbody' in kwargs:
-            resp, body = self.client.json_request('POST', self.base_url,
+            resp, body = self.client.json_request('POST', url_str,
                                                   data=kwargs['jsonbody'],
                                                   headers=newheaders)
         else:
-            resp, body = self.client.json_request('POST', self.base_url,
+            resp, body = self.client.json_request('POST', url_str,
                                                   data=kwargs,
                                                   headers=newheaders)
         return resp
