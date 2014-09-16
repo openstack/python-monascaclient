@@ -290,7 +290,21 @@ Python API
 There's also a complete Python API.
 
 In order to use the python api directly, you must first obtain an auth token and 
-identify the monasca api endpoint.
+identify the monasca api endpoint.  The user can obtain the token and endpoint 
+using the keystone client api:   
+http://docs.openstack.org/developer/python-keystoneclient/.
+The service catalog name for our API endpoint is "monasca".
+
+Start using the monascaclient API by constructing the monascaclient client.Client class.
+The Client class takes these parameters: api_version, endpoint, and token. 
+The Client class is used to call all monasca-api resource commands (i.e. 
+client.Client.metrics.create(fields)).
+
+Long running users of Client will recieve an indication
+that the keystone token has expired when they receive an HTTP response
+code of 401 Unauthorized from the monasca-API.  In this case, it is
+up to the user to get a new token from keystone which can be passed 
+into the client.Client.replace_token(token) method.
 
 The api_version matches the version of the Monasca API.  Currently it is 'v2_0'.
 
