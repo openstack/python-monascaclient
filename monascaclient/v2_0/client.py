@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from monascaclient.common import http
+from monascaclient.v2_0 import alarm_definitions
 from monascaclient.v2_0 import alarms
 from monascaclient.v2_0 import metrics
 from monascaclient.v2_0 import notifications
@@ -37,6 +38,7 @@ class Client(object):
         self.notifications = notifications.NotificationsManager(
             self.http_client)
         self.alarms = alarms.AlarmsManager(self.http_client)
+        self.alarm_definitions = alarm_definitions.AlarmDefinitionsManager(self.http_client)
 
     def replace_token(self, token):
         self.http_client.replace_token(token)

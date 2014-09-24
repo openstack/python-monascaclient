@@ -46,7 +46,7 @@ class MonascaShell(object):
             # formatter_class=HelpFormatter,
             formatter_class=lambda prog: argparse.HelpFormatter(
                 prog,
-                max_help_position=25)
+                max_help_position=29)
         )
 
         # Global arguments

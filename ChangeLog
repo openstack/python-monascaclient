@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+1.0.4
+-----
+* Alarmed metrics API changes supported. 
+
 1.0.3
 -----
 * use keystone endpoint when api url is not input

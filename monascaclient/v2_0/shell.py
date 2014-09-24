@@ -42,7 +42,7 @@ notification_types = ['EMAIL', 'SMS']
 @utils.arg('--time', metavar='<UNIX_TIMESTAMP>',
            default=time.time(), type=int,
            help='Metric timestamp. Default: current timestamp.')
-@utils.arg('--tenant_id', metavar='<CROSS_TENANT_ID>',
+@utils.arg('--tenant-id', metavar='<CROSS_TENANT_ID>',
            help='The tenant you want to post the metric for.')
 @utils.arg('value', metavar='<METRIC_VALUE>',
            type=float,
@@ -100,9 +100,6 @@ def do_metric_list(mc, args):
         fields['name'] = args.name
     if args.dimensions:
         fields['dimensions'] = utils.format_parameters(args.dimensions)
-        if 'name' not in fields:
-            print('--name is required when --dimensions are specified.')
-            return
     try:
         metric = mc.metrics.list(**fields)
     except exc.HTTPException as he:
@@ -456,14 +453,19 @@ def do_notification_update(mc, args):
         print(jsonutils.dumps(notification, indent=2))
 
 
-@utils.arg('name', metavar='<ALARM_NAME>',
-           help='Name of the alarm to create.')
+@utils.arg('name', metavar='<ALARM_DEFINITION_NAME>',
+           help='Name of the alarm definition to create.')
 @utils.arg('--description', metavar='<DESCRIPTION>',
            help='Description of the alarm.')
 @utils.arg('expression', metavar='<EXPRESSION>',
            help='The alarm expression to evaluate. Quoted.')
 @utils.arg('--severity', metavar='<SEVERITY>',
            help='Severity is one of [LOW, MEDIUM, HIGH, CRITICAL].')
+@utils.arg('--match-by', metavar='<DIMENSION_KEY1,DIMENSION_KEY2,...>',
+           help='The metric dimensions to match to the alarm dimensions. '
+           'One or more dimension key names separated by a comma. '
+           'Key names need quoting when they contain special chars [&,(,),{,},>,<] '
+           'that confuse the CLI parser.')
 @utils.arg('--alarm-actions', metavar='<NOTIFICATION-ID>',
            help='The notification method to use when an alarm state is ALARM. '
            'This param may be specified multiple times.',
@@ -476,8 +478,8 @@ def do_notification_update(mc, args):
            help='The notification method to use when an alarm state is '
            'UNDETERMINED. This param may be specified multiple times.',
            action='append')
-def do_alarm_create(mc, args):
-    '''Create alarm.'''
+def do_alarm_definition_create(mc, args):
+    '''Create an alarm definition.'''
     fields = {}
     fields['name'] = args.name
     if args.description:
@@ -496,8 +498,10 @@ def do_alarm_create(mc, args):
             print(errmsg)
             return
         fields['severity'] = args.severity
+    if args.match_by:
+        fields['match_by'] = args.match_by.split(',')
     try:
-        alarm = mc.alarms.create(**fields)
+        alarm = mc.alarm_definitions.create(**fields)
     except exc.HTTPException as he:
         raise exc.CommandError(
             'HTTPException code=%s message=%s' %
@@ -506,14 +510,14 @@ def do_alarm_create(mc, args):
         print(jsonutils.dumps(alarm, indent=2))
 
 
-@utils.arg('id', metavar='<ALARM_ID>',
-           help='The ID of the alarm.')
-def do_alarm_show(mc, args):
-    '''Describe the alarm.'''
+@utils.arg('id', metavar='<ALARM_DEFINITION_ID>',
+           help='The ID of the alarm definition.')
+def do_alarm_definition_show(mc, args):
+    '''Describe the alarm definition.'''
     fields = {}
     fields['alarm_id'] = args.id
     try:
-        alarm = mc.alarms.get(**fields)
+        alarm = mc.alarm_definitions.get(**fields)
     except exc.HTTPException as he:
         raise exc.CommandError(
             'HTTPException code=%s message=%s' %
@@ -528,7 +532,7 @@ def do_alarm_show(mc, args):
             'id': utils.json_formatter,
             'expression': utils.json_formatter,
             'expression_data': utils.format_expression_data,
-            'state': utils.json_formatter,
+            'match_by': utils.json_formatter,
             'actions_enabled': utils.json_formatter,
             'alarm_actions': utils.json_formatter,
             'ok_actions': utils.json_formatter,
@@ -540,8 +544,8 @@ def do_alarm_show(mc, args):
         utils.print_dict(alarm, formatters=formatters)
 
 
-@utils.arg('--name', metavar='<ALARM_NAME>',
-           help='Name of the alarm.')
+@utils.arg('--name', metavar='<ALARM_DEFINITION_NAME>',
+           help='Name of the alarm definition.')
 @utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
            help='key value pair used to specify a metric dimension. '
            'This can be specified multiple times, or once with parameters '
@@ -549,24 +553,15 @@ def do_alarm_show(mc, args):
            'Dimensions need quoting when they contain special chars [&,(,),{,},>,<] '
            'that confuse the CLI parser.',
            action='append')
-@utils.arg('--state', metavar='<STATE>',
-           help='STATE is one of [UNDETERMINED, OK, ALARM].')
-def do_alarm_list(mc, args):
-    '''List alarms for this tenant.'''
+def do_alarm_definition_list(mc, args):
+    '''List alarm definitions for this tenant.'''
     fields = {}
     if args.name:
         fields['name'] = args.name
     if args.dimensions:
         fields['dimensions'] = utils.format_parameters(args.dimensions)
-    if args.state:
-        if args.state.upper() not in state_types:
-            errmsg = 'Invalid state, not one of [' + \
-                ', '.join(state_types) + ']'
-            print(errmsg)
-            return
-        fields['state'] = args.state
     try:
-        alarm = mc.alarms.list(**fields)
+        alarm = mc.alarm_definitions.list(**fields)
     except exc.HTTPException as he:
         raise exc.CommandError(
             'HTTPException code=%s message=%s' %
@@ -575,12 +570,12 @@ def do_alarm_list(mc, args):
         if args.json:
             print(utils.json_formatter(alarm))
             return
-        cols = ['name', 'id', 'expression', 'state', 'actions_enabled']
+        cols = ['name', 'id', 'expression', 'match_by', 'actions_enabled']
         formatters = {
             'name': lambda x: x['name'],
             'id': lambda x: x['id'],
             'expression': lambda x: x['expression'],
-            'state': lambda x: x['state'],
+            'match_by': lambda x: x['match_by'],
             'actions_enabled': lambda x: x['actions_enabled'],
         }
         if isinstance(alarm, list):
@@ -593,26 +588,26 @@ def do_alarm_list(mc, args):
             utils.print_list(alarm_list, cols, formatters=formatters, sortby=1)
 
 
-@utils.arg('id', metavar='<ALARM_ID>',
-           help='The ID of the alarm.')
-def do_alarm_delete(mc, args):
-    '''Delete alarm.'''
+@utils.arg('id', metavar='<ALARM_DEFINITION_ID>',
+           help='The ID of the alarm definition.')
+def do_alarm_definition_delete(mc, args):
+    '''Delete the alarm definition.'''
     fields = {}
     fields['alarm_id'] = args.id
     try:
-        mc.alarms.delete(**fields)
+        mc.alarm_definitions.delete(**fields)
     except exc.HTTPException as he:
         raise exc.CommandError(
             'HTTPException code=%s message=%s' %
             (he.code, he.message))
     else:
-        print('Successfully deleted alarm')
+        print('Successfully deleted alarm definition')
 
 
-@utils.arg('id', metavar='<ALARM_ID>',
-           help='The ID of the alarm.')
-@utils.arg('name', metavar='<ALARM_NAME>',
-           help='Name of the alarm.')
+@utils.arg('id', metavar='<ALARM_DEFINITION_ID>',
+           help='The ID of the alarm definition.')
+@utils.arg('name', metavar='<ALARM_DEFINITION_NAME>',
+           help='Name of the alarm definition.')
 @utils.arg('--description', metavar='<DESCRIPTION>',
            help='Description of the alarm.')
 @utils.arg('expression', metavar='<EXPRESSION>',
@@ -631,12 +626,15 @@ def do_alarm_delete(mc, args):
            action='append')
 @utils.arg('actions_enabled', metavar='<ACTIONS-ENABLED>',
            help='The actions-enabled boolean is one of [true,false]')
-@utils.arg('state', metavar='<STATE>',
-           help='The alarm state. State is one of [UNDETERMINED,ALARM,OK]')
+@utils.arg('--match-by', metavar='<DIMENSION_KEY1,DIMENSION_KEY2,...>',
+           help='The metric dimensions to match to the alarm dimensions. '
+           'One or more dimension key names separated by a comma. '
+           'Key names need quoting when they contain special chars [&,(,),{,},>,<] '
+           'that confuse the CLI parser.')
 @utils.arg('--severity', metavar='<SEVERITY>',
            help='Severity is one of [LOW, MEDIUM, HIGH, CRITICAL].')
-def do_alarm_update(mc, args):
-    '''Update the alarm.'''
+def do_alarm_definition_update(mc, args):
+    '''Update the alarm definition.'''
     fields = {}
     fields['alarm_id'] = args.id
     fields['name'] = args.name
@@ -656,13 +654,8 @@ def do_alarm_update(mc, args):
             print(errmsg)
             return
         fields['actions_enabled'] = args.actions_enabled in ['true', 'True']
-    if args.state:
-        if args.state.upper() not in state_types:
-            errmsg = 'Invalid state, not one of [' + \
-                ', '.join(state_types) + ']'
-            print(errmsg)
-            return
-        fields['state'] = args.state
+    if args.match_by:
+        fields['match_by'] = args.match_by.split(',')
     if args.severity:
         if args.severity.upper() not in severity_types:
             errmsg = 'Invalid severity, not one of [' + \
@@ -671,7 +664,7 @@ def do_alarm_update(mc, args):
             return
         fields['severity'] = args.severity
     try:
-        alarm = mc.alarms.update(**fields)
+        alarm = mc.alarm_definitions.update(**fields)
     except exc.HTTPException as he:
         raise exc.CommandError(
             'HTTPException code=%s message=%s' %
@@ -680,10 +673,10 @@ def do_alarm_update(mc, args):
         print(jsonutils.dumps(alarm, indent=2))
 
 
-@utils.arg('id', metavar='<ALARM_ID>',
-           help='The ID of the alarm.')
-@utils.arg('--name', metavar='<ALARM_NAME>',
-           help='Name of the alarm.')
+@utils.arg('id', metavar='<ALARM_DEFINITION_ID>',
+           help='The ID of the alarm definition.')
+@utils.arg('--name', metavar='<ALARM_DEFINITION_NAME>',
+           help='Name of the alarm definition.')
 @utils.arg('--description', metavar='<DESCRIPTION>',
            help='Description of the alarm.')
 @utils.arg('--expression', metavar='<EXPRESSION>',
@@ -702,12 +695,15 @@ def do_alarm_update(mc, args):
            action='append')
 @utils.arg('--actions-enabled', metavar='<ACTIONS-ENABLED>',
            help='The actions-enabled boolean is one of [true,false]')
-@utils.arg('--state', metavar='<STATE>',
-           help='The alarm state. State is one of [UNDETERMINED,ALARM,OK]')
+@utils.arg('--match-by', metavar='<DIMENSION_KEY1,DIMENSION_KEY2,...>',
+           help='The metric dimensions to match to the alarm dimensions. '
+           'One or more dimension key names separated by a comma. '
+           'Key names need quoting when they contain special chars [&,(,),{,},>,<] '
+           'that confuse the CLI parser.')
 @utils.arg('--severity', metavar='<SEVERITY>',
            help='Severity is one of [LOW, MEDIUM, HIGH, CRITICAL].')
-def do_alarm_patch(mc, args):
-    '''Patch the alarm.'''
+def do_alarm_definition_patch(mc, args):
+    '''Patch the alarm definition.'''
     fields = {}
     fields['alarm_id'] = args.id
     if args.name:
@@ -729,13 +725,8 @@ def do_alarm_patch(mc, args):
             print(errmsg)
             return
         fields['actions_enabled'] = args.actions_enabled in ['true', 'True']
-    if args.state:
-        if args.state.upper() not in state_types:
-            errmsg = 'Invalid state, not one of [' + \
-                ', '.join(state_types) + ']'
-            print(errmsg)
-            return
-        fields['state'] = args.state
+    if args.match_by:
+        fields['match_by'] = args.match_by.split(',')
     if args.severity:
         if args.severity.upper() not in severity_types:
             errmsg = 'Invalid severity, not one of [' + \
@@ -743,6 +734,137 @@ def do_alarm_patch(mc, args):
             print(errmsg)
             return
         fields['severity'] = args.severity
+    try:
+        alarm = mc.alarm_definitions.patch(**fields)
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
+    else:
+        print(jsonutils.dumps(alarm, indent=2))
+
+
+@utils.arg('--alarm-definition-id', metavar='<ALARM_DEFINITION_ID>',
+           help='The ID of the alarm definition.')
+@utils.arg('--metric-name', metavar='<METRIC_NAME>',
+           help='Name of the metric.')
+@utils.arg('--metric-dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
+           help='key value pair used to specify a metric dimension. '
+           'This can be specified multiple times, or once with parameters '
+           'separated by a comma. '
+           'Dimensions need quoting when they contain special chars [&,(,),{,},>,<] '
+           'that confuse the CLI parser.',
+           action='append')
+@utils.arg('--state', metavar='<ALARM_STATE>',
+           help='ALARM_STATE is one of [UNDETERMINED, OK, ALARM].')
+def do_alarm_list(mc, args):
+    '''List alarms for this tenant.'''
+    fields = {}
+    if args.alarm_definition_id:
+        fields['alarm_definition_id'] = args.alarm_definition_id
+    if args.metric_name:
+        fields['metric_name'] = args.metric_name
+    if args.metric_dimensions:
+        fields['metric_dimensions'] = utils.format_parameters(args.metric_dimensions)
+    if args.state:
+        if args.state.upper() not in state_types:
+            errmsg = 'Invalid state, not one of [' + \
+                ', '.join(state_types) + ']'
+            print(errmsg)
+            return
+        fields['state'] = args.state
+    try:
+        alarm = mc.alarms.list(**fields)
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
+    else:
+        if args.json:
+            print(utils.json_formatter(alarm))
+            return
+        cols = ['id', 'alarm_definition_id', 'metrics', 'state']
+        formatters = {
+            'id': lambda x: x['id'],
+            'alarm_definition_id': lambda x: x['alarm_definition_id'],
+            'metrics': lambda x: x['metrics'],
+            'state': lambda x: x['state'],
+        }
+        if isinstance(alarm, list):
+            # print the list
+            utils.print_list(alarm, cols, formatters=formatters, sortby=3)
+        else:
+            # add the dictionary to a list, so print_list works
+            alarm_list = list()
+            alarm_list.append(alarm)
+            utils.print_list(alarm_list, cols, formatters=formatters, sortby=3)
+
+
+@utils.arg('id', metavar='<ALARM_ID>',
+           help='The ID of the alarm.')
+def do_alarm_show(mc, args):
+    '''Describe the alarm.'''
+    fields = {}
+    fields['alarm_id'] = args.id
+    try:
+        alarm = mc.alarms.get(**fields)
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
+    else:
+        if args.json:
+            print(utils.json_formatter(alarm))
+            return
+        # print out detail of a single alarm
+        formatters = {
+            'id': utils.json_formatter,
+            'alarm_definition_id': utils.json_formatter,
+            'metrics': utils.json_formatter,
+            'state': utils.json_formatter,
+            'links': utils.format_dictlist,
+        }
+        utils.print_dict(alarm, formatters=formatters)
+
+
+@utils.arg('id', metavar='<ALARM_ID>',
+           help='The ID of the alarm.')
+@utils.arg('state', metavar='<ALARM_STATE>',
+           help='ALARM_STATE is one of [UNDETERMINED, OK, ALARM].')
+def do_alarm_update(mc, args):
+    '''Update the alarm state.'''
+    fields = {}
+    fields['alarm_id'] = args.id
+    if args.state.upper() not in state_types:
+            errmsg = 'Invalid state, not one of [' + \
+                ', '.join(state_types) + ']'
+            print(errmsg)
+            return
+    fields['state'] = args.state
+    try:
+        alarm = mc.alarms.update(**fields)
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
+    else:
+        print(jsonutils.dumps(alarm, indent=2))
+
+
+@utils.arg('id', metavar='<ALARM_ID>',
+           help='The ID of the alarm.')
+@utils.arg('state', metavar='<ALARM_STATE>',
+           help='ALARM_STATE is one of [UNDETERMINED, OK, ALARM].')
+def do_alarm_patch(mc, args):
+    '''Patch the alarm state.'''
+    fields = {}
+    fields['alarm_id'] = args.id
+    if args.state.upper() not in state_types:
+            errmsg = 'Invalid state, not one of [' + \
+                ', '.join(state_types) + ']'
+            print(errmsg)
+            return
+    fields['state'] = args.state
     try:
         alarm = mc.alarms.patch(**fields)
     except exc.HTTPException as he:
@@ -755,8 +877,24 @@ def do_alarm_patch(mc, args):
 
 @utils.arg('id', metavar='<ALARM_ID>',
            help='The ID of the alarm.')
+def do_alarm_delete(mc, args):
+    '''Delete the alarm.'''
+    fields = {}
+    fields['alarm_id'] = args.id
+    try:
+        mc.alarms.delete(**fields)
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
+    else:
+        print('Successfully deleted alarm')
+
+
+@utils.arg('id', metavar='<ALARM_ID>',
+           help='The ID of the alarm.')
 def do_alarm_history(mc, args):
-    '''Alarm state history.'''
+    '''Alarm state transition history.'''
     fields = {}
     fields['alarm_id'] = args.id
     try:
@@ -766,27 +904,10 @@ def do_alarm_history(mc, args):
             'HTTPException code=%s message=%s' %
             (he.code, he.message))
     else:
-        if args.json:
-            print(utils.json_formatter(alarm))
-            return
-        cols = ['alarm_id', 'new_state', 'old_state', 'timestamp', 'reason',
-                'reason_data']
-        formatters = {
-            'alarm_id': lambda x: x['alarm_id'],
-            'old_state': lambda x: x['old_state'],
-            'new_state': lambda x: x['new_state'],
-            'timestamp': lambda x: x['timestamp'],
-            'reason': lambda x: x['reason'],
-            'reason_data': lambda x: x['reason_data'],
-        }
-        if isinstance(alarm, list):
-            # print the list
-            utils.print_list(alarm, cols, formatters=formatters, sortby=3)
-        else:
-            # add the dictionary to a list, so print_list works
-            alarm_list = list()
-            alarm_list.append(alarm)
-            utils.print_list(alarm_list, cols, formatters=formatters, sortby=3)
+        # if args.json:
+        print(utils.json_formatter(alarm))
+        return
+        # TODO(cindyo) format output
 
 
 @utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
@@ -816,24 +937,7 @@ def do_alarm_history_list(mc, args):
             'HTTPException code=%s message=%s' %
             (he.code, he.message))
     else:
-        if args.json:
-            print(utils.json_formatter(alarm))
-            return
-        cols = ['alarm_id', 'new_state', 'old_state', 'reason',
-                'reason_data', 'timestamp']
-        formatters = {
-            'alarm_id': lambda x: x['alarm_id'],
-            'old_state': lambda x: x['old_state'],
-            'new_state': lambda x: x['new_state'],
-            'reason': lambda x: x['reason'],
-            'reason_data': lambda x: x['reason_data'],
-            'timestamp': lambda x: x['timestamp'],
-        }
-        if isinstance(alarm, list):
-            # print the list
-            utils.print_list(alarm, cols, formatters=formatters, sortby=5)
-        else:
-            # add the dictionary to a list, so print_list works
-            alarm_list = list()
-            alarm_list.append(alarm)
-            utils.print_list(alarm_list, cols, formatters=formatters, sortby=5)
+        # if args.json:
+        print(utils.json_formatter(alarm))
+        return
+        # TODO(cindyo) format output

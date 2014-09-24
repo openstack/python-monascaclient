@@ -89,27 +89,32 @@ You'll find complete documentation on the shell by running
   
   positional arguments:
     <subcommand>
-      alarm-create         Create alarm.
-      alarm-delete         Delete alarm.
-      alarm-history        Alarm state history.
-      alarm-history-list   List alarms state history.
-      alarm-list           List alarms for this tenant.
-      alarm-patch          Patch the alarm.
-      alarm-show           Describe the alarm.
-      alarm-update         Update the alarm.
-      measurement-list     List measurements for the specified metric.
-      metric-create        Create metric.
-      metric-create-raw    Create metric from raw json body.
-      metric-list          List metrics for this tenant.
-      metric-statistics    List measurement statistics for the specified metric.
-      notification-create  Create notification.
-      notification-delete  Delete notification.
-      notification-list    List notifications for this tenant.
-      notification-show    Describe the notification.
-      notification-update  Update notification.
-      bash-completion      Prints all of the commands and options to stdout.
-      help                 Display help about this program or one of its
-                           subcommands.
+      alarm-definition-create  Create an alarm definition.
+      alarm-definition-delete  Delete the alarm definition.
+      alarm-definition-list    List alarm definitions for this tenant.
+      alarm-definition-patch   Patch the alarm definition.
+      alarm-definition-show    Describe the alarm definition.
+      alarm-definition-update  Update the alarm definition.
+      alarm-delete             Delete the alarm.
+      alarm-history            Alarm state history.
+      alarm-history-list       List alarms state history.
+      alarm-list               List alarms for this tenant.
+      alarm-patch              Patch the alarm.
+      alarm-show               Describe the alarm.
+      alarm-update             Update the alarm.
+      measurement-list         List measurements for the specified metric.
+      metric-create            Create metric.
+      metric-create-raw        Create metric from raw json body.
+      metric-list              List metrics for this tenant.
+      metric-statistics        List measurement statistics for the specified metric.
+      notification-create      Create notification.
+      notification-delete      Delete notification.
+      notification-list        List notifications for this tenant.
+      notification-show        Describe the notification.
+      notification-update      Update notification.
+      bash-completion          Prints all of the commands and options to stdout.
+      help                     Display help about this program or one of its
+                               subcommands.
   
   optional arguments:
     -j, --json             output raw json response
@@ -168,7 +173,7 @@ Basic command tab completion can be enabled by sourcing the bash completion scri
 
 Metrics Examples
 ~~~~~~~~~~~~~~~~
-Note: this is not meant to be a complete list.
+Note:  To see complete usage: 'monasca help' and 'monasca help <command>'
 
 metric-create::
   
@@ -211,7 +216,7 @@ measurement-list::
 
 Notifications Examples
 ~~~~~~~~~~~~~~~~~~~~~~
-Note: this is not meant to be a complete list.
+Note:  To see complete usage: 'monasca help' and 'monasca help <command>'
 
 notification-create::
   
@@ -229,59 +234,58 @@ notification-list::
 
 Alarms Examples
 ~~~~~~~~~~~~~~~
-Note: this is not meant to be a complete list.
+Note:  To see complete usage: 'monasca help' and 'monasca help <command>'
 
-alarm-create::
+alarm-definition-create::
   
-  monasca alarm-create cpu1alarm 'cpu1>10'
-  monasca alarm-create cpu2alarm 'cpu1>99' --severity HIGH
-  monasca alarm-create test1alarm1 'avg(metric1{instance_id=123)>=10' --severity CRITICAL --description 'avg greater than thresh' --alarm-actions 5651406c-447d-40bd-b868-b2b3e6b59e32
+  monasca alarm-definition-create --match-by hostname TEST_ALARM_DEF_MATCH_BY "max(cpu.load_avg_1_min) > 0"
 
-alarm-list::
+alarm-definition-list::
   
-  monasca alarm-list
-  +-------------+--------------------------------------+------------------------------------+--------------+-----------------+
-  | name        | id                                   | expression                         | state        | actions_enabled |
-  +-------------+--------------------------------------+------------------------------------+--------------+-----------------+
-  | cpu1alarm   | 67b9f4cc-3d57-4c6c-848c-555d0b3a8579 | cpu1>10                            | UNDETERMINED | True            |
-  | cpu2alarm   | 9e6b9fad-ef1b-4030-beab-10678bcc758a | cpu1>99                            | UNDETERMINED | True            |
-  | test1alarm1 | c81e1d40-2115-4557-96f4-eda6b8823fd6 | avg(metric1{instance_id=123}) >= 10| UNDETERMINED | True            |
-  +-------------+--------------------------------------+------------------------------------+--------------+-----------------+
+  +------------------------------+--------------------------------------+------------------------------------------------+---------------+-----------------+
+  | name                         | id                                   | expression                                     | match_by      | actions_enabled |
+  +------------------------------+--------------------------------------+------------------------------------------------+---------------+-----------------+
+  | TEST_ALARM_DEF_MATCH_BY      | addfef44-e458-4a54-855b-78908e8cd60c | max(cpu.load_avg_1_min) > 0                    | [u'hostname'] | True            |
+  +------------------------------+--------------------------------------+------------------------------------------------+---------------+-----------------+
 
-alarm-show::
+alarm-definition-show::
   
-  monasca alarm-show c81e1d40-2115-4557-96f4-eda6b8823fd6
+  monasca alarm-definition-show addfef44-e458-4a54-855b-78908e8cd60c
   +----------------------+----------------------------------------------------------------------------------------------------+
   | Property             | Value                                                                                              |
   +----------------------+----------------------------------------------------------------------------------------------------+
   | actions_enabled      | true                                                                                               |
-  | alarm_actions        | [                                                                                                  |
-  |                      |   "5651406c-447d-40bd-b868-b2b3e6b59e32"                                                           |
+  | alarm_actions        | []                                                                                                 |
+  | description          | ""                                                                                                 |
+  | expression           | "max(cpu.load_avg_1_min) > 0"                                                                      |
+  | id                   | "addfef44-e458-4a54-855b-78908e8cd60c"                                                             |
+  | links                | href:http://192.168.10.4:8080/v2.0/alarm-definitions/addfef44-e458-4a54-855b-78908e8cd60c,rel:self |
+  | match_by             | [                                                                                                  |
+  |                      |   "hostname"                                                                                       |
   |                      | ]                                                                                                  |
-  | description          | "avg greater than thresh"                                                                          |
-  | expression           | "avg(metric1{instance_id=123})>=10"                                                                |
-  | expression_data      | function: AVG                                                                                      |
-  |                      | metric_name: metric1                                                                               |
-  |                      | period: 60                                                                                         |
-  |                      | threshold: 10.0                                                                                    |
-  |                      | periods: 1                                                                                         |
-  |                      | operator: GTE                                                                                      |
-  |                      | dimensions: {                                                                                      |
-  |                      | instance_id: 123                                                                                   |
-  |                      | }                                                                                                  |
-  | id                   | "c81e1d40-2115-4557-96f4-eda6b8823fd6"                                                             |
-  | links                | href:http://192.168.10.4:8080/v2.0/alarms/c81e1d40-2115-4557-96f4-eda6b8823fd6,rel:self            |
-  |                      | href:http://192.168.10.4:8080/v2.0/alarms/c81e1d40-2115-4557-96f4-eda6b8823fd6/history,rel:history |
-  | name                 | "test1alarm1"                                                                                      |
+  | name                 | "TEST_ALARM_DEF_MATCH_BY"                                                                          |
   | ok_actions           | []                                                                                                 |
-  | severity             | "CRITICAL"                                                                                         |
-  | state                | "UNDETERMINED"                                                                                     |
+  | severity             | "LOW"                                                                                              |
   | undetermined_actions | []                                                                                                 |
   +----------------------+----------------------------------------------------------------------------------------------------+
 
+alarm-definition-delete::
+  
+  monasca alarm-definition-delete addfef44-e458-4a54-855b-78908e8cd60c
+
+alarm-list::
+  
+  monasca alarm-list
+  +--------------------------------------+--------------------------------------+----------------------------------------------------------------------------------------------------------+-------+
+  | id                                   | alarm_definition_id                  | metrics                                                                                                  | state |
+  +--------------------------------------+--------------------------------------+----------------------------------------------------------------------------------------------------------+-------+
+  | 46b8568d-99fc-4801-8a9f-5469b4fefaea | addfef44-e458-4a54-855b-78908e8cd60c | [{u'name': u'cpu.load_avg_1_min', u'dimensions': {u'hostname': u'mini-mon', u'service': u'monitoring'}}] | ALARM |
+  | e9399e5e-cabe-433e-b1d8-56be0bd809a9 | addfef44-e458-4a54-855b-78908e8cd60c | [{u'name': u'cpu.load_avg_1_min', u'dimensions': {u'hostname': u'devstack', u'service': u'monitoring'}}] | ALARM |
+  +--------------------------------------+--------------------------------------+----------------------------------------------------------------------------------------------------------+-------+
+
 alarm-patch::
   
-  monasca alarm-patch c81e1d40-2115-4557-96f4-eda6b8823fd6 --state OK
+  monasca alarm-patch 46b8568d-99fc-4801-8a9f-5469b4fefaea --state OK
 
 
 Python API
