@@ -238,19 +238,19 @@ Note:  To see complete usage: 'monasca help' and 'monasca help <command>'
 
 alarm-definition-create::
   
-  monasca alarm-definition-create --match-by hostname TEST_ALARM_DEF_MATCH_BY "max(cpu.load_avg_1_min) > 0"
+  monasca alarm-definition-create alarmPerHost "max(cpu.load_avg_1_min) > 0" --match-by hostname
 
 alarm-definition-list::
   
-  +------------------------------+--------------------------------------+------------------------------------------------+---------------+-----------------+
-  | name                         | id                                   | expression                                     | match_by      | actions_enabled |
-  +------------------------------+--------------------------------------+------------------------------------------------+---------------+-----------------+
-  | TEST_ALARM_DEF_MATCH_BY      | addfef44-e458-4a54-855b-78908e8cd60c | max(cpu.load_avg_1_min) > 0                    | [u'hostname'] | True            |
-  +------------------------------+--------------------------------------+------------------------------------------------+---------------+-----------------+
+  +--------------+--------------------------------------+-----------------------------+----------+-----------------+
+  | name         | id                                   | expression                  | match_by | actions_enabled |
+  +--------------+--------------------------------------+-----------------------------+----------+-----------------+
+  | alarmPerHost | 4bf6bfc2-c5ac-4d57-b7db-cf5313b05412 | max(cpu.load_avg_1_min) > 0 | hostname | True            |
+  +--------------+--------------------------------------+-----------------------------+----------+-----------------+
 
 alarm-definition-show::
   
-  monasca alarm-definition-show addfef44-e458-4a54-855b-78908e8cd60c
+  monasca alarm-definition-show 4bf6bfc2-c5ac-4d57-b7db-cf5313b05412
   +----------------------+----------------------------------------------------------------------------------------------------+
   | Property             | Value                                                                                              |
   +----------------------+----------------------------------------------------------------------------------------------------+
@@ -258,12 +258,12 @@ alarm-definition-show::
   | alarm_actions        | []                                                                                                 |
   | description          | ""                                                                                                 |
   | expression           | "max(cpu.load_avg_1_min) > 0"                                                                      |
-  | id                   | "addfef44-e458-4a54-855b-78908e8cd60c"                                                             |
-  | links                | href:http://192.168.10.4:8080/v2.0/alarm-definitions/addfef44-e458-4a54-855b-78908e8cd60c,rel:self |
+  | id                   | "4bf6bfc2-c5ac-4d57-b7db-cf5313b05412"                                                             |
+  | links                | href:http://192.168.10.4:8080/v2.0/alarm-definitions/4bf6bfc2-c5ac-4d57-b7db-cf5313b05412,rel:self |
   | match_by             | [                                                                                                  |
   |                      |   "hostname"                                                                                       |
   |                      | ]                                                                                                  |
-  | name                 | "TEST_ALARM_DEF_MATCH_BY"                                                                          |
+  | name                 | "alarmPerHost"                                                                                     |
   | ok_actions           | []                                                                                                 |
   | severity             | "LOW"                                                                                              |
   | undetermined_actions | []                                                                                                 |
@@ -271,21 +271,34 @@ alarm-definition-show::
 
 alarm-definition-delete::
   
-  monasca alarm-definition-delete addfef44-e458-4a54-855b-78908e8cd60c
+  monasca alarm-definition-delete 4bf6bfc2-c5ac-4d57-b7db-cf5313b05412
 
 alarm-list::
   
   monasca alarm-list
-  +--------------------------------------+--------------------------------------+----------------------------------------------------------------------------------------------------------+-------+
-  | id                                   | alarm_definition_id                  | metrics                                                                                                  | state |
-  +--------------------------------------+--------------------------------------+----------------------------------------------------------------------------------------------------------+-------+
-  | 46b8568d-99fc-4801-8a9f-5469b4fefaea | addfef44-e458-4a54-855b-78908e8cd60c | [{u'name': u'cpu.load_avg_1_min', u'dimensions': {u'hostname': u'mini-mon', u'service': u'monitoring'}}] | ALARM |
-  | e9399e5e-cabe-433e-b1d8-56be0bd809a9 | addfef44-e458-4a54-855b-78908e8cd60c | [{u'name': u'cpu.load_avg_1_min', u'dimensions': {u'hostname': u'devstack', u'service': u'monitoring'}}] | ALARM |
-  +--------------------------------------+--------------------------------------+----------------------------------------------------------------------------------------------------------+-------+
+  +--------------------------------------+--------------------------------------+--------------+--------------------+---------------------+----------+-------+
+  | id                                   | alarm_definition_id                  | alarm_name   | metric_name        | metric_dimensions   | severity | state |
+  +--------------------------------------+--------------------------------------+--------------+--------------------+---------------------+----------+-------+
+  | 35122ab6-3007-41e7-9654-22e97b387f75 | 754276aa-a892-47c0-b74a-9c96ed84a712 | alarmPerHost | cpu.load_avg_1_min | hostname: mini-mon  | LOW      | ALARM |
+  |                                      |                                      |              |                    | service: monitoring |          |       |
+  | 54ab81e3-b4d6-4fd0-9fec-707909f2d576 | 754276aa-a892-47c0-b74a-9c96ed84a712 | alarmPerHost | cpu.load_avg_1_min | hostname: devstack  | LOW      | ALARM |
+  |                                      |                                      |              |                    | service: monitoring |          |       |
+  +--------------------------------------+--------------------------------------+--------------+--------------------+---------------------+----------+-------+
+
+alarm-history::
+  
+  monasca alarm-history 9d748b72-939b-45e7-a807-c0c5ad88d3e4
+  +--------------------------------------+-----------+--------------+------------------------------------------------------------------------------+-------------+--------------------+---------------------+--------------------------+
+  | alarm_id                             | new_state | old_state    | reason                                                                       | reason_data | metric_name        | metric_dimensions   | timestamp                |
+  +--------------------------------------+-----------+--------------+------------------------------------------------------------------------------+-------------+--------------------+---------------------+--------------------------+
+  | 9d748b72-939b-45e7-a807-c0c5ad88d3e4 | ALARM     | UNDETERMINED | Thresholds were exceeded for the sub-alarms: [max(cpu.load_avg_1_min) > 0.0] | {}          | cpu.load_avg_1_min | hostname: mini-mon  | 2014-10-14T21:14:11.000Z |
+  |                                      |           |              |                                                                              |             |                    | service: monitoring |                          |
+  +--------------------------------------+-----------+--------------+------------------------------------------------------------------------------+-------------+--------------------+---------------------+--------------------------+
+
 
 alarm-patch::
   
-  monasca alarm-patch 46b8568d-99fc-4801-8a9f-5469b4fefaea --state OK
+  monasca alarm-patch fda5537b-1550-435f-9d6c-262b7e05065b --state OK
 
 
 Python API

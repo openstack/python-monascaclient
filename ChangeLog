@@ -1,6 +1,12 @@
 CHANGES
 =======
 
+1.0.5
+-----
+* Fixed formatting for alarm-list, alarm-definition-list
+* Added fields to alarm-list
+* format output for alarm-history
+
 1.0.4
 -----
 * Alarmed metrics API changes supported. 

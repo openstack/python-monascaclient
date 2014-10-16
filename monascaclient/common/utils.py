@@ -232,3 +232,14 @@ def format_dict(dict):
             d_str = k + ': ' + v
         dstring_list.append(d_str)
     return '\n'.join(dstring_list)
+
+
+def format_list(in_list):
+    string_list = list()
+    for k in in_list:
+        if isinstance(k, unicode):
+            key = k.encode('utf-8')
+        else:
+            key = k
+        string_list.append(key)
+    return '\n'.join(string_list)

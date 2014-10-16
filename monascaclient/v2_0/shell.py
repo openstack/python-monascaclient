@@ -14,6 +14,7 @@
 # limitations under the License.
 
 import json
+import numbers
 import time
 
 from monascaclient.common import utils
@@ -177,6 +178,37 @@ def format_statistic_value(statistics, columns, stat_type):
         value_str = '{:12.2f}'.format(stat[stat_index])
         value_list.append(value_str)
     return '\n'.join(value_list)
+
+
+def format_metric_name(metrics):
+    # returns newline separated metric names for the column
+    metric_string_list = list()
+    for metric in metrics:
+        metric_name = metric['name']
+        metric_dimensions = metric['dimensions']
+        metric_string_list.append(metric_name)
+        # need to line up with dimensions column
+        rng = len(metric_dimensions)
+        for i in range(rng):
+            if i == rng - 1:
+                # last one
+                break
+            metric_string_list.append(" ")
+    return '\n'.join(metric_string_list)
+
+
+def format_metric_dimensions(metrics):
+    # returns newline separated dimension key values for the column
+    metric_string_list = list()
+    for metric in metrics:
+        metric_dimensions = metric['dimensions']
+        for k, v in metric_dimensions.items():
+            if isinstance(v, numbers.Number):
+                d_str = k + ': ' + str(v)
+            else:
+                d_str = k + ': ' + v
+            metric_string_list.append(d_str)
+    return '\n'.join(metric_string_list)
 
 
 @utils.arg('name', metavar='<METRIC_NAME>',
@@ -575,7 +607,7 @@ def do_alarm_definition_list(mc, args):
             'name': lambda x: x['name'],
             'id': lambda x: x['id'],
             'expression': lambda x: x['expression'],
-            'match_by': lambda x: x['match_by'],
+            'match_by': lambda x: utils.format_list(x['match_by']),
             'actions_enabled': lambda x: x['actions_enabled'],
         }
         if isinstance(alarm, list):
@@ -783,21 +815,24 @@ def do_alarm_list(mc, args):
         if args.json:
             print(utils.json_formatter(alarm))
             return
-        cols = ['id', 'alarm_definition_id', 'metrics', 'state']
+        cols = ['id', 'alarm_definition_id', 'alarm_name', 'metric_name', 'metric_dimensions', 'severity', 'state']
         formatters = {
             'id': lambda x: x['id'],
-            'alarm_definition_id': lambda x: x['alarm_definition_id'],
-            'metrics': lambda x: x['metrics'],
+            'alarm_definition_id': lambda x: x['alarm_definition']['id'],
+            'alarm_name': lambda x: x['alarm_definition']['name'],
+            'metric_name': lambda x: format_metric_name(x['metrics']),
+            'metric_dimensions': lambda x: format_metric_dimensions(x['metrics']),
+            'severity': lambda x: x['alarm_definition']['severity'],
             'state': lambda x: x['state'],
         }
         if isinstance(alarm, list):
             # print the list
-            utils.print_list(alarm, cols, formatters=formatters, sortby=3)
+            utils.print_list(alarm, cols, formatters=formatters, sortby=2)
         else:
             # add the dictionary to a list, so print_list works
             alarm_list = list()
             alarm_list.append(alarm)
-            utils.print_list(alarm_list, cols, formatters=formatters, sortby=3)
+            utils.print_list(alarm_list, cols, formatters=formatters, sortby=2)
 
 
 @utils.arg('id', metavar='<ALARM_ID>',
@@ -819,7 +854,7 @@ def do_alarm_show(mc, args):
         # print out detail of a single alarm
         formatters = {
             'id': utils.json_formatter,
-            'alarm_definition_id': utils.json_formatter,
+            'alarm_definition': utils.json_formatter,
             'metrics': utils.json_formatter,
             'state': utils.json_formatter,
             'links': utils.format_dictlist,
@@ -891,6 +926,33 @@ def do_alarm_delete(mc, args):
         print('Successfully deleted alarm')
 
 
+def output_alarm_history(args, alarm_history):
+    if args.json:
+            print(utils.json_formatter(alarm_history))
+            return
+    # format output
+    cols = ['alarm_id', 'new_state', 'old_state', 'reason',
+            'reason_data', 'metric_name', 'metric_dimensions', 'timestamp']
+    formatters = {
+        'alarm_id': lambda x: x['alarm_id'],
+        'new_state': lambda x: x['new_state'],
+        'old_state': lambda x: x['old_state'],
+        'reason': lambda x: x['reason'],
+        'reason_data': lambda x: x['reason_data'],
+        'metric_name': lambda x: format_metric_name(x['metrics']),
+        'metric_dimensions': lambda x: format_metric_dimensions(x['metrics']),
+        'timestamp': lambda x: x['timestamp'],
+    }
+    if isinstance(alarm_history, list):
+        # print the list
+        utils.print_list(alarm_history, cols, formatters=formatters, sortby=7)
+    else:
+        # add the dictionary to a list, so print_list works
+        alarm_list = list()
+        alarm_list.append(alarm_history)
+        utils.print_list(alarm_list, cols, formatters=formatters, sortby=7)
+
+
 @utils.arg('id', metavar='<ALARM_ID>',
            help='The ID of the alarm.')
 def do_alarm_history(mc, args):
@@ -904,10 +966,7 @@ def do_alarm_history(mc, args):
             'HTTPException code=%s message=%s' %
             (he.code, he.message))
     else:
-        # if args.json:
-        print(utils.json_formatter(alarm))
-        return
-        # TODO(cindyo) format output
+        output_alarm_history(args, alarm)
 
 
 @utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
@@ -937,7 +996,4 @@ def do_alarm_history_list(mc, args):
             'HTTPException code=%s message=%s' %
             (he.code, he.message))
     else:
-        # if args.json:
-        print(utils.json_formatter(alarm))
-        return
-        # TODO(cindyo) format output
+        output_alarm_history(args, alarm)
