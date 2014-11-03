@@ -17,7 +17,7 @@ import re
 import sys
 
 import fixtures
-from keystoneclient.v2_0 import client as ksclient
+from keystoneclient.v3 import client as ksclient
 from mox3 import mox
 import six
 import testtools
@@ -31,9 +31,10 @@ from monascaclient.tests import fakes
 class TestCase(testtools.TestCase):
 
     def set_fake_env(self, fake_env):
-        client_env = ('OS_USERNAME', 'OS_PASSWORD', 'OS_TENANT_ID',
-                      'OS_TENANT_NAME', 'OS_AUTH_URL', 'OS_REGION_NAME',
+        client_env = ('OS_USERNAME', 'OS_PASSWORD', 'OS_PROJECT_ID',
+                      'OS_PROJECT_NAME', 'OS_AUTH_URL', 'OS_REGION_NAME',
                       'OS_AUTH_TOKEN', 'OS_NO_CLIENT_AUTH', 'OS_SERVICE_TYPE',
+                      'OS_DOMAIN_NAME', 'OS_DOMAIN_ID',
                       'OS_ENDPOINT_TYPE', 'MONASCA_API_URL')
 
         for key in client_env:
@@ -152,7 +153,7 @@ class ShellTestMonascaCommands(ShellBase):
         fake_env = {
             'OS_USERNAME': 'username',
             'OS_PASSWORD': 'password',
-            'OS_TENANT_NAME': 'tenant_name',
+            'OS_PROJECT_NAME': 'project_name',
             'OS_AUTH_URL': 'http://no.where',
         }
         self.set_fake_env(fake_env)

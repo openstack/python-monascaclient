@@ -23,7 +23,7 @@ import argparse
 import logging
 import sys
 
-from keystoneclient.v2_0 import client as ksclient
+from keystoneclient.v3 import client as ksclient
 
 import monascaclient
 from monascaclient import client as monasca_client
@@ -115,18 +115,32 @@ class MonascaShell(object):
         parser.add_argument('--os_password',
                             help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-tenant-id',
-                            default=utils.env('OS_TENANT_ID'),
-                            help='Defaults to env[OS_TENANT_ID].')
+        parser.add_argument('--os-project-id',
+                            default=utils.env('OS_PROJECT_ID'),
+                            help='Defaults to env[OS_PROJECT_ID].')
 
-        parser.add_argument('--os_tenant_id',
+        parser.add_argument('--os_project_id',
                             help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-tenant-name',
-                            default=utils.env('OS_TENANT_NAME'),
-                            help='Defaults to env[OS_TENANT_NAME].')
+        parser.add_argument('--os-project-name',
+                            default=utils.env('OS_PROJECT_NAME'),
+                            help='Defaults to env[OS_PROJECT_NAME].')
 
-        parser.add_argument('--os_tenant_name',
+        parser.add_argument('--os_project_name',
+                            help=argparse.SUPPRESS)
+
+        parser.add_argument('--os-domain-id',
+                            default=utils.env('OS_DOMAIN_ID'),
+                            help='Defaults to env[OS_DOMAIN_ID].')
+
+        parser.add_argument('--os_domain_id',
+                            help=argparse.SUPPRESS)
+
+        parser.add_argument('--os-domain-name',
+                            default=utils.env('OS_DOMAIN_NAME'),
+                            help='Defaults to env[OS_DOMAIN_NAME].')
+
+        parser.add_argument('--os_domain_name',
                             help=argparse.SUPPRESS)
 
         parser.add_argument('--os-auth-url',
@@ -236,18 +250,24 @@ class MonascaShell(object):
 
         :param username: name of user
         :param password: user's password
-        :param tenant_id: unique identifier of tenant
-        :param tenant_name: name of tenant
+        :param project_id: unique identifier of project
+        :param project_name: name of project
+        :param domain_name: name of domain project is in
+        :param domain_id: id of domain project is in
         :param auth_url: endpoint to authenticate against
         :param token: token to use instead of username/password
         """
         kc_args = {'auth_url': kwargs.get('auth_url'),
                    'insecure': kwargs.get('insecure')}
 
-        if kwargs.get('tenant_id'):
-            kc_args['tenant_id'] = kwargs.get('tenant_id')
-        else:
-            kc_args['tenant_name'] = kwargs.get('tenant_name')
+        if kwargs.get('project_id'):
+            kc_args['project_id'] = kwargs.get('project_id')
+        elif kwargs.get('project_name'):
+            kc_args['project_name'] = kwargs.get('project_name')
+            if kwargs.get('domain_name'):
+                kc_args['project_domain_name'] = kwargs.get('domain_name')
+            if kwargs.get('domain_id'):
+                kc_args['project_domain_id'] = kwargs.get('domain_id')
 
         if kwargs.get('token'):
             kc_args['token'] = kwargs.get('token')
@@ -256,6 +276,24 @@ class MonascaShell(object):
             kc_args['password'] = kwargs.get('password')
 
         return ksclient.Client(**kc_args)
+
+    def _get_token(self, _ksclient):
+        """Validate token is project scoped and return it if it is
+
+        project_id and auth_token were fetched when keystone client was created
+
+        :param _ksclient: keystone client
+        """
+        if _ksclient.project_id:
+            return _ksclient.auth_token
+        raise exc.CommandError("User does not have a default project. "
+                               "You must provide a project id using "
+                               "--os-project-id or via env[OS_PROJECT_ID], "
+                               "or you must provide a project name using "
+                               "--os-project-name or via env[OS_PROJECT_NAME] "
+                               "and a domain using --os-domain-name, via "
+                               "env[OS_DOMAIN_NAME],  using --os-domain-id or "
+                               "via env[OS_DOMAIN_ID]")
 
     def _get_endpoint(self, client, **kwargs):
         """Get an endpoint using the provided keystone client."""
@@ -327,14 +365,6 @@ class MonascaShell(object):
                                        " via either --monasca-api-url or"
                                        " env[MONASCA_API_URL]")
         else:
-            # Tenant name or ID is needed to make keystoneclient retrieve a
-            # service catalog, it's not required if os_no_client_auth is
-            # specified, neither is the auth URL
-            if not (args.os_tenant_id or args.os_tenant_name):
-                raise exc.CommandError("You must provide a tenant_id via"
-                                       " either --os-tenant-id or via"
-                                       " env[OS_TENANT_ID]")
-
             if not args.os_auth_url:
                 raise exc.CommandError("You must provide an auth url via"
                                        " either --os-auth-url or via"
@@ -344,11 +374,13 @@ class MonascaShell(object):
             'username': args.os_username,
             'password': args.os_password,
             'token': args.os_auth_token,
-            'tenant_id': args.os_tenant_id,
-            'tenant_name': args.os_tenant_name,
             'auth_url': args.os_auth_url,
             'service_type': args.os_service_type,
             'endpoint_type': args.os_endpoint_type,
+            'project_id': args.os_project_id,
+            'project_name': args.os_project_name,
+            'domain_id': args.os_domain_id,
+            'domain_name': args.os_domain_name,
             'insecure': args.insecure
         }
 
@@ -356,7 +388,10 @@ class MonascaShell(object):
 
         if not args.os_no_client_auth:
             _ksclient = self._get_ksclient(**kwargs)
-            token = args.os_auth_token or _ksclient.auth_token
+            if args.os_auth_token:
+                token = args.os_auth_token
+            else:
+                token = self._get_token(_ksclient)
 
             kwargs = {
                 'token': token,

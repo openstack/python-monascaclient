@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from keystoneclient.v2_0 import client as ksclient
+from keystoneclient.v3 import client as ksclient
 
 from monascaclient.openstack.common import jsonutils
 
@@ -23,14 +23,14 @@ def script_keystone_client(token=None):
         ksclient.Client(auth_url='http://no.where',
                         insecure=False,
                         tenant_id='tenant_id',
-                        token=token).AndReturn(FakeKeystone(token))
+                        token=token).AndReturn(FakeKeystone(token, None))
     else:
         ksclient.Client(auth_url='http://no.where',
                         insecure=False,
                         password='password',
-                        tenant_name='tenant_name',
+                        project_name='project_name',
                         username='username').AndReturn(FakeKeystone(
-                                                       'abcd1234'))
+                                                       'abcd1234', 'test'))
 
 
 def fake_headers():
@@ -49,8 +49,9 @@ class FakeServiceCatalog():
 class FakeKeystone():
     service_catalog = FakeServiceCatalog()
 
-    def __init__(self, auth_token):
+    def __init__(self, auth_token, project_id):
         self.auth_token = auth_token
+        self.project_id = project_id
 
 
 class FakeRaw():
