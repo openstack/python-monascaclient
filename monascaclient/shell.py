@@ -91,11 +91,13 @@ class MonascaShell(object):
                             'This option is not necessary if your key is'
                             ' prepended to your cert file.')
 
-        parser.add_argument('--ca-file',
-                            help='Path of CA SSL certificate(s) used to verify'
-                            ' the remote server\'s certificate. Without this'
-                            ' option the client looks'
-                            ' for the default system CA certificates.')
+        parser.add_argument('--os-cacert',
+                            default=utils.env('OS_CACERT'),
+                            help='Specify a CA bundle file to use in verifying'
+                            ' a TLS (https) server certificate. Defaults to'
+                            ' env[OS_CACERT]. Without either of these, the'
+                            ' client looks for the default system CA'
+                            ' certificates.')
 
         parser.add_argument('--timeout',
                             default=600,
@@ -260,6 +262,8 @@ class MonascaShell(object):
         kc_args = {'auth_url': kwargs.get('auth_url'),
                    'insecure': kwargs.get('insecure')}
 
+        if kwargs.get('os_cacert'):
+            kc_args['cacert'] = kwargs.get('os_cacert')
         if kwargs.get('project_id'):
             kc_args['project_id'] = kwargs.get('project_id')
         elif kwargs.get('project_name'):
@@ -377,6 +381,7 @@ class MonascaShell(object):
             'auth_url': args.os_auth_url,
             'service_type': args.os_service_type,
             'endpoint_type': args.os_endpoint_type,
+            'os_cacert': args.os_cacert,
             'project_id': args.os_project_id,
             'project_name': args.os_project_name,
             'domain_id': args.os_domain_id,
@@ -397,7 +402,7 @@ class MonascaShell(object):
                 'token': token,
                 'insecure': args.insecure,
                 'timeout': args.timeout,
-                'ca_file': args.ca_file,
+                'os_cacert': args.os_cacert,
                 'cert_file': args.cert_file,
                 'key_file': args.key_file,
                 'username': args.os_username,

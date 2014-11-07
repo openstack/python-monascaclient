@@ -69,7 +69,7 @@ class HTTPClient(object):
         self.key_file = kwargs.get('key_file')
 
         self.ssl_connection_params = {
-            'ca_file': kwargs.get('ca_file'),
+            'os_cacert': kwargs.get('os_cacert'),
             'cert_file': kwargs.get('cert_file'),
             'key_file': kwargs.get('key_file'),
             'insecure': kwargs.get('insecure'),
@@ -80,7 +80,7 @@ class HTTPClient(object):
             if kwargs.get('insecure'):
                 self.verify_cert = False
             else:
-                self.verify_cert = kwargs.get('ca_file', get_system_ca_file())
+                self.verify_cert = kwargs.get('os_cacert', get_system_ca_file())
 
     def replace_token(self, token):
         self.auth_token = token
@@ -96,7 +96,7 @@ class HTTPClient(object):
         conn_params_fmt = [
             ('key_file', '--key %s'),
             ('cert_file', '--cert %s'),
-            ('ca_file', '--cacert %s'),
+            ('os_cacert', '--cacert %s'),
         ]
         for (key, fmt) in conn_params_fmt:
             value = self.ssl_connection_params.get(key)
