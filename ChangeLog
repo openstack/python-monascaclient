@@ -1,6 +1,18 @@
 CHANGES
 =======
 
+1.0.7
+-----
+* Change the argument ca-file to be os-cacert to be more consistent with keystone and other CLIs
+* Pass the os-cacert option to keystone client so it can validate keystone server certificate
+
+1.0.6
+-----
+* Use Keystone v3 authentication. Only supports v3 now
+* When the Keystone v3 is authentication is used, ensure it returns a project scoped token
+* Rename os-tenant-id to os-project id and os-tenant-name to os-project-name to match keystone v3
+* Allow the user to specify os-domain-name or os-domain-id if needed to resolve os-project-name
+
 1.0.5
 -----
 * Fixed formatting for alarm-list, alarm-definition-list
