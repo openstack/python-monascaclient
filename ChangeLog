@@ -1,59 +1,73 @@
 CHANGES
 =======
 
+
 1.0.7
 -----
-* Change the argument ca-file to be os-cacert to be more consistent with keystone and other CLIs
-* Pass the os-cacert option to keystone client so it can validate keystone server certificate
+
+* Update ChangeLog
+* Removing support for SMS on client
+* Need to pass the ca-file arg to keystone, too
 
 1.0.6
 -----
-* Use Keystone v3 authentication. Only supports v3 now
-* When the Keystone v3 is authentication is used, ensure it returns a project scoped token
-* Rename os-tenant-id to os-project id and os-tenant-name to os-project-name to match keystone v3
-* Allow the user to specify os-domain-name or os-domain-id if needed to resolve os-project-name
+
+* Use keystone v3 and get a project scoped token
 
 1.0.5
 -----
-* Fixed formatting for alarm-list, alarm-definition-list
-* Added fields to alarm-list
-* format output for alarm-history
+
+* alarm formatting changes
 
 1.0.4
 -----
-* Alarmed metrics API changes supported. 
+
+* Alarmed metrics API changes supported
+* updated README.rst for API clients
 
 1.0.3
 -----
-* use keystone endpoint when api url is not input
+
+* Added cross domain tenant param to metric POST
 * fixed unicode decode problem when printing exception
-* added optional cross tenant_id parameter to metric POST
+* use keystone endpoint when api url is not input
 
 1.0.2
 -----
-* supports unicode
+
+* Updated Changelog
 * help for dimensions mentions need for quoting
-* fix several bashate issues
+* supports unicode
 
 1.0.1
 -----
-* Update requirements matching global
-* bump hacking to 0.9.x series
-* use pbr.version, changelog updated
+
+* Fix several bashate issues
+* user pbr.version, update ChangeLog
+* Add .gitreview file
+* Bump hacking to 0.9.x series
+* removed transform dimension calls for alarm commands
+* quote alarm expression dimension values to allow special chars
 
 1.0.0
 -----
-* renamed monclient to monascaclient
-* add gitreview
-* bash completion script and README
+
+* renaming monclient to monascaclient, alarm-update fix
+* GET alarms by name, Client replace_token, help fixes, id size
+* Add .gitreview file. pep8 fixes
+* README update for bash completion
+* added bash completion script to the install
 * pep8 changes
 * fixed timestamp ordering in measurement-list, alarm-history. renamed enabled to actions-enabled
 * Fixed enabled parms for alarm-patch, alarm-update
+* 1.0.3
 * Add babel as a dependency
+* Updated version info
 * Updated README
 * Added metric-statistics command
 * Modified the auth token to match dev env
 * Added severity to alarm commands, Added alarm-list by state option
+* 1.0.1 changelog
 * new metric-create-raw command to support raw json body
 * Temporary fix for version problems in the egg/wheel
 * Added ChangeLog and .idea to the .gitignore
