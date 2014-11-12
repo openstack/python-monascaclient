@@ -216,6 +216,16 @@ class ShellTestMonascaCommands(ShellBase):
             retvalue = self.shell(argstr)
             self.assertRegexpMatches(retvalue, "^Invalid type")
 
+    def test_notifications_create_type_sms(self):
+        self._script_keystone_client()
+        argstrings = [
+            'notification-create sms1 SMS myphonenumber',
+        ]
+        self.m.ReplayAll()
+        for argstr in argstrings:
+            retvalue = self.shell(argstr)
+            self.assertRegexpMatches(retvalue, "^Invalid type")
+
     def test_good_notifications_create_subcommand(self):
         self._script_keystone_client()
 

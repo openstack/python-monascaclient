@@ -28,7 +28,7 @@ state_types = ['UNDETERMINED', 'ALARM', 'OK']
 enabled_types = ['True', 'true', 'False', 'false']
 
 # Notification valid types
-notification_types = ['EMAIL', 'SMS']
+notification_types = ['EMAIL']
 
 
 @utils.arg('name', metavar='<METRIC_NAME>',
@@ -357,9 +357,9 @@ def do_metric_statistics(mc, args):
 @utils.arg('name', metavar='<NOTIFICATION_NAME>',
            help='Name of the notification to create.')
 @utils.arg('type', metavar='<TYPE>',
-           help='The notification type.  Type is one of [EMAIL, SMS].')
+           help='The notification type. Type must be EMAIL.')
 @utils.arg('address', metavar='<ADDRESS>',
-           help='Depending on the type, a valid EMAIL or SMS Address')
+           help='A valid EMAIL Address')
 def do_notification_create(mc, args):
     '''Create notification.'''
     if args.type.upper() not in notification_types:
@@ -460,9 +460,9 @@ def do_notification_delete(mc, args):
 @utils.arg('name', metavar='<NOTIFICATION_NAME>',
            help='Name of the notification.')
 @utils.arg('type', metavar='<TYPE>',
-           help='The notification type.  Type is one of [EMAIL, SMS].')
+           help='The notification type. Type must be EMAIL.')
 @utils.arg('address', metavar='<ADDRESS>',
-           help='Depending on the type, a valid EMAIL or SMS Address')
+           help='A valid EMAIL Address')
 def do_notification_update(mc, args):
     '''Update notification.'''
     fields = {}
