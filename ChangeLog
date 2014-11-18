@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* Use relative path for monasca.bash_completion
 
 1.0.7
 -----

@@ -407,6 +407,7 @@ class MonascaShell(object):
                 'key_file': args.key_file,
                 'username': args.os_username,
                 'password': args.os_password,
+                'service_type': args.os_service_type,
                 'endpoint_type': args.os_endpoint_type
             }
 
