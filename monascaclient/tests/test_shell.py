@@ -251,3 +251,29 @@ class ShellTestMonascaCommands(ShellBase):
         for argstr in argstrings:
             retvalue = self.shell(argstr)
             self.assertRegexpMatches(retvalue, "id")
+
+    def test_good_notifications_create_subcommand_webhook(self):
+        self._script_keystone_client()
+
+        resp = fakes.FakeHTTPResponse(
+            201,
+            'Created',
+            {'location': 'http://no.where/v2.0/notification-methods'},
+            None)
+        http.HTTPClient.json_request(
+            'POST',
+            '/notification-methods',
+            data={'name': 'mypost',
+                  'type': 'WEBHOOK',
+                  'address': 'http://localhost:8080'},
+            headers={'X-Auth-Key': 'password',
+                     'X-Auth-User': 'username'}).AndReturn((resp, 'id'))
+
+        self.m.ReplayAll()
+
+        argstrings = [
+            'notification-create mypost WEBHOOK http://localhost:8080',
+        ]
+        for argstr in argstrings:
+            retvalue = self.shell(argstr)
+            self.assertRegexpMatches(retvalue, "id")

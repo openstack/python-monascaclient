@@ -5,7 +5,7 @@ This is a client library for Monasca built to interface with the Monasca API. It
 provides a Python API (the ``monascaclient`` module) and a command-line tool
 (``monasca``).
 
-The Monasca Client was written using the OpenStack Heat Python client as a framework. 
+The Monasca Client was written using the OpenStack Heat Python client as a framework.
 
 .. contents:: Contents:
    :local:
@@ -14,14 +14,14 @@ Ubuntu Install
 --------------
 Requires:
   - pip - version >= 1.4.  python get-pip.py
-  
+
 Install It:
   - sudo pip install python-monascaclient
-  
+
 Alternative Manual Install Steps:
   - cd to your python-monascaclient repo
   - sudo pip install -r requirements.txt
-  - python setup.py install 
+  - python setup.py install
 
 Command-line API
 ----------------
@@ -34,29 +34,29 @@ Usage:
   monasca help
 
   monasca help <command>
-  
-  monasca -j <command>
-  
-    This outputs the results in jason format.  Normally output is in table format.
-  
 
-The monascaclient CLI needs the Monasca API endpoint url and the OS_AUTH_TOKEN to pass to the 
-Monasca API RESTful interface.  This is provided through environment or CLI 
+  monasca -j <command>
+
+    This outputs the results in jason format.  Normally output is in table format.
+
+
+The monascaclient CLI needs the Monasca API endpoint url and the OS_AUTH_TOKEN to pass to the
+Monasca API RESTful interface.  This is provided through environment or CLI
 parameters.
 
 Environmental Variables
-~~~~~~~~~~~~~~~~~~~~~~~  
+~~~~~~~~~~~~~~~~~~~~~~~
 
 Environmental variables can be sourced, or optionally passed in as CLI arguments.
 It is easiest to source them first and then use the CLI.
 
 When token and endpoint are known::
-  
+
   export OS_AUTH_TOKEN=XXX
   export MONASCA_API_URL=http://192.168.10.4:8080/v2.0/
 
 When using Keystone to obtain the token and endpoint::
-  
+
   export OS_USERNAME=
   export OS_PASSWORD=
   export OS_TENANT_NAME=
@@ -64,7 +64,7 @@ When using Keystone to obtain the token and endpoint::
   export OS_REGION_NAME=
 
 When using Vagrant Environment with middleware disabled::
-  
+
   export OS_AUTH_TOKEN=82510970543135
   export OS_NO_CLIENT_AUTH=1
   export MONASCA_API_URL=http://192.168.10.4:8080/v2.0/
@@ -73,7 +73,7 @@ The Monasca API will treat the auth token as the tenant ID when Keystone is not 
 
 You'll find complete documentation on the shell by running
 ``monasca help``::
-  
+
   usage: monasca [-j] [--version] [-d] [-v] [-k] [--cert-file CERT_FILE]
              [--key-file KEY_FILE] [--ca-file CA_FILE] [--timeout TIMEOUT]
              [--os-username OS_USERNAME] [--os-password OS_PASSWORD]
@@ -86,7 +86,7 @@ You'll find complete documentation on the shell by running
              <subcommand> ...
 
   Command-line interface to the monasca-client API.
-  
+
   positional arguments:
     <subcommand>
       alarm-definition-create  Create an alarm definition.
@@ -115,7 +115,7 @@ You'll find complete documentation on the shell by running
       bash-completion          Prints all of the commands and options to stdout.
       help                     Display help about this program or one of its
                                subcommands.
-  
+
   optional arguments:
     -j, --json             output raw json response
     --version              Shows the client version and exits.
@@ -159,7 +159,7 @@ You'll find complete documentation on the shell by running
                            Defaults to env[OS_SERVICE_TYPE].
     --os-endpoint-type OS_ENDPOINT_TYPE
                            Defaults to env[OS_ENDPOINT_TYPE].
-  
+
   See "mon help COMMAND" for help on a specific command.
 
 
@@ -167,7 +167,7 @@ Bash Completion
 ~~~~~~~~~~~~~~~
 Basic command tab completion can be enabled by sourcing the bash completion script.
 ::
-  
+
   source /usr/local/share/monasca.bash_completion
 
 
@@ -176,14 +176,14 @@ Metrics Examples
 Note:  To see complete usage: 'monasca help' and 'monasca help <command>'
 
 metric-create::
-  
+
   monasca metric-create cpu1 123.40
   monasca metric-create metric1 1234.56 --dimensions instance_id=123,service=ourservice
   monasca metric-create metric1 2222.22 --dimensions instance_id=123,service=ourservice
   monasca metric-create metric1 3333.33 --dimensions instance_id=222,service=ourservice
 
 metric-list::
-  
+
   monasca metric-list
   +---------+--------------------+
   | name    | dimensions         |
@@ -194,7 +194,7 @@ metric-list::
   +---------+--------------------+
 
 measurement-list::
-  
+
   monasca measurement-list metric1 2014-01-01T00:00:00Z
   +---------+--------------------+----------------+----------------------+--------------+
   | name    | dimensions         | measurement_id | timestamp            | value        |
@@ -204,7 +204,7 @@ measurement-list::
   | metric1 | instance_id:222    |     726837     | 2014-05-08T21:49:47Z |      3333.33 |
   |         | service:ourservice |                |                      |              |
   +---------+--------------------+----------------+----------------------+--------------+
-  
+
   monasca measurement-list metric1 2014-01-01T00:00:00Z --dimensions instance_id=123
   +---------+--------------------+----------------+----------------------+--------------+
   | name    | dimensions         | measurement_id | timestamp            | value        |
@@ -212,23 +212,25 @@ measurement-list::
   | metric1 | instance_id:123    |     723885     | 2014-05-08T21:46:32Z |      1234.56 |
   |         | service:ourservice |     725951     | 2014-05-08T21:48:50Z |      2222.22 |
   +---------+--------------------+----------------+----------------------+--------------+
-  
+
 
 Notifications Examples
 ~~~~~~~~~~~~~~~~~~~~~~
 Note:  To see complete usage: 'monasca help' and 'monasca help <command>'
 
 notification-create::
-  
+
   monasca notification-create cindyemail1 EMAIL cindy.employee@hp.com
+  monasca notification-create myapplication WEBHOOK http://localhost:5000
 
 notification-list::
-  
+
   monasca notification-list
   +---------------+--------------------------------------+-------+----------------------+
   | name          | id                                   | type  | address              |
   +---------------+--------------------------------------+-------+----------------------+
   | cindyemail1   | 5651406c-447d-40bd-b868-b2b3e6b59e32 | EMAIL |cindy.employee@hp.com |
+  | myapplication | 55905ce2-91e3-41ce-b45a-de7032f8d718 | WEBHOOK |http://localhost:5000
   +---------------+--------------------------------------+-------+----------------------+
 
 
@@ -237,11 +239,11 @@ Alarms Examples
 Note:  To see complete usage: 'monasca help' and 'monasca help <command>'
 
 alarm-definition-create::
-  
+
   monasca alarm-definition-create alarmPerHost "max(cpu.load_avg_1_min) > 0" --match-by hostname
 
 alarm-definition-list::
-  
+
   +--------------+--------------------------------------+-----------------------------+----------+-----------------+
   | name         | id                                   | expression                  | match_by | actions_enabled |
   +--------------+--------------------------------------+-----------------------------+----------+-----------------+
@@ -249,7 +251,7 @@ alarm-definition-list::
   +--------------+--------------------------------------+-----------------------------+----------+-----------------+
 
 alarm-definition-show::
-  
+
   monasca alarm-definition-show 4bf6bfc2-c5ac-4d57-b7db-cf5313b05412
   +----------------------+----------------------------------------------------------------------------------------------------+
   | Property             | Value                                                                                              |
@@ -270,11 +272,11 @@ alarm-definition-show::
   +----------------------+----------------------------------------------------------------------------------------------------+
 
 alarm-definition-delete::
-  
+
   monasca alarm-definition-delete 4bf6bfc2-c5ac-4d57-b7db-cf5313b05412
 
 alarm-list::
-  
+
   monasca alarm-list
   +--------------------------------------+--------------------------------------+--------------+--------------------+---------------------+----------+-------+
   | id                                   | alarm_definition_id                  | alarm_name   | metric_name        | metric_dimensions   | severity | state |
@@ -286,7 +288,7 @@ alarm-list::
   +--------------------------------------+--------------------------------------+--------------+--------------------+---------------------+----------+-------+
 
 alarm-history::
-  
+
   monasca alarm-history 9d748b72-939b-45e7-a807-c0c5ad88d3e4
   +--------------------------------------+-----------+--------------+------------------------------------------------------------------------------+-------------+--------------------+---------------------+--------------------------+
   | alarm_id                             | new_state | old_state    | reason                                                                       | reason_data | metric_name        | metric_dimensions   | timestamp                |
@@ -297,7 +299,7 @@ alarm-history::
 
 
 alarm-patch::
-  
+
   monasca alarm-patch fda5537b-1550-435f-9d6c-262b7e05065b --state OK
 
 
@@ -306,21 +308,21 @@ Python API
 
 There's also a complete Python API.
 
-In order to use the python api directly, you must first obtain an auth token and 
-identify the monasca api endpoint.  The user can obtain the token and endpoint 
-using the keystone client api:   
+In order to use the python api directly, you must first obtain an auth token and
+identify the monasca api endpoint.  The user can obtain the token and endpoint
+using the keystone client api:
 http://docs.openstack.org/developer/python-keystoneclient/.
 The service catalog name for our API endpoint is "monasca".
 
 Start using the monascaclient API by constructing the monascaclient client.Client class.
-The Client class takes these parameters: api_version, endpoint, and token. 
-The Client class is used to call all monasca-api resource commands (i.e. 
+The Client class takes these parameters: api_version, endpoint, and token.
+The Client class is used to call all monasca-api resource commands (i.e.
 client.Client.metrics.create(fields)).
 
 Long running users of Client will recieve an indication
 that the keystone token has expired when they receive an HTTP response
 code of 401 Unauthorized from the monasca-API.  In this case, it is
-up to the user to get a new token from keystone which can be passed 
+up to the user to get a new token from keystone which can be passed
 into the client.Client.replace_token(token) method.
 
 The api_version matches the version of the Monasca API.  Currently it is 'v2_0'.
@@ -329,20 +331,20 @@ When calling the commands, refer to monascaclient.v2_0.shell.py 'do_<command>'
 to see the required and optional fields for each command.
 
 Refer to this example in python-monascaclient/client_api_example.py::
-    
+
   from monascaclient import client
   import monascaclient.exc as exc
   import time
-   
+
   api_version = '2_0'
   endpoint = 'http://192.168.10.4:8080/v2.0'
   kwargs = {
       'token': '12345678'
   }
-   
+
   # construct the mon client
   monasca_client = client.Client(api_version, endpoint, **kwargs)
-   
+
   # call the metric-create command
   dimensions = {'instance_id': '12345', 'service': 'hello'}
   fields = {}
@@ -370,7 +372,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
-    
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
