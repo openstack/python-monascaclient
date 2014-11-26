@@ -333,17 +333,18 @@ to see the required and optional fields for each command.
 Refer to this example in python-monascaclient/client_api_example.py::
 
   from monascaclient import client
+  from monascaclient import ksclient
   import monascaclient.exc as exc
   import time
 
   api_version = '2_0'
-  endpoint = 'http://192.168.10.4:8080/v2.0'
-  kwargs = {
-      'token': '12345678'
-  }
+
+  # Authenticate to Keystone
+  keystone_url = 'http://keystone:5000/v3'
+  ks = ksclient.KSClient(auth_url=keystone_url, username='user', password='password')
 
   # construct the mon client
-  monasca_client = client.Client(api_version, endpoint, **kwargs)
+  monasca_client = client.Client(api_version, ks.monasca_url, token=ks.token)
 
   # call the metric-create command
   dimensions = {'instance_id': '12345', 'service': 'hello'}

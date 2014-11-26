@@ -23,12 +23,11 @@ import argparse
 import logging
 import sys
 
-from keystoneclient.v3 import client as ksclient
-
 import monascaclient
 from monascaclient import client as monasca_client
 from monascaclient.common import utils
 from monascaclient import exc
+from monascaclient import ksclient
 
 
 logger = logging.getLogger(__name__)
@@ -247,70 +246,6 @@ class MonascaShell(object):
                 subparser.add_argument(*args, **kwargs)
             subparser.set_defaults(func=callback)
 
-    def _get_ksclient(self, **kwargs):
-        """Get an endpoint and auth token from Keystone.
-
-        :param username: name of user
-        :param password: user's password
-        :param project_id: unique identifier of project
-        :param project_name: name of project
-        :param domain_name: name of domain project is in
-        :param domain_id: id of domain project is in
-        :param auth_url: endpoint to authenticate against
-        :param token: token to use instead of username/password
-        """
-        kc_args = {'auth_url': kwargs.get('auth_url'),
-                   'insecure': kwargs.get('insecure')}
-
-        if kwargs.get('os_cacert'):
-            kc_args['cacert'] = kwargs.get('os_cacert')
-        if kwargs.get('project_id'):
-            kc_args['project_id'] = kwargs.get('project_id')
-        elif kwargs.get('project_name'):
-            kc_args['project_name'] = kwargs.get('project_name')
-            if kwargs.get('domain_name'):
-                kc_args['project_domain_name'] = kwargs.get('domain_name')
-            if kwargs.get('domain_id'):
-                kc_args['project_domain_id'] = kwargs.get('domain_id')
-
-        if kwargs.get('token'):
-            kc_args['token'] = kwargs.get('token')
-        else:
-            kc_args['username'] = kwargs.get('username')
-            kc_args['password'] = kwargs.get('password')
-
-        return ksclient.Client(**kc_args)
-
-    def _get_token(self, _ksclient):
-        """Validate token is project scoped and return it if it is
-
-        project_id and auth_token were fetched when keystone client was created
-
-        :param _ksclient: keystone client
-        """
-        if _ksclient.project_id:
-            return _ksclient.auth_token
-        raise exc.CommandError("User does not have a default project. "
-                               "You must provide a project id using "
-                               "--os-project-id or via env[OS_PROJECT_ID], "
-                               "or you must provide a project name using "
-                               "--os-project-name or via env[OS_PROJECT_NAME] "
-                               "and a domain using --os-domain-name, via "
-                               "env[OS_DOMAIN_NAME],  using --os-domain-id or "
-                               "via env[OS_DOMAIN_ID]")
-
-    def _get_endpoint(self, client, **kwargs):
-        """Get an endpoint using the provided keystone client."""
-        if kwargs.get('region_name'):
-            return client.service_catalog.url_for(
-                service_type=kwargs.get('service_type') or 'monitoring',
-                attr='region',
-                filter_value=kwargs.get('region_name'),
-                endpoint_type=kwargs.get('endpoint_type') or 'publicURL')
-        return client.service_catalog.url_for(
-            service_type=kwargs.get('service_type') or 'monitoring',
-            endpoint_type=kwargs.get('endpoint_type') or 'publicURL')
-
     def _setup_logging(self, debug):
         log_lvl = logging.DEBUG if debug else logging.ERROR
         logging.basicConfig(
@@ -392,11 +327,11 @@ class MonascaShell(object):
         endpoint = args.monasca_api_url
 
         if not args.os_no_client_auth:
-            _ksclient = self._get_ksclient(**kwargs)
+            _ksclient = ksclient.KSClient(**kwargs)
             if args.os_auth_token:
                 token = args.os_auth_token
             else:
-                token = self._get_token(_ksclient)
+                token = _ksclient.token
 
             kwargs = {
                 'token': token,
@@ -415,7 +350,7 @@ class MonascaShell(object):
                 kwargs['region_name'] = args.os_region_name
 
             if not endpoint:
-                endpoint = self._get_endpoint(_ksclient, **kwargs)
+                endpoint = _ksclient.monasca_url
 
         client = monasca_client.Client(api_version, endpoint, **kwargs)
 
