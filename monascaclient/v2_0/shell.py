@@ -727,11 +727,6 @@ def do_alarm_definition_update(mc, args):
            action='append')
 @utils.arg('--actions-enabled', metavar='<ACTIONS-ENABLED>',
            help='The actions-enabled boolean is one of [true,false]')
-@utils.arg('--match-by', metavar='<DIMENSION_KEY1,DIMENSION_KEY2,...>',
-           help='The metric dimensions to match to the alarm dimensions. '
-           'One or more dimension key names separated by a comma. '
-           'Key names need quoting when they contain special chars [&,(,),{,},>,<] '
-           'that confuse the CLI parser.')
 @utils.arg('--severity', metavar='<SEVERITY>',
            help='Severity is one of [LOW, MEDIUM, HIGH, CRITICAL].')
 def do_alarm_definition_patch(mc, args):
@@ -757,8 +752,6 @@ def do_alarm_definition_patch(mc, args):
             print(errmsg)
             return
         fields['actions_enabled'] = args.actions_enabled in ['true', 'True']
-    if args.match_by:
-        fields['match_by'] = args.match_by.split(',')
     if args.severity:
         if args.severity.upper() not in severity_types:
             errmsg = 'Invalid severity, not one of [' + \
