@@ -28,7 +28,7 @@ state_types = ['UNDETERMINED', 'ALARM', 'OK']
 enabled_types = ['True', 'true', 'False', 'false']
 
 # Notification valid types
-notification_types = ['EMAIL', 'WEBHOOK']
+notification_types = ['EMAIL', 'WEBHOOK', 'PAGERDUTY']
 
 
 @utils.arg('name', metavar='<METRIC_NAME>',
