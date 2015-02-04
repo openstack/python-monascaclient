@@ -357,9 +357,9 @@ def do_metric_statistics(mc, args):
 @utils.arg('name', metavar='<NOTIFICATION_NAME>',
            help='Name of the notification to create.')
 @utils.arg('type', metavar='<TYPE>',
-           help='The notification type. Type must be either EMAIL or WEBHOOK.')
+           help='The notification type. Type must be EMAIL, WEBHOOK, or PAGERDUTY.')
 @utils.arg('address', metavar='<ADDRESS>',
-           help='A valid EMAIL Address or URL')
+           help='A valid EMAIL Address, URL, or SERVICE KEY')
 def do_notification_create(mc, args):
     '''Create notification.'''
     if args.type.upper() not in notification_types:
@@ -460,9 +460,9 @@ def do_notification_delete(mc, args):
 @utils.arg('name', metavar='<NOTIFICATION_NAME>',
            help='Name of the notification.')
 @utils.arg('type', metavar='<TYPE>',
-           help='The notification type. Type must be either EMAIL or WEBHOOK.')
+           help='The notification type. Type must be either EMAIL, WEBHOOK, or PAGERDUTY.')
 @utils.arg('address', metavar='<ADDRESS>',
-           help='A valid EMAIL Address or URL')
+           help='A valid EMAIL Address, URL, or SERVICE KEY')
 def do_notification_update(mc, args):
     '''Update notification.'''
     fields = {}

@@ -222,6 +222,7 @@ notification-create::
 
   monasca notification-create cindyemail1 EMAIL cindy.employee@hp.com
   monasca notification-create myapplication WEBHOOK http://localhost:5000
+  monasca notification-create mypagerduty PAGERDUTY nzH2LVRdMzun11HNC2oD
 
 notification-list::
 
@@ -231,6 +232,7 @@ notification-list::
   +---------------+--------------------------------------+-------+----------------------+
   | cindyemail1   | 5651406c-447d-40bd-b868-b2b3e6b59e32 | EMAIL |cindy.employee@hp.com |
   | myapplication | 55905ce2-91e3-41ce-b45a-de7032f8d718 | WEBHOOK |http://localhost:5000
+  | mypagerduty   | 5720ccb5-6a3d-22ba-545g-ce467a5b41a2 | PAGERDUTY |nzH2LVRdMzun11HNC2oD
   +---------------+--------------------------------------+-------+----------------------+
 
 
