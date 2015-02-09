@@ -59,7 +59,7 @@ When using Keystone to obtain the token and endpoint::
 
   export OS_USERNAME=
   export OS_PASSWORD=
-  export OS_TENANT_NAME=
+  export OS_PROJECT_NAME=
   export OS_AUTH_URL=
   export OS_REGION_NAME=
 
@@ -75,15 +75,18 @@ You'll find complete documentation on the shell by running
 ``monasca help``::
 
   usage: monasca [-j] [--version] [-d] [-v] [-k] [--cert-file CERT_FILE]
-             [--key-file KEY_FILE] [--ca-file CA_FILE] [--timeout TIMEOUT]
-             [--os-username OS_USERNAME] [--os-password OS_PASSWORD]
-             [--os-tenant-id OS_TENANT_ID] [--os-tenant-name OS_TENANT_NAME]
-             [--os-auth-url OS_AUTH_URL] [--os-region-name OS_REGION_NAME]
-             [--os-auth-token OS_AUTH_TOKEN] [--os-no-client-auth]
-             [--mon-api-url MONASCA_API_URL] [--mon-api-version MONASCA_API_VERSION]
-             [--os-service-type OS_SERVICE_TYPE]
-             [--os-endpoint-type OS_ENDPOINT_TYPE]
-             <subcommand> ...
+               [--key-file KEY_FILE] [--os-cacert OS_CACERT]
+               [--timeout TIMEOUT] [--os-username OS_USERNAME]
+               [--os-password OS_PASSWORD] [--os-project-id OS_PROJECT_ID]
+               [--os-project-name OS_PROJECT_NAME]
+               [--os-domain-id OS_DOMAIN_ID] [--os-domain-name OS_DOMAIN_NAME]
+               [--os-auth-url OS_AUTH_URL] [--os-region-name OS_REGION_NAME]
+               [--os-auth-token OS_AUTH_TOKEN] [--os-no-client-auth]
+               [--monasca-api-url MONASCA_API_URL]
+               [--monasca-api-version MONASCA_API_VERSION]
+               [--os-service-type OS_SERVICE_TYPE]
+               [--os-endpoint-type OS_ENDPOINT_TYPE]
+               <subcommand> ...
 
   Command-line interface to the monasca-client API.
 
@@ -117,48 +120,51 @@ You'll find complete documentation on the shell by running
                                subcommands.
 
   optional arguments:
-    -j, --json             output raw json response
-    --version              Shows the client version and exits.
-    -d, --debug            Defaults to env[MONASCA_DEBUG].
-    -v, --verbose          Print more verbose output.
-    -k, --insecure         Explicitly allow the client to perform "insecure" SSL
-                           (https) requests. The server's certificate will not
-                           be verified against any certificate authorities. This
-                           option should be used with caution.
-    --cert-file CERT_FILE  Path of certificate file to use in SSL connection.
-                           This file can optionally be prepended with the
-                           private key.
-    --key-file KEY_FILE    Path of client key to use in SSL connection.This
-                           option is not necessary if your key is prepended to
-                           your cert file.
-    --ca-file CA_FILE      Path of CA SSL certificate(s) used to verify the
-                           remote server's certificate. Without this option the
-                           client looks for the default system CA certificates.
-    --timeout TIMEOUT      Number of seconds to wait for a response.
-    --os-username OS_USERNAME
-                           Defaults to env[OS_USERNAME].
-    --os-password OS_PASSWORD
-                           Defaults to env[OS_PASSWORD].
-    --os-tenant-id OS_TENANT_ID
-                           Defaults to env[OS_TENANT_ID].
-    --os-tenant-name OS_TENANT_NAME
-                           Defaults to env[OS_TENANT_NAME].
-    --os-auth-url OS_AUTH_URL
-                           Defaults to env[OS_AUTH_URL].
+    -j, --json                 output raw json response
+    --version                  Shows the client version and exits.
+    -d, --debug                Defaults to env[MONASCA_DEBUG].
+    -v, --verbose              Print more verbose output.
+    -k, --insecure             Explicitly allow the client to perform "insecure" SSL
+                               (https) requests. The server's certificate will not
+                               be verified against any certificate authorities. This
+                               option should be used with caution.
+    --cert-file CERT_FILE      Path of certificate file to use in SSL connection.
+                               This file can optionally be prepended with the
+                               private key.
+    --key-file KEY_FILE        Path of client key to use in SSL connection.This
+                               option is not necessary if your key is prepended to
+                               your cert file.
+    --os-cacert OS_CACERT      Specify a CA bundle file to use in verifying a
+                               TLS (https) server certificate. Defaults to
+                               env[OS_CACERT]. Without either of these, the
+                               client looks for the default system CA
+                               certificates.
+    --timeout TIMEOUT          Number of seconds to wait for a response.
+    --os-username OS_USERNAME  Defaults to env[OS_USERNAME].
+    --os-password OS_PASSWORD  Defaults to env[OS_PASSWORD].
+    --os-project-id OS_PROJECT_ID
+                               Defaults to env[OS_PROJECT_ID].
+    --os-project-name OS_PROJECT_NAME
+                               Defaults to env[OS_PROJECT_NAME].
+    --os-domain-id OS_DOMAIN_ID
+                               Defaults to env[OS_DOMAIN_ID].
+    --os-domain-name OS_DOMAIN_NAME
+                               Defaults to env[OS_DOMAIN_NAME].
+    --os-auth-url OS_AUTH_URL  Defaults to env[OS_AUTH_URL].
     --os-region-name OS_REGION_NAME
-                           Defaults to env[OS_REGION_NAME].
+                               Defaults to env[OS_REGION_NAME].
     --os-auth-token OS_AUTH_TOKEN
-                           Defaults to env[OS_AUTH_TOKEN].
-    --os-no-client-auth    Do not contact keystone for a token. Defaults to
-                           env[OS_NO_CLIENT_AUTH].
-    --mon-api-url MONASCA_API_URL
-                           Defaults to env[MONASCA_API_URL].
-    --mon-api-version MONASCA_API_VERSION
-                           Defaults to env[MONASCA_API_VERSION] or 2_0
+                               Defaults to env[OS_AUTH_TOKEN].
+    --os-no-client-auth        Do not contact keystone for a token. Defaults to
+                               env[OS_NO_CLIENT_AUTH].
+    --monasca-api-url MONASCA_API_URL
+                               Defaults to env[MONASCA_API_URL].
+    --monasca-api-version MONASCA_API_VERSION
+                               Defaults to env[MONASCA_API_VERSION] or 2_0
     --os-service-type OS_SERVICE_TYPE
-                           Defaults to env[OS_SERVICE_TYPE].
+                               Defaults to env[OS_SERVICE_TYPE].
     --os-endpoint-type OS_ENDPOINT_TYPE
-                           Defaults to env[OS_ENDPOINT_TYPE].
+                               Defaults to env[OS_ENDPOINT_TYPE].
 
   See "mon help COMMAND" for help on a specific command.
 
