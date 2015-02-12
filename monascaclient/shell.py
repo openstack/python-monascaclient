@@ -86,7 +86,7 @@ class MonascaShell(object):
                             'prepended with the private key.')
 
         parser.add_argument('--key-file',
-                            help='Path of client key to use in SSL connection.'
+                            help='Path of client key to use in SSL connection. '
                             'This option is not necessary if your key is'
                             ' prepended to your cert file.')
 

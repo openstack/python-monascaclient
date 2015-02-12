@@ -219,11 +219,7 @@ class HTTPClient(object):
 
     def json_request(self, method, url, **kwargs):
         kwargs.setdefault('headers', {})
-        if method == "PATCH":
-            kwargs['headers'].setdefault('Content-Type',
-                                         'application/json-patch+json')
-        else:
-            kwargs['headers'].setdefault('Content-Type', 'application/json')
+        kwargs['headers'].setdefault('Content-Type', 'application/json')
         kwargs['headers'].setdefault('Accept', 'application/json')
 
         if 'data' in kwargs:
