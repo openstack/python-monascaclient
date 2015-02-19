@@ -23,6 +23,18 @@ Alternative Manual Install Steps:
   - sudo pip install -r requirements.txt
   - python setup.py install
 
+Building and Packaging
+----------------------
+Install the tool dependencies
+    sudo apt-get install python-pip python-virtualenv
+
+In the python-monascaclient source directory
+    virtualenv --no-site-packages .venv
+    source ./.venv/bin/activate
+    pip install wheel
+    python setup.py bdist_wheel
+    pip install $(ls -1rt dist/*.whl | tail -1) --upgrade
+
 Command-line API
 ----------------
 Installing this distribution gets you a shell command, ``monasca``, that you
@@ -37,7 +49,7 @@ Usage:
 
   monasca -j <command>
 
-    This outputs the results in jason format.  Normally output is in table format.
+    This outputs the results in json format.  Normally output is in table format.
 
 
 The monascaclient CLI needs the Monasca API endpoint url and the OS_AUTH_TOKEN to pass to the
