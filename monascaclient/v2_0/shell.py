@@ -41,8 +41,8 @@ notification_types = ['EMAIL', 'WEBHOOK', 'PAGERDUTY']
            'that confuse the CLI parser.',
            action='append')
 @utils.arg('--time', metavar='<UNIX_TIMESTAMP>',
-           default=time.time(), type=int,
-           help='Metric timestamp. Default: current timestamp.')
+           default=time.time() * 1000, type=int,
+           help='Metric timestamp in milliseconds. Default: current timestamp.')
 @utils.arg('--project-id', metavar='<CROSS_PROJECT_ID>',
            help='The Project ID to create metric on behalf of. '
            'Requires monitoring-delegate role in keystone.',
