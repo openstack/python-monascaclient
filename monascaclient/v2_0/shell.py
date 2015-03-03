@@ -40,6 +40,13 @@ notification_types = ['EMAIL', 'WEBHOOK', 'PAGERDUTY']
            'Dimensions need quoting when they contain special chars [&,(,),{,},>,<] '
            'that confuse the CLI parser.',
            action='append')
+@utils.arg('--value-meta', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
+           help='key value pair for extra information about a value. '
+           'This can be specified multiple times, or once with parameters '
+           'separated by a comma. '
+           'value_meta need quoting when they contain special chars [&,(,),{,},>,<] '
+           'that confuse the CLI parser.',
+           action='append')
 @utils.arg('--time', metavar='<UNIX_TIMESTAMP>',
            default=time.time(), type=int,
            help='Metric timestamp. Default: current timestamp.')
@@ -58,6 +65,8 @@ def do_metric_create(mc, args):
         fields['dimensions'] = utils.format_parameters(args.dimensions)
     fields['timestamp'] = args.time
     fields['value'] = args.value
+    if args.value_meta:
+        fields['value_meta'] = utils.format_parameters(args.value_meta)
     if args.project_id:
         fields['tenant_id'] = args.project_id
     try:
@@ -150,8 +159,27 @@ def format_measure_timestamp(measurements):
     return '\n'.join(meas_string_list)
 
 
+def format_value_meta(measurements):
+    # returns newline separated values for the value column
+    meas_string_list = list()
+    for meas in measurements:
+        if len(meas) < 4:
+            meas_string = ""
+        else:
+            meta_string_list = []
+            for k, v in meas[3].items():
+                if isinstance(v, numbers.Number):
+                    m_str = k + ': ' + str(v)
+                else:
+                    m_str = k + ': ' + v
+                meta_string_list.append(m_str)
+            meas_string = ','.join(meta_string_list)
+        meas_string_list.append(meas_string)
+    return '\n'.join(meas_string_list)
+
+
 def format_measure_value(measurements):
-    # reutrns newline separated values for the value column
+    # returns newline separated values for the value column
     meas_string_list = list()
     for meas in measurements:
         meas_string = '{:12.2f}'.format(meas[2])
@@ -245,13 +273,14 @@ def do_measurement_list(mc, args):
         if args.json:
             print(utils.json_formatter(metric))
             return
-        cols = ['name', 'dimensions', 'measurement_id', 'timestamp', 'value']
+        cols = ['name', 'dimensions', 'measurement_id', 'timestamp', 'value', 'value_meta']
         formatters = {
             'name': lambda x: x['name'],
             'dimensions': lambda x: utils.format_dict(x['dimensions']),
             'measurement_id': lambda x: format_measure_id(x['measurements']),
             'timestamp': lambda x: format_measure_timestamp(x['measurements']),
             'value': lambda x: format_measure_value(x['measurements']),
+            'value_meta': lambda x: format_value_meta(x['measurements']),
         }
         if isinstance(metric, list):
             # print the list

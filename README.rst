@@ -187,6 +187,7 @@ metric-create::
   monasca metric-create metric1 1234.56 --dimensions instance_id=123,service=ourservice
   monasca metric-create metric1 2222.22 --dimensions instance_id=123,service=ourservice
   monasca metric-create metric1 3333.33 --dimensions instance_id=222,service=ourservice
+  monasca metric-create metric1 4444.44 --dimensions instance_id=222 --value-meta rc=404
 
 metric-list::
 
@@ -202,22 +203,22 @@ metric-list::
 measurement-list::
 
   monasca measurement-list metric1 2014-01-01T00:00:00Z
-  +---------+--------------------+----------------+----------------------+--------------+
-  | name    | dimensions         | measurement_id | timestamp            | value        |
-  +---------+--------------------+----------------+----------------------+--------------+
-  | metric1 | instance_id:123    |     723885     | 2014-05-08T21:46:32Z |      1234.56 |
-  |         | service:ourservice |     725951     | 2014-05-08T21:48:50Z |      2222.22 |
-  | metric1 | instance_id:222    |     726837     | 2014-05-08T21:49:47Z |      3333.33 |
-  |         | service:ourservice |                |                      |              |
-  +---------+--------------------+----------------+----------------------+--------------+
+  +---------+--------------------+----------------+----------------------+--------------+-------------+
+  | name    | dimensions         | measurement_id | timestamp            | value        |  value_meta |
+  +---------+--------------------+----------------+----------------------+--------------+-------------+
+  | metric1 | instance_id:123    |     723885     | 2014-05-08T21:46:32Z |      1234.56 |             |
+  |         | service:ourservice |     725951     | 2014-05-08T21:48:50Z |      2222.22 |             |
+  | metric1 | instance_id:222    |     726837     | 2014-05-08T21:49:47Z |      3333.33 |             |
+  |         | service:ourservice |     726983     | 2014-05-08T21:50:27Z |      4444.44 | rc: 404     |
+  +---------+--------------------+----------------+----------------------+--------------+-------------+
 
   monasca measurement-list metric1 2014-01-01T00:00:00Z --dimensions instance_id=123
-  +---------+--------------------+----------------+----------------------+--------------+
-  | name    | dimensions         | measurement_id | timestamp            | value        |
-  +---------+--------------------+----------------+----------------------+--------------+
-  | metric1 | instance_id:123    |     723885     | 2014-05-08T21:46:32Z |      1234.56 |
-  |         | service:ourservice |     725951     | 2014-05-08T21:48:50Z |      2222.22 |
-  +---------+--------------------+----------------+----------------------+--------------+
+  +---------+--------------------+----------------+----------------------+--------------+-------------+
+  | name    | dimensions         | measurement_id | timestamp            | value        |  value_meta |
+  +---------+--------------------+----------------+----------------------+--------------+-------------+
+  | metric1 | instance_id:123    |     723885     | 2014-05-08T21:46:32Z |      1234.56 |             |
+  |         | service:ourservice |     725951     | 2014-05-08T21:48:50Z |      2222.22 |             |
+  +---------+--------------------+----------------+----------------------+--------------+-------------+
 
 
 Notifications Examples
