@@ -48,7 +48,7 @@ class NotificationsManager(monasca_manager.MonascaManager):
         newheaders = self.get_headers()
         resp, body = self.client.json_request(
             'GET', self.base_url, headers=newheaders)
-        return body
+        return body['elements'] if type(body) is dict else body
 
     def delete(self, **kwargs):
         """Delete a notification."""
