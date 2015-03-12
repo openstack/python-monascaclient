@@ -58,7 +58,7 @@ class MetricsManager(monasca_manager.MonascaManager):
         # print url_str
         resp, body = self.client.json_request(
             'GET', url_str, headers=newheaders)
-        return body
+        return body['elements'] if type(body) is dict else body
 
     def list_measurements(self, **kwargs):
         """Get a list of measurements based on metric definition filters."""
@@ -73,7 +73,7 @@ class MetricsManager(monasca_manager.MonascaManager):
         # print url_str
         resp, body = self.client.json_request(
             'GET', url_str, headers=newheaders)
-        return body
+        return body['elements'] if type(body) is dict else body
 
     def list_statistics(self, **kwargs):
         """Get a list of measurement statistics based on metric def filters."""
@@ -88,4 +88,4 @@ class MetricsManager(monasca_manager.MonascaManager):
         # print url_str
         resp, body = self.client.json_request(
             'GET', url_str, headers=newheaders)
-        return body
+        return body['elements'] if type(body) is dict else body

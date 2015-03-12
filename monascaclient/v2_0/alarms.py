@@ -49,7 +49,7 @@ class AlarmsManager(monasca_manager.MonascaManager):
         # print url_str
         resp, body = self.client.json_request(
             'GET', url_str, headers=newheaders)
-        return body
+        return body['elements'] if type(body) is dict else body
 
     def delete(self, **kwargs):
         """Delete a specific alarm."""
@@ -86,7 +86,7 @@ class AlarmsManager(monasca_manager.MonascaManager):
         del kwargs['alarm_id']
         resp, body = self.client.json_request('GET', url_str,
                                               headers=newheaders)
-        return body
+        return body['elements'] if type(body) is dict else body
 
     def history_list(self, **kwargs):
         """History list of alarm state."""
@@ -99,4 +99,4 @@ class AlarmsManager(monasca_manager.MonascaManager):
             url_str = url_str + '?%s' % urlutils.urlencode(kwargs, True)
         resp, body = self.client.json_request('GET', url_str,
                                               headers=newheaders)
-        return body
+        return body['elements'] if type(body) is dict else body

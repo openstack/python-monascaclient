@@ -57,7 +57,7 @@ class AlarmDefinitionsManager(monasca_manager.MonascaManager):
         # print url_str
         resp, body = self.client.json_request(
             'GET', url_str, headers=newheaders)
-        return body
+        return body['elements'] if type(body) is dict else body
 
     def delete(self, **kwargs):
         """Delete a specific alarm definition."""
