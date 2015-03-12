@@ -105,6 +105,10 @@ def do_metric_create_raw(mc, args):
            'Dimensions need quoting when they contain special chars [&,(,),{,},>,<] '
            'that confuse the CLI parser.',
            action='append')
+@utils.arg('--offset', metavar='<OFFSET LOCATION>',
+           help='The offset used to paginate the return data.')
+@utils.arg('--limit', metavar='<RETURN LIMIT>',
+           help='The amount of data to be returned up to the API maximum limit.')
 def do_metric_list(mc, args):
     '''List metrics for this tenant.'''
     fields = {}
@@ -112,6 +116,11 @@ def do_metric_list(mc, args):
         fields['name'] = args.name
     if args.dimensions:
         fields['dimensions'] = utils.format_parameters(args.dimensions)
+    if args.limit:
+        fields['limit'] = args.limit
+    if args.offset:
+        fields['offset'] = args.offset
+
     try:
         metric = mc.metrics.list(**fields)
     except exc.HTTPException as he:
@@ -254,6 +263,10 @@ def format_metric_dimensions(metrics):
            help='measurements >= UTC time. format: 2014-01-01T00:00:00Z.')
 @utils.arg('--endtime', metavar='<UTC_END_TIME>',
            help='measurements <= UTC time. format: 2014-01-01T00:00:00Z.')
+@utils.arg('--offset', metavar='<OFFSET LOCATION>',
+           help='The offset used to paginate the return data.')
+@utils.arg('--limit', metavar='<RETURN LIMIT>',
+           help='The amount of data to be returned up to the API maximum limit.')
 def do_measurement_list(mc, args):
     '''List measurements for the specified metric.'''
     fields = {}
@@ -263,6 +276,11 @@ def do_measurement_list(mc, args):
     fields['start_time'] = args.starttime
     if args.endtime:
         fields['end_time'] = args.endtime
+    if args.limit:
+        fields['limit'] = args.limit
+    if args.offset:
+        fields['offset'] = args.offset
+
     try:
         metric = mc.metrics.list_measurements(**fields)
     except exc.HTTPException as he:
@@ -314,6 +332,10 @@ def do_measurement_list(mc, args):
            help='measurements <= UTC time. format: 2014-01-01T00:00:00Z.')
 @utils.arg('--period', metavar='<PERIOD>',
            help='number of seconds per interval (default is 300)')
+@utils.arg('--offset', metavar='<OFFSET LOCATION>',
+           help='The offset used to paginate the return data.')
+@utils.arg('--limit', metavar='<RETURN LIMIT>',
+           help='The amount of data to be returned up to the API maximum limit.')
 def do_metric_statistics(mc, args):
     '''List measurement statistics for the specified metric.'''
     statistic_types = ['AVG', 'MIN', 'MAX', 'COUNT', 'SUM']
@@ -334,6 +356,11 @@ def do_metric_statistics(mc, args):
     if args.period:
         fields['period'] = args.period
     fields['statistics'] = args.statistics
+    if args.limit:
+        fields['limit'] = args.limit
+    if args.offset:
+        fields['offset'] = args.offset
+
     try:
         metric = mc.metrics.list_statistics(**fields)
     except exc.HTTPException as he:
@@ -438,10 +465,20 @@ def do_notification_show(mc, args):
         utils.print_dict(notification, formatters=formatters)
 
 
+@utils.arg('--offset', metavar='<OFFSET LOCATION>',
+           help='The offset used to paginate the return data.')
+@utils.arg('--limit', metavar='<RETURN LIMIT>',
+           help='The amount of data to be returned up to the API maximum limit.')
 def do_notification_list(mc, args):
     '''List notifications for this tenant.'''
+    fields = {}
+    if args.limit:
+        fields['limit'] = args.limit
+    if args.offset:
+        fields['offset'] = args.offset
+
     try:
-        notification = mc.notifications.list()
+        notification = mc.notifications.list(**fields)
     except exc.HTTPException as he:
         raise exc.CommandError(
             'HTTPException code=%s message=%s' %
@@ -616,6 +653,10 @@ def do_alarm_definition_show(mc, args):
            'Dimensions need quoting when they contain special chars [&,(,),{,},>,<] '
            'that confuse the CLI parser.',
            action='append')
+@utils.arg('--offset', metavar='<OFFSET LOCATION>',
+           help='The offset used to paginate the return data.')
+@utils.arg('--limit', metavar='<RETURN LIMIT>',
+           help='The amount of data to be returned up to the API maximum limit.')
 def do_alarm_definition_list(mc, args):
     '''List alarm definitions for this tenant.'''
     fields = {}
@@ -623,6 +664,10 @@ def do_alarm_definition_list(mc, args):
         fields['name'] = args.name
     if args.dimensions:
         fields['dimensions'] = utils.format_parameters(args.dimensions)
+    if args.limit:
+        fields['limit'] = args.limit
+    if args.offset:
+        fields['offset'] = args.offset
     try:
         alarm = mc.alarm_definitions.list(**fields)
     except exc.HTTPException as he:
@@ -813,6 +858,10 @@ def do_alarm_definition_patch(mc, args):
            action='append')
 @utils.arg('--state', metavar='<ALARM_STATE>',
            help='ALARM_STATE is one of [UNDETERMINED, OK, ALARM].')
+@utils.arg('--offset', metavar='<OFFSET LOCATION>',
+           help='The offset used to paginate the return data.')
+@utils.arg('--limit', metavar='<RETURN LIMIT>',
+           help='The amount of data to be returned up to the API maximum limit.')
 def do_alarm_list(mc, args):
     '''List alarms for this tenant.'''
     fields = {}
@@ -829,6 +878,10 @@ def do_alarm_list(mc, args):
             print(errmsg)
             return
         fields['state'] = args.state
+    if args.limit:
+        fields['limit'] = args.limit
+    if args.offset:
+        fields['offset'] = args.offset
     try:
         alarm = mc.alarms.list(**fields)
     except exc.HTTPException as he:
@@ -979,10 +1032,18 @@ def output_alarm_history(args, alarm_history):
 
 @utils.arg('id', metavar='<ALARM_ID>',
            help='The ID of the alarm.')
+@utils.arg('--offset', metavar='<OFFSET LOCATION>',
+           help='The offset used to paginate the return data.')
+@utils.arg('--limit', metavar='<RETURN LIMIT>',
+           help='The amount of data to be returned up to the API maximum limit.')
 def do_alarm_history(mc, args):
     '''Alarm state transition history.'''
     fields = {}
     fields['alarm_id'] = args.id
+    if args.limit:
+        fields['limit'] = args.limit
+    if args.offset:
+        fields['offset'] = args.offset
     try:
         alarm = mc.alarms.history(**fields)
     except exc.HTTPException as he:
@@ -1004,6 +1065,10 @@ def do_alarm_history(mc, args):
            help='measurements >= UTC time. format: 2014-01-01T00:00:00Z.')
 @utils.arg('--endtime', metavar='<UTC_END_TIME>',
            help='measurements <= UTC time. format: 2014-01-01T00:00:00Z.')
+@utils.arg('--offset', metavar='<OFFSET LOCATION>',
+           help='The offset used to paginate the return data.')
+@utils.arg('--limit', metavar='<RETURN LIMIT>',
+           help='The amount of data to be returned up to the API maximum limit.')
 def do_alarm_history_list(mc, args):
     '''List alarms state history.'''
     fields = {}
@@ -1013,6 +1078,10 @@ def do_alarm_history_list(mc, args):
         fields['start_time'] = args.starttime
     if args.endtime:
         fields['end_time'] = args.endtime
+    if args.limit:
+        fields['limit'] = args.limit
+    if args.offset:
+        fields['offset'] = args.offset
     try:
         alarm = mc.alarms.history_list(**fields)
     except exc.HTTPException as he:
