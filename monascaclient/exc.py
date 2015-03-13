@@ -13,11 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import sys
 
 from monascaclient.openstack.common import jsonutils
 
 verbose = 0
+
+log = logging.getLogger(__name__)
 
 
 class BaseException(Exception):
@@ -54,21 +57,34 @@ class HTTPException(BaseException):
     def __init__(self, message=None):
         super(HTTPException, self).__init__(message)
         try:
+            log.error("exception: {}".format(message))
             self.error = jsonutils.loads(message)
-            if 'error' not in self.error:
-                raise KeyError('Key "error" not exists')
-        except KeyError:
-            # NOTE(jianingy): If key 'error' happens not exist,
-            # self.message becomes no sense. In this case, we
-            # return doc of current exception class instead.
-            self.error = {'error':
-                          {'message': self.__class__.__doc__}}
         except Exception:
             self.error = {'error':
                           {'message': self.message or self.__class__.__doc__}}
 
     def __str__(self):
-        message = self.error['error'].get('message', 'Internal Error')
+
+        if 'description' in self.error:
+            # Python API:
+            # Expected message format:
+            # {
+            #    "title": "Foo",
+            #    "description": "Bar"
+            # }
+            message = self.error['description']
+        else:
+            # Java API:
+            # Expected message format:
+            # {
+            #    "conflict":{"code":409,
+            #                "message":"Bar",
+            #                "details":"",
+            #                "internal_code":"Baz"}
+            # }
+            for key in self.error:
+                message = self.error[key].get('message', 'Internal Error')
+
         if verbose:
             traceback = self.error['error'].get('traceback', '')
             return 'ERROR: %s\n%s' % (message, traceback)
