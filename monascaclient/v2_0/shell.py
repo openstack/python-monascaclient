@@ -241,7 +241,7 @@ def format_metric_dimensions(metrics):
     return '\n'.join(metric_string_list)
 
 
-@utils.arg('name', metavar='<METRIC_NAME>',
+@utils.arg('--name', metavar='<METRIC_NAME>',
            help='Name of the metric to list measurements.')
 @utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
            help='key value pair used to specify a metric dimension. '
@@ -257,7 +257,8 @@ def format_metric_dimensions(metrics):
 def do_measurement_list(mc, args):
     '''List measurements for the specified metric.'''
     fields = {}
-    fields['name'] = args.name
+    if args.name:
+        fields['name'] = args.name
     if args.dimensions:
         fields['dimensions'] = utils.format_parameters(args.dimensions)
     fields['start_time'] = args.starttime
