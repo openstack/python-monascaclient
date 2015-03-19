@@ -84,6 +84,8 @@ class AlarmsManager(monasca_manager.MonascaManager):
         newheaders = self.get_headers()
         url_str = self.base_url + '/%s/state-history' % kwargs['alarm_id']
         del kwargs['alarm_id']
+        if kwargs:
+            url_str = url_str + '?%s' % urlutils.urlencode(kwargs, True)
         resp, body = self.client.json_request('GET', url_str,
                                               headers=newheaders)
         return body['elements'] if type(body) is dict else body
