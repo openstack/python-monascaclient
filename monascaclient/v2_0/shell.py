@@ -152,48 +152,46 @@ def do_metric_list(mc, args):
 
 def format_measure_id(measurements):
     # returns newline separated measurements id's for the id column
-    meas_string_list = list()
-    for meas in measurements:
-        # meas_string = '{:10d}'.format(meas[0])
-        meas_string = '{:20d}'.format(meas[0])
-        meas_string_list.append(meas_string)
-    return '\n'.join(meas_string_list)
+    measure_string_list = list()
+    for measure in measurements:
+        measure_string_list.append('{}'.format(measure[0]))
+    return '\n'.join(measure_string_list)
 
 
 def format_measure_timestamp(measurements):
     # returns newline separated times for the timestamp column
-    meas_string_list = list()
-    for meas in measurements:
-        meas_string_list.append(str(meas[1]))
-    return '\n'.join(meas_string_list)
+    measure_string_list = list()
+    for measure in measurements:
+        measure_string_list.append(str(measure[1]))
+    return '\n'.join(measure_string_list)
 
 
 def format_value_meta(measurements):
     # returns newline separated values for the value column
-    meas_string_list = list()
-    for meas in measurements:
-        if len(meas) < 4:
-            meas_string = ""
+    measure_string_list = list()
+    for measure in measurements:
+        if len(measure) < 4:
+            measure_string = ""
         else:
             meta_string_list = []
-            for k, v in meas[3].items():
+            for k, v in measure[3].items():
                 if isinstance(v, numbers.Number):
                     m_str = k + ': ' + str(v)
                 else:
                     m_str = k + ': ' + v
                 meta_string_list.append(m_str)
-            meas_string = ','.join(meta_string_list)
-        meas_string_list.append(meas_string)
-    return '\n'.join(meas_string_list)
+            measure_string = ','.join(meta_string_list)
+        measure_string_list.append(measure_string)
+    return '\n'.join(measure_string_list)
 
 
 def format_measure_value(measurements):
     # returns newline separated values for the value column
-    meas_string_list = list()
-    for meas in measurements:
-        meas_string = '{:12.2f}'.format(meas[2])
-        meas_string_list.append(meas_string)
-    return '\n'.join(meas_string_list)
+    measure_string_list = list()
+    for measure in measurements:
+        measure_string = '{:12.2f}'.format(measure[2])
+        measure_string_list.append(measure_string)
+    return '\n'.join(measure_string_list)
 
 
 def format_statistic_timestamp(statistics, columns, name):
@@ -267,6 +265,9 @@ def format_metric_dimensions(metrics):
            help='The offset used to paginate the return data.')
 @utils.arg('--limit', metavar='<RETURN LIMIT>',
            help='The amount of data to be returned up to the API maximum limit.')
+@utils.arg('--merge_metrics', action='store_const',
+           const=True,
+           help='Merge multiple metrics into a single result.')
 def do_measurement_list(mc, args):
     '''List measurements for the specified metric.'''
     fields = {}
@@ -281,6 +282,8 @@ def do_measurement_list(mc, args):
         fields['limit'] = args.limit
     if args.offset:
         fields['offset'] = args.offset
+    if args.merge_metrics:
+        fields['merge_metrics'] = args.merge_metrics
 
     try:
         metric = mc.metrics.list_measurements(**fields)
@@ -337,6 +340,9 @@ def do_measurement_list(mc, args):
            help='The offset used to paginate the return data.')
 @utils.arg('--limit', metavar='<RETURN LIMIT>',
            help='The amount of data to be returned up to the API maximum limit.')
+@utils.arg('--merge_metrics', action='store_const',
+           const=True,
+           help='Merge multiple metrics into a single result.')
 def do_metric_statistics(mc, args):
     '''List measurement statistics for the specified metric.'''
     statistic_types = ['AVG', 'MIN', 'MAX', 'COUNT', 'SUM']
@@ -361,6 +367,8 @@ def do_metric_statistics(mc, args):
         fields['limit'] = args.limit
     if args.offset:
         fields['offset'] = args.offset
+    if args.merge_metrics:
+        fields['merge_metrics'] = args.merge_metrics
 
     try:
         metric = mc.metrics.list_statistics(**fields)
