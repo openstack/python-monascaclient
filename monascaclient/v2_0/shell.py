@@ -867,6 +867,8 @@ def do_alarm_definition_patch(mc, args):
            action='append')
 @utils.arg('--state', metavar='<ALARM_STATE>',
            help='ALARM_STATE is one of [UNDETERMINED, OK, ALARM].')
+@utils.arg('--state-updated-start-time', metavar='<UTC_STATE_UPDATED_START>',
+           help='Return all alarms whose state was updated on or after the time specified')
 @utils.arg('--offset', metavar='<OFFSET LOCATION>',
            help='The offset used to paginate the return data.')
 @utils.arg('--limit', metavar='<RETURN LIMIT>',
@@ -887,6 +889,8 @@ def do_alarm_list(mc, args):
             print(errmsg)
             return
         fields['state'] = args.state
+    if args.state_updated_start_time:
+        fields['state_updated_start_time'] = args.state_updated_start_time
     if args.limit:
         fields['limit'] = args.limit
     if args.offset:
@@ -901,7 +905,8 @@ def do_alarm_list(mc, args):
         if args.json:
             print(utils.json_formatter(alarm))
             return
-        cols = ['id', 'alarm_definition_id', 'alarm_name', 'metric_name', 'metric_dimensions', 'severity', 'state']
+        cols = ['id', 'alarm_definition_id', 'alarm_name', 'metric_name', 'metric_dimensions', 'severity', 'state',
+                'state_updated_timestamp', "created_timestamp"]
         formatters = {
             'id': lambda x: x['id'],
             'alarm_definition_id': lambda x: x['alarm_definition']['id'],
@@ -910,6 +915,8 @@ def do_alarm_list(mc, args):
             'metric_dimensions': lambda x: format_metric_dimensions(x['metrics']),
             'severity': lambda x: x['alarm_definition']['severity'],
             'state': lambda x: x['state'],
+            'state_updated_timestamp': lambda x: x['state_updated_timestamp'],
+            'created_timestamp': lambda x: x['created_timestamp'],
         }
         if isinstance(alarm, list):
             # print the list
