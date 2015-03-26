@@ -60,6 +60,21 @@ class MetricsManager(monasca_manager.MonascaManager):
             'GET', url_str, headers=newheaders)
         return body['elements'] if type(body) is dict else body
 
+    def list_names(self, **kwargs):
+        """Get a list of metric names."""
+        url_str = self.base_url + '/names'
+        newheaders = self.get_headers()
+        if 'dimensions' in kwargs:
+            dimstr = self.get_dimensions_url_string(kwargs['dimensions'])
+            kwargs['dimensions'] = dimstr
+
+        if kwargs:
+            url_str = url_str + '?%s' % urlutils.urlencode(kwargs, True)
+        # print url_str
+        resp, body = self.client.json_request(
+            'GET', url_str, headers=newheaders)
+        return body['elements'] if type(body) is dict else body
+
     def list_measurements(self, **kwargs):
         """Get a list of measurements based on metric definition filters."""
         url_str = self.base_url + '/measurements'
