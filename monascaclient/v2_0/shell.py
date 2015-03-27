@@ -150,20 +150,14 @@ def do_metric_list(mc, args):
                 sortby=0)
 
 
-def format_measure_id(measurements):
-    # returns newline separated measurements id's for the id column
-    measure_string_list = list()
-    for measure in measurements:
-        measure_string_list.append('{}'.format(measure[0]))
-    return '\n'.join(measure_string_list)
-
-
 def format_measure_timestamp(measurements):
     # returns newline separated times for the timestamp column
-    measure_string_list = list()
-    for measure in measurements:
-        measure_string_list.append(str(measure[1]))
-    return '\n'.join(measure_string_list)
+    return '\n'.join([str(m[0]) for m in measurements])
+
+
+def format_measure_value(measurements):
+    # returns newline separated values for the value column
+    return '\n'.join(['{:12.2f}'.format(m[1]) for m in measurements])
 
 
 def format_value_meta(measurements):
@@ -174,22 +168,13 @@ def format_value_meta(measurements):
             measure_string = ""
         else:
             meta_string_list = []
-            for k, v in measure[3].items():
+            for k, v in measure[2].items():
                 if isinstance(v, numbers.Number):
                     m_str = k + ': ' + str(v)
                 else:
                     m_str = k + ': ' + v
                 meta_string_list.append(m_str)
             measure_string = ','.join(meta_string_list)
-        measure_string_list.append(measure_string)
-    return '\n'.join(measure_string_list)
-
-
-def format_measure_value(measurements):
-    # returns newline separated values for the value column
-    measure_string_list = list()
-    for measure in measurements:
-        measure_string = '{:12.2f}'.format(measure[2])
         measure_string_list.append(measure_string)
     return '\n'.join(measure_string_list)
 
@@ -295,11 +280,10 @@ def do_measurement_list(mc, args):
         if args.json:
             print(utils.json_formatter(metric))
             return
-        cols = ['name', 'dimensions', 'measurement_id', 'timestamp', 'value', 'value_meta']
+        cols = ['name', 'dimensions', 'timestamp', 'value', 'value_meta']
         formatters = {
             'name': lambda x: x['name'],
             'dimensions': lambda x: utils.format_dict(x['dimensions']),
-            'measurement_id': lambda x: format_measure_id(x['measurements']),
             'timestamp': lambda x: format_measure_timestamp(x['measurements']),
             'value': lambda x: format_measure_value(x['measurements']),
             'value_meta': lambda x: format_value_meta(x['measurements']),
