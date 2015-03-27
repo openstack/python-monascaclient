@@ -30,9 +30,13 @@ Install the tool dependencies
 
 In the python-monascaclient source directory
     virtualenv --no-site-packages .venv
+
     source ./.venv/bin/activate
+
     pip install wheel
+
     python setup.py bdist_wheel
+
     pip install $(ls -1rt dist/*.whl | tail -1) --upgrade
 
 Command-line API
