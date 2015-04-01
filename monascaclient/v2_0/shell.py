@@ -164,7 +164,7 @@ def format_value_meta(measurements):
     # returns newline separated values for the value column
     measure_string_list = list()
     for measure in measurements:
-        if len(measure) < 4:
+        if len(measure) < 3:
             measure_string = ""
         else:
             meta_string_list = []
