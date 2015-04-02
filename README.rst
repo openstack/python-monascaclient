@@ -15,6 +15,9 @@ Ubuntu Install
 Requires:
   - pip - version >= 1.4.  python get-pip.py
 
+See versions on PYPI:
+  https://pypi.python.org/pypi/python-monascaclient/
+
 Install It:
   - sudo pip install python-monascaclient
 
