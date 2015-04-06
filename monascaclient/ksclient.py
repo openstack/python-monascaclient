@@ -92,7 +92,8 @@ class KSClient(object):
                     attr='region',
                     filter_value=self._kwargs.get('region_name'),
                     endpoint_type=self._kwargs.get('endpoint_type') or 'publicURL')
-            self._monasca_url = self._keystone.service_catalog.url_for(
-                service_type=self._kwargs.get('service_type') or 'monitoring',
-                endpoint_type=self._kwargs.get('endpoint_type') or 'publicURL')
+            else:
+                self._monasca_url = self._keystone.service_catalog.url_for(
+                    service_type=self._kwargs.get('service_type') or 'monitoring',
+                    endpoint_type=self._kwargs.get('endpoint_type') or 'publicURL')
         return self._monasca_url

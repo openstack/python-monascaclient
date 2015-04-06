@@ -321,7 +321,9 @@ class MonascaShell(object):
             'project_name': args.os_project_name,
             'domain_id': args.os_domain_id,
             'domain_name': args.os_domain_name,
-            'insecure': args.insecure
+            'insecure': args.insecure,
+            'region_name': args.os_region_name
+
         }
 
         endpoint = args.monasca_api_url
