@@ -72,14 +72,7 @@ class KSClient(object):
             if self._keystone.project_id:
                 self._token = self._keystone.auth_token
             else:
-                raise exc.CommandError("User does not have a default project. "
-                                       "You must provide a project id using "
-                                       "--os-project-id or via env[OS_PROJECT_ID], "
-                                       "or you must provide a project name using "
-                                       "--os-project-name or via env[OS_PROJECT_NAME] "
-                                       "and a domain using --os-domain-name, via "
-                                       "env[OS_DOMAIN_NAME],  using --os-domain-id or "
-                                       "via env[OS_DOMAIN_ID]")
+                raise exc.CommandError("No project id or project name.")
         return self._token
 
     @property
