@@ -333,7 +333,17 @@ class MonascaShell(object):
             if args.os_auth_token:
                 token = args.os_auth_token
             else:
-                token = _ksclient.token
+                try:
+                    token = _ksclient.token
+                except exc.CommandError:
+                    raise exc.CommandError("User does not have a default project. "
+                                           "You must provide a project id using "
+                                           "--os-project-id or via env[OS_PROJECT_ID], "
+                                           "or you must provide a project name using "
+                                           "--os-project-name or via env[OS_PROJECT_NAME] "
+                                           "and a domain using --os-domain-name, via "
+                                           "env[OS_DOMAIN_NAME],  using --os-domain-id or "
+                                           "via env[OS_DOMAIN_ID]")
 
             kwargs = {
                 'token': token,
