@@ -87,9 +87,9 @@ class HTTPException(BaseException):
 
         if verbose:
             traceback = self.error['error'].get('traceback', '')
-            return 'ERROR: %s\n%s' % (message, traceback)
+            return '%s\n%s' % (message, traceback)
         else:
-            return 'ERROR: %s' % message
+            return '%s' % message
 
 
 class HTTPMultipleChoices(HTTPException):
