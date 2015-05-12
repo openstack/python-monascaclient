@@ -853,6 +853,10 @@ def do_alarm_definition_patch(mc, args):
            help='ALARM_STATE is one of [UNDETERMINED, OK, ALARM].')
 @utils.arg('--state-updated-start-time', metavar='<UTC_STATE_UPDATED_START>',
            help='Return all alarms whose state was updated on or after the time specified')
+@utils.arg('--lifecycle-state', metavar='<LIFECYCLE_STATE>',
+           help='The lifecycle state of the alarm')
+@utils.arg('--link', metavar='<LINK>',
+           help='The link to external data associated with the alarm')
 @utils.arg('--offset', metavar='<OFFSET LOCATION>',
            help='The offset used to paginate the return data.')
 @utils.arg('--limit', metavar='<RETURN LIMIT>',
@@ -875,6 +879,10 @@ def do_alarm_list(mc, args):
         fields['state'] = args.state
     if args.state_updated_start_time:
         fields['state_updated_start_time'] = args.state_updated_start_time
+    if args.lifecycle_state:
+        fields['lifecycle_state'] = args.lifecycle_state
+    if args.link:
+        fields['link'] = args.link
     if args.limit:
         fields['limit'] = args.limit
     if args.offset:
@@ -890,7 +898,7 @@ def do_alarm_list(mc, args):
             print(utils.json_formatter(alarm))
             return
         cols = ['id', 'alarm_definition_id', 'alarm_name', 'metric_name', 'metric_dimensions', 'severity', 'state',
-                'state_updated_timestamp', "created_timestamp"]
+                'lifecycle_state', 'link', 'state_updated_timestamp', 'updated_timestamp', "created_timestamp"]
         formatters = {
             'id': lambda x: x['id'],
             'alarm_definition_id': lambda x: x['alarm_definition']['id'],
@@ -899,7 +907,10 @@ def do_alarm_list(mc, args):
             'metric_dimensions': lambda x: format_metric_dimensions(x['metrics']),
             'severity': lambda x: x['alarm_definition']['severity'],
             'state': lambda x: x['state'],
+            'lifecycle_state': lambda x: x['lifecycle_state'],
+            'link': lambda x: x['link'],
             'state_updated_timestamp': lambda x: x['state_updated_timestamp'],
+            'updated_timestamp': lambda x: x['updated_timestamp'],
             'created_timestamp': lambda x: x['created_timestamp'],
         }
         if isinstance(alarm, list):
@@ -943,6 +954,10 @@ def do_alarm_show(mc, args):
            help='The ID of the alarm.')
 @utils.arg('state', metavar='<ALARM_STATE>',
            help='ALARM_STATE is one of [UNDETERMINED, OK, ALARM].')
+@utils.arg('lifecycle_state', metavar='<LIFECYCLE_STATE>',
+           help='The lifecycle state of the alarm')
+@utils.arg('link', metavar='<LINK>',
+           help='A link to an external resource with information about the alarm')
 def do_alarm_update(mc, args):
     '''Update the alarm state.'''
     fields = {}
@@ -953,6 +968,8 @@ def do_alarm_update(mc, args):
             print(errmsg)
             return
     fields['state'] = args.state
+    fields['lifecycle_state'] = args.lifecycle_state
+    fields['link'] = args.link
     try:
         alarm = mc.alarms.update(**fields)
     except exc.HTTPException as he:
@@ -965,18 +982,27 @@ def do_alarm_update(mc, args):
 
 @utils.arg('id', metavar='<ALARM_ID>',
            help='The ID of the alarm.')
-@utils.arg('state', metavar='<ALARM_STATE>',
+@utils.arg('--state', metavar='<ALARM_STATE>',
            help='ALARM_STATE is one of [UNDETERMINED, OK, ALARM].')
+@utils.arg('--lifecycle-state', metavar='<LIFECYCLE_STATE>',
+           help='The lifecycle state of the alarm')
+@utils.arg('--link', metavar='<LINK>',
+           help='A link to an external resource with information about the alarm')
 def do_alarm_patch(mc, args):
     '''Patch the alarm state.'''
     fields = {}
     fields['alarm_id'] = args.id
-    if args.state.upper() not in state_types:
+    if args.state:
+        if args.state.upper() not in state_types:
             errmsg = 'Invalid state, not one of [' + \
                 ', '.join(state_types) + ']'
             print(errmsg)
             return
-    fields['state'] = args.state
+        fields['state'] = args.state
+    if args.lifecycle_state:
+        fields['lifecycle_state'] = args.lifecycle_state
+    if args.link:
+        fields['link'] = args.link
     try:
         alarm = mc.alarms.patch(**fields)
     except exc.HTTPException as he:
