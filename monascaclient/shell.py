@@ -85,10 +85,11 @@ class MonascaShell(object):
                             'connection. This file can optionally be '
                             'prepended with the private key.')
 
-        parser.add_argument('--key-file',
-                            help='Path of client key to use in SSL connection. '
-                            'This option is not necessary if your key is'
-                            ' prepended to your cert file.')
+        parser.add_argument(
+            '--key-file',
+            help='Path of client key to use in SSL connection. '
+            'This option is not necessary if your key is'
+            ' prepended to your cert file.')
 
         parser.add_argument('--os-cacert',
                             default=utils.env('OS_CACERT'),
@@ -336,14 +337,15 @@ class MonascaShell(object):
                 try:
                     token = _ksclient.token
                 except exc.CommandError:
-                    raise exc.CommandError("User does not have a default project. "
-                                           "You must provide a project id using "
-                                           "--os-project-id or via env[OS_PROJECT_ID], "
-                                           "or you must provide a project name using "
-                                           "--os-project-name or via env[OS_PROJECT_NAME] "
-                                           "and a domain using --os-domain-name, via "
-                                           "env[OS_DOMAIN_NAME],  using --os-domain-id or "
-                                           "via env[OS_DOMAIN_ID]")
+                    raise exc.CommandError(
+                        "User does not have a default project. "
+                        "You must provide a project id using "
+                        "--os-project-id or via env[OS_PROJECT_ID], "
+                        "or you must provide a project name using "
+                        "--os-project-name or via env[OS_PROJECT_NAME] "
+                        "and a domain using --os-domain-name, via "
+                        "env[OS_DOMAIN_NAME],  using --os-domain-id or "
+                        "via env[OS_DOMAIN_ID]")
 
             kwargs = {
                 'token': token,
@@ -355,11 +357,20 @@ class MonascaShell(object):
                 'username': args.os_username,
                 'password': args.os_password,
                 'service_type': args.os_service_type,
-                'endpoint_type': args.os_endpoint_type
+                'endpoint_type': args.os_endpoint_type,
+                'auth_url': args.os_auth_url
             }
 
             if args.os_region_name:
                 kwargs['region_name'] = args.os_region_name
+            if args.os_project_name:
+                kwargs['project_name'] = args.os_project_name
+            if args.os_project_id:
+                kwargs['project_id'] = args.os_project_id
+            if args.os_domain_name:
+                kwargs['domain_name'] = args.os_domain_name
+            if args.os_domain_id:
+                kwargs['domain_id'] = args.os_domain_id
 
             if not endpoint:
                 endpoint = _ksclient.monasca_url

@@ -26,27 +26,27 @@ endpoint = 'http://192.168.10.4:8080/v2.0'
 # The api version of monasca-api
 api_version = '2_0'
 
-# There are other kwarg options (ca files) used for http request.
-# Refer to monascaclient.shell.py for other kwargs supported.
-kwargs = {}
-
-kwargs['token'] = 'Mehi789blahblahblah'
-# construct the monasca client
-monasca_client = client.Client(api_version, endpoint, **kwargs)
-
-# simulating token expired, call replace_token after initial construction
-token = '172ebe22ec204257a958409e333b1695'
-monasca_client.replace_token(token)
+# Pass in the keystone authentication kwargs to construct a monasca client.
+# The monasca_client will try to authenticate with keystone one time
+# when it sees a 401 unauthorized resp, to take care of a stale token.
+# In this example no token is input, so it will get a 401 when executing the
+# first metrics.create request, and will authenticate and try again.
+auth_kwargs = {'username': 'mini-mon',
+               'password': 'password',
+               'project_name': 'mini-mon',
+               'auth_url': 'http://192.168.10.5:35357/v3/'}
+monasca_client = client.Client(api_version, endpoint, **auth_kwargs)
 
 # you can reference the monascaclient.v2_0.shell.py
-# do_commands for command fields
+# do_commands for command field initialization.
 
 # post a metric
 dimensions = {'instance_id': '12345', 'service': 'nova'}
 fields = {}
 fields['name'] = 'metric1'
 fields['dimensions'] = dimensions
-fields['timestamp'] = time.time()
+# time in milliseconds
+fields['timestamp'] = time.time() * 1000
 fields['value'] = 222.333
 try:
     resp = monasca_client.metrics.create(**fields)
@@ -61,7 +61,7 @@ dimensions = {'instance_id': '12345', 'service': u'\u76db\u5927'}
 fields = {}
 fields['name'] = 'metric1'
 fields['dimensions'] = dimensions
-fields['timestamp'] = time.time()
+fields['timestamp'] = time.time() * 1000
 fields['value'] = 222.333
 try:
     resp = monasca_client.metrics.create(**fields)
@@ -72,7 +72,7 @@ else:
     print('Successfully created metric')
 
 print ('Giving the DB time to update...')
-time.sleep(10)
+time.sleep(5)
 
 # metric-list
 name = 'metric1'

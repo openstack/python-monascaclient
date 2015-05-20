@@ -22,6 +22,7 @@ import requests
 import six
 
 from monascaclient import exc
+from monascaclient import ksclient
 from monascaclient.openstack.common import jsonutils
 from monascaclient.openstack.common.py3kcompat import urlutils
 from monascaclient.openstack.common import strutils
@@ -64,6 +65,14 @@ class HTTPClient(object):
         self.region_name = kwargs.get('region_name')
         self.include_pass = kwargs.get('include_pass')
         self.endpoint_url = endpoint
+        # adding for re-authenticate
+        self.project_name = kwargs.get('project_name')
+        self.region_name = kwargs.get('region_name')
+        self.project_id = kwargs.get('project_id')
+        self.domain_id = kwargs.get('domain_id')
+        self.domain_name = kwargs.get('domain_name')
+        self.endpoint_type = kwargs.get('endpoint_type')
+        self.service_type = kwargs.get('service_type')
 
         self.cert_file = kwargs.get('cert_file')
         self.key_file = kwargs.get('key_file')
@@ -80,10 +89,33 @@ class HTTPClient(object):
             if kwargs.get('insecure'):
                 self.verify_cert = False
             else:
-                self.verify_cert = kwargs.get('os_cacert', get_system_ca_file())
+                self.verify_cert = kwargs.get(
+                    'os_cacert', get_system_ca_file())
 
     def replace_token(self, token):
         self.auth_token = token
+
+    def re_authenticate(self):
+        ks_args = {
+            'username': self.username,
+            'password': self.password,
+            'token': '',
+            'auth_url': self.auth_url,
+            'service_type': self.service_type,
+            'endpoint_type': self.endpoint_type,
+            'os_cacert': self.ssl_connection_params['os_cacert'],
+            'project_id': self.project_id,
+            'project_name': self.project_name,
+            'domain_id': self.domain_id,
+            'domain_name': self.domain_name,
+            'insecure': self.ssl_connection_params['insecure'],
+            'region_name': self.region_name
+        }
+        try:
+            _ksclient = ksclient.KSClient(**ks_args)
+            self.auth_token = _ksclient.token
+        except Exception as e:
+            raise e
 
     def log_curl_request(self, method, url, kwargs):
         curl = ['curl -i -X %s' % method]
@@ -189,6 +221,20 @@ class HTTPClient(object):
                                        "--include-password or export "
                                        "MONASCA_INCLUDE_PASSWORD=1\n%s"
                                        % resp.content)
+        elif (resp.status_code == 401 or
+              (resp.status_code == 500 and "(HTTP 401)" in resp.content)):
+            # re-authenticate and attempt one more request
+            try:
+                self.re_authenticate()
+                kwargs['headers']['X-Auth-Token'] = self.auth_token
+                resp = requests.request(
+                    method,
+                    self.endpoint_url + url,
+                    allow_redirects=allow_redirects,
+                    **kwargs)
+            except Exception as e:
+                raise exc.HTTPUnauthorized(e)
+
         elif 400 <= resp.status_code < 600:
             raise exc.from_response(resp)
         elif resp.status_code in (301, 302, 305):
