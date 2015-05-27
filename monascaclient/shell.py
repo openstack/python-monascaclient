@@ -21,6 +21,7 @@ from __future__ import print_function
 
 import argparse
 import logging
+import string
 import sys
 
 import monascaclient
@@ -310,6 +311,9 @@ class MonascaShell(object):
                                        " either --os-auth-url or via"
                                        " env[OS_AUTH_URL]")
 
+        if args.os_auth_url and 'v2.0' in args.os_auth_url:
+            args.os_auth_url = string.replace(args.os_auth_url, 'v2.0', 'v3')
+
         kwargs = {
             'username': args.os_username,
             'password': args.os_password,
@@ -324,7 +328,6 @@ class MonascaShell(object):
             'domain_name': args.os_domain_name,
             'insecure': args.insecure,
             'region_name': args.os_region_name
-
         }
 
         endpoint = args.monasca_api_url

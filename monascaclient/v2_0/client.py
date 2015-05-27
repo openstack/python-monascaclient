@@ -12,6 +12,7 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import string
 
 from monascaclient.common import http
 from monascaclient.v2_0 import alarm_definitions
@@ -33,12 +34,16 @@ class Client(object):
 
     def __init__(self, *args, **kwargs):
         """Initialize a new http client for the monasca API."""
+        if 'auth_url' in kwargs and 'v2.0' in kwargs['auth_url']:
+            kwargs['auth_url'] = string.replace(
+                kwargs['auth_url'], 'v2.0', 'v3')
         self.http_client = http.HTTPClient(*args, **kwargs)
         self.metrics = metrics.MetricsManager(self.http_client)
         self.notifications = notifications.NotificationsManager(
             self.http_client)
         self.alarms = alarms.AlarmsManager(self.http_client)
-        self.alarm_definitions = alarm_definitions.AlarmDefinitionsManager(self.http_client)
+        self.alarm_definitions = alarm_definitions.AlarmDefinitionsManager(
+            self.http_client)
 
     def replace_token(self, token):
         self.http_client.replace_token(token)
