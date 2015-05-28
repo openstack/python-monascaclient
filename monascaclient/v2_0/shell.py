@@ -13,9 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import json
 import numbers
 import time
+
 
 from monascaclient.common import utils
 import monascaclient.exc as exc
@@ -243,7 +245,7 @@ def format_metric_dimensions(metrics):
            'that confuse the CLI parser.',
            action='append')
 @utils.arg('starttime', metavar='<UTC_START_TIME>',
-           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z.')
+           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z. OR Format: -120 (previous 120 minutes')
 @utils.arg('--endtime', metavar='<UTC_END_TIME>',
            help='measurements <= UTC time. format: 2014-01-01T00:00:00Z.')
 @utils.arg('--offset', metavar='<OFFSET LOCATION>',
@@ -260,6 +262,11 @@ def do_measurement_list(mc, args):
 
     if args.dimensions:
         fields['dimensions'] = utils.format_parameters(args.dimensions)
+    if args.starttime[0] == '-':
+        deltaT = time.time() + (int(args.starttime) * 60)
+        utc = str(datetime.datetime.utcfromtimestamp(deltaT))
+        utc = utc.replace(" ", "T")[:-7] + 'Z'
+        args.starttime = utc
     fields['start_time'] = args.starttime
     if args.endtime:
         fields['end_time'] = args.endtime
@@ -315,7 +322,7 @@ def do_measurement_list(mc, args):
            'that confuse the CLI parser.',
            action='append')
 @utils.arg('starttime', metavar='<UTC_START_TIME>',
-           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z.')
+           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z. OR Format: -120 (previous 120 minutes')
 @utils.arg('--endtime', metavar='<UTC_END_TIME>',
            help='measurements <= UTC time. format: 2014-01-01T00:00:00Z.')
 @utils.arg('--period', metavar='<PERIOD>',
@@ -341,6 +348,11 @@ def do_metric_statistics(mc, args):
     fields['name'] = args.name
     if args.dimensions:
         fields['dimensions'] = utils.format_parameters(args.dimensions)
+    if args.starttime[0] == '-':
+        deltaT = time.time() + (int(args.starttime) * 60)
+        utc = str(datetime.datetime.utcfromtimestamp(deltaT))
+        utc = utc.replace(" ", "T")[:-7] + 'Z'
+        args.starttime = utc
     fields['start_time'] = args.starttime
     if args.endtime:
         fields['end_time'] = args.endtime
@@ -1088,7 +1100,7 @@ def do_alarm_history(mc, args):
            'that confuse the CLI parser.',
            action='append')
 @utils.arg('--starttime', metavar='<UTC_START_TIME>',
-           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z.')
+           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z. OR format: -120 (for previous 2 hours)')
 @utils.arg('--endtime', metavar='<UTC_END_TIME>',
            help='measurements <= UTC time. format: 2014-01-01T00:00:00Z.')
 @utils.arg('--offset', metavar='<OFFSET LOCATION>',
@@ -1101,6 +1113,11 @@ def do_alarm_history_list(mc, args):
     if args.dimensions:
         fields['dimensions'] = utils.format_parameters(args.dimensions)
     if args.starttime:
+        if args.starttime[0] == '-':
+            deltaT = time.time() + (int(args.starttime) * 60)
+            utc = str(datetime.datetime.utcfromtimestamp(deltaT))
+            utc = utc.replace(" ", "T")[:-7] + 'Z'
+            args.starttime = utc
         fields['start_time'] = args.starttime
     if args.endtime:
         fields['end_time'] = args.endtime
