@@ -909,12 +909,13 @@ def do_alarm_list(mc, args):
         if args.json:
             print(utils.json_formatter(alarm))
             return
-        cols = ['id', 'alarm_definition_id', 'alarm_name', 'metric_name', 'metric_dimensions', 'severity', 'state',
-                'lifecycle_state', 'link', 'state_updated_timestamp', 'updated_timestamp', "created_timestamp"]
+        cols = ['id', 'alarm_definition_id', 'alarm_definition_name', 'metric_name', 'metric_dimensions',
+                'severity', 'state', 'lifecycle_state', 'link', 'state_updated_timestamp',
+                'updated_timestamp', "created_timestamp"]
         formatters = {
             'id': lambda x: x['id'],
             'alarm_definition_id': lambda x: x['alarm_definition']['id'],
-            'alarm_name': lambda x: x['alarm_definition']['name'],
+            'alarm_definition_name': lambda x: x['alarm_definition']['name'],
             'metric_name': lambda x: format_metric_name(x['metrics']),
             'metric_dimensions': lambda x: format_metric_dimensions(x['metrics']),
             'severity': lambda x: x['alarm_definition']['severity'],
