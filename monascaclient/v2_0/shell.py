@@ -140,7 +140,7 @@ def do_metric_list(mc, args):
         }
         if isinstance(metric, list):
             # print the list
-            utils.print_list(metric, cols, formatters=formatters, sortby=0)
+            utils.print_list(metric, cols, formatters=formatters)
         else:
             # add the dictionary to a list, so print_list works
             metric_list = list()
@@ -148,8 +148,7 @@ def do_metric_list(mc, args):
             utils.print_list(
                 metric_list,
                 cols,
-                formatters=formatters,
-                sortby=0)
+                formatters=formatters)
 
 
 def format_measure_timestamp(measurements):
@@ -297,7 +296,7 @@ def do_measurement_list(mc, args):
         }
         if isinstance(metric, list):
             # print the list
-            utils.print_list(metric, cols, formatters=formatters, sortby=3)
+            utils.print_list(metric, cols, formatters=formatters)
         else:
             # add the dictionary to a list, so print_list works
             metric_list = list()
@@ -305,8 +304,7 @@ def do_measurement_list(mc, args):
             utils.print_list(
                 metric_list,
                 cols,
-                formatters=formatters,
-                sortby=3)
+                formatters=formatters)
 
 
 @utils.arg('name', metavar='<METRIC_NAME>',
@@ -405,7 +403,7 @@ def do_metric_statistics(mc, args):
         }
         if isinstance(metric, list):
             # print the list
-            utils.print_list(metric, cols, formatters=formatters, sortby=2)
+            utils.print_list(metric, cols, formatters=formatters)
         else:
             # add the dictionary to a list, so print_list works
             metric_list = list()
@@ -413,8 +411,7 @@ def do_metric_statistics(mc, args):
             utils.print_list(
                 metric_list,
                 cols,
-                formatters=formatters,
-                sortby=2)
+                formatters=formatters)
 
 
 @utils.arg('name', metavar='<NOTIFICATION_NAME>',
@@ -504,12 +501,11 @@ def do_notification_list(mc, args):
             utils.print_list(
                 notification,
                 cols,
-                formatters=formatters,
-                sortby=0)
+                formatters=formatters)
         else:
             notif_list = list()
             notif_list.append(notification)
-            utils.print_list(notif_list, cols, formatters=formatters, sortby=0)
+            utils.print_list(notif_list, cols, formatters=formatters)
 
 
 @utils.arg('id', metavar='<NOTIFICATION_ID>',
@@ -693,12 +689,12 @@ def do_alarm_definition_list(mc, args):
         }
         if isinstance(alarm, list):
             # print the list
-            utils.print_list(alarm, cols, formatters=formatters, sortby=1)
+            utils.print_list(alarm, cols, formatters=formatters)
         else:
             # add the dictionary to a list, so print_list works
             alarm_list = list()
             alarm_list.append(alarm)
-            utils.print_list(alarm_list, cols, formatters=formatters, sortby=1)
+            utils.print_list(alarm_list, cols, formatters=formatters)
 
 
 @utils.arg('id', metavar='<ALARM_DEFINITION_ID>',
@@ -928,12 +924,12 @@ def do_alarm_list(mc, args):
         }
         if isinstance(alarm, list):
             # print the list
-            utils.print_list(alarm, cols, formatters=formatters, sortby=2)
+            utils.print_list(alarm, cols, formatters=formatters)
         else:
             # add the dictionary to a list, so print_list works
             alarm_list = list()
             alarm_list.append(alarm)
-            utils.print_list(alarm_list, cols, formatters=formatters, sortby=2)
+            utils.print_list(alarm_list, cols, formatters=formatters)
 
 
 @utils.arg('id', metavar='<ALARM_ID>',
@@ -1061,12 +1057,12 @@ def output_alarm_history(args, alarm_history):
     }
     if isinstance(alarm_history, list):
         # print the list
-        utils.print_list(alarm_history, cols, formatters=formatters, sortby=7)
+        utils.print_list(alarm_history, cols, formatters=formatters)
     else:
         # add the dictionary to a list, so print_list works
         alarm_list = list()
         alarm_list.append(alarm_history)
-        utils.print_list(alarm_list, cols, formatters=formatters, sortby=7)
+        utils.print_list(alarm_list, cols, formatters=formatters)
 
 
 @utils.arg('id', metavar='<ALARM_ID>',
