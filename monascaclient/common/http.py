@@ -219,8 +219,7 @@ class HTTPClient(object):
             raise exc.HTTPUnauthorized("Authentication failed. Please try"
                                        " again with option "
                                        "--include-password or export "
-                                       "MONASCA_INCLUDE_PASSWORD=1\n%s"
-                                       % resp.content)
+                                       "MONASCA_INCLUDE_PASSWORD=1\n")
         elif (resp.status_code == 401 or
               (resp.status_code == 500 and "(HTTP 401)" in resp.content)):
             # re-authenticate and attempt one more request
