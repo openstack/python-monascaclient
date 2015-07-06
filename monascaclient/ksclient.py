@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Hewlett-Packard Development Company, L.P.
+# Copyright (c) 2014 Hewlett-Packard Development Company, L.P.i
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,10 +18,13 @@ Wrapper around python keystone client to assist in getting a properly scoped tok
 endpoint for Monasca.
 """
 
+import logging
+
 from keystoneclient.v3 import client
 
 from monascaclient import exc
 
+log = logging.getLogger(__name__)
 
 class KSClient(object):
     def __init__(self, **kwargs):
@@ -29,7 +32,9 @@ class KSClient(object):
 
         :param username: name of user
         :param password: user's password
-        :param project_id: unique identifier of project
+        :param user_domain_id: unique identifier of domain username resides in (optional)
+	:param user_domain_name: name of domain for username
+	:param project_id: unique identifier of project
         :param project_name: name of project
         :param domain_name: name of domain project is in
         :param domain_id: id of domain project is in
@@ -45,9 +50,9 @@ class KSClient(object):
             kc_args['project_id'] = kwargs.get('project_id')
         elif kwargs.get('project_name'):
             kc_args['project_name'] = kwargs.get('project_name')
-            if kwargs.get('domain_name'):
+            if kwargs.get('project_domain_name'):
                 kc_args['project_domain_name'] = kwargs.get('domain_name')
-            if kwargs.get('domain_id'):
+            if kwargs.get('project_domain_id'):
                 kc_args['project_domain_id'] = kwargs.get('domain_id')
 
         if kwargs.get('token'):
@@ -55,8 +60,11 @@ class KSClient(object):
         else:
             kc_args['username'] = kwargs.get('username')
             kc_args['password'] = kwargs.get('password')
+            kc_args['user_domain_name'] = kwargs.get('user_domain_name')
+            kc_args['user_domain_id'] = kwargs.get('user_domain_id')
 
         self._kwargs = kwargs
+        log.debug("Creating keystone client: {0}".format(repr(kc_args)))
         self._keystone = client.Client(**kc_args)
         self._token = None
         self._monasca_url = None
