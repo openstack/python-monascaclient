@@ -24,11 +24,14 @@ from monascaclient import exc
 
 
 class KSClient(object):
+
     def __init__(self, **kwargs):
         """Get an endpoint and auth token from Keystone.
 
         :param username: name of user
         :param password: user's password
+        :param user_domain_id: unique identifier of domain username resides in (optional)
+        :param user_domain_name: name of domain for username (optional), if user_domain_id not specified
         :param project_id: unique identifier of project
         :param project_name: name of project
         :param domain_name: name of domain project is in
@@ -55,6 +58,11 @@ class KSClient(object):
         else:
             kc_args['username'] = kwargs.get('username')
             kc_args['password'] = kwargs.get('password')
+            # when username not in the default domain (id='default'), supply user domain (as namespace)
+            if kwargs.get('user_domain_name'):
+                kc_args['user_domain_name'] = kwargs.get('user_domain_name')
+            if kwargs.get('user_domain_id'):
+                kc_args['user_domain_id'] = kwargs.get('user_domain_id')
 
         self._kwargs = kwargs
         self._keystone = client.Client(**kc_args)

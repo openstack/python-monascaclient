@@ -78,9 +78,12 @@ When using Keystone to obtain the token and endpoint::
 
   export OS_USERNAME=
   export OS_PASSWORD=
+  export OS_USER_DOMAIN_NAME=
   export OS_PROJECT_NAME=
   export OS_AUTH_URL=
   export OS_REGION_NAME=
+
+When OS_USER_DOMAIN_NAME is not set, then 'Default' is assumed. Alternatively IDs can be used instead of names.
 
 When using Vagrant Environment with middleware disabled::
 
@@ -97,6 +100,7 @@ You'll find complete documentation on the shell by running
                [--key-file KEY_FILE] [--os-cacert OS_CACERT]
                [--timeout TIMEOUT] [--os-username OS_USERNAME]
                [--os-password OS_PASSWORD] [--os-project-id OS_PROJECT_ID]
+               [--os-user-domain-id OS_USER_DOMAIN_ID] [--os-user-domain-name OS_USER_DOMAIN_NAME]
                [--os-project-name OS_PROJECT_NAME]
                [--os-domain-id OS_DOMAIN_ID] [--os-domain-name OS_DOMAIN_NAME]
                [--os-auth-url OS_AUTH_URL] [--os-region-name OS_REGION_NAME]

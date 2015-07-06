@@ -31,7 +31,8 @@ from monascaclient.tests import fakes
 class TestCase(testtools.TestCase):
 
     def set_fake_env(self, fake_env):
-        client_env = ('OS_USERNAME', 'OS_PASSWORD', 'OS_PROJECT_ID',
+        client_env = ('OS_USERNAME', 'OS_PASSWORD', 'OS_USER_DOMAIN_ID',
+                      'OS_USER_DOMAIN_NAME', 'OS_PROJECT_ID',
                       'OS_PROJECT_NAME', 'OS_AUTH_URL', 'OS_REGION_NAME',
                       'OS_AUTH_TOKEN', 'OS_NO_CLIENT_AUTH', 'OS_SERVICE_TYPE',
                       'OS_DOMAIN_NAME', 'OS_DOMAIN_ID',

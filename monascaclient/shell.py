@@ -118,6 +118,14 @@ class MonascaShell(object):
         parser.add_argument('--os_password',
                             help=argparse.SUPPRESS)
 
+        parser.add_argument('--os-user-domain-id',
+                            default=utils.env('OS_USER_DOMAIN_ID'),
+                            help='Defaults to env[OS_USER_DOMAIN_ID].')
+
+        parser.add_argument('--os-user-domain-name',
+                            default=utils.env('OS_USER_DOMAIN_NAME'),
+                            help='Defaults to env[OS_USER_DOMAIN_NAME].')
+
         parser.add_argument('--os-project-id',
                             default=utils.env('OS_PROJECT_ID'),
                             help='Defaults to env[OS_PROJECT_ID].')
@@ -322,6 +330,8 @@ class MonascaShell(object):
             'service_type': args.os_service_type,
             'endpoint_type': args.os_endpoint_type,
             'os_cacert': args.os_cacert,
+            'user_domain_id': args.os_user_domain_id,
+            'user_domain_name': args.os_user_domain_name,
             'project_id': args.os_project_id,
             'project_name': args.os_project_name,
             'domain_id': args.os_domain_id,
@@ -346,7 +356,7 @@ class MonascaShell(object):
                         "--os-project-id or via env[OS_PROJECT_ID], "
                         "or you must provide a project name using "
                         "--os-project-name or via env[OS_PROJECT_NAME] "
-                        "and a domain using --os-domain-name, via "
+                        "and a project domain using --os-domain-name, via "
                         "env[OS_DOMAIN_NAME],  using --os-domain-id or "
                         "via env[OS_DOMAIN_ID]")
 
@@ -364,6 +374,10 @@ class MonascaShell(object):
                 'auth_url': args.os_auth_url
             }
 
+            if args.os_user_domain_name:
+                kwargs['user_domain_name'] = args.os_user_domain_name
+            if args.os_user_domain_id:
+                kwargs['user_domain_id'] = args.os_user_domain_id
             if args.os_region_name:
                 kwargs['region_name'] = args.os_region_name
             if args.os_project_name:
