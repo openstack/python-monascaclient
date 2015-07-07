@@ -62,6 +62,8 @@ class HTTPClient(object):
         self.auth_token = kwargs.get('token')
         self.username = kwargs.get('username')
         self.password = kwargs.get('password')
+        self.user_domain_id = kwargs.get('user_domain_id')
+        self.user_domain_name = kwargs.get('user_domain_name')
         self.region_name = kwargs.get('region_name')
         self.include_pass = kwargs.get('include_pass')
         self.endpoint_url = endpoint
@@ -99,6 +101,8 @@ class HTTPClient(object):
         ks_args = {
             'username': self.username,
             'password': self.password,
+            'user_domain_id': self.user_domain_id,
+	    'user_domain_name': self.user_domain_name,
             'token': '',
             'auth_url': self.auth_url,
             'service_type': self.service_type,
@@ -255,6 +259,7 @@ class HTTPClient(object):
         return resp
 
     def credentials_headers(self):
+        LOG.warning('Using Monasca-API w/o Keystone')
         creds = {}
         if self.username:
             creds['X-Auth-User'] = self.username
