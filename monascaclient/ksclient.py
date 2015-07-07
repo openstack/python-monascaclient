@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Hewlett-Packard Development Company, L.P.i
+# Copyright (c) 2014 Hewlett-Packard Development Company, L.P.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -64,7 +64,6 @@ class KSClient(object):
             kc_args['user_domain_id'] = kwargs.get('user_domain_id')
 
         self._kwargs = kwargs
-        log.debug("Creating keystone client: {0}".format(repr(kc_args)))
         self._keystone = client.Client(**kc_args)
         self._token = None
         self._monasca_url = None
