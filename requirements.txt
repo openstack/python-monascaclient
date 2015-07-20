@@ -1,6 +1,7 @@
 argparse
 babel
 iso8601>=0.1.9
+oslo.utils<2.0
 pbr>=0.11,<2.0
 PrettyTable>=0.7,<0.8
 python-keystoneclient>=0.9.0
