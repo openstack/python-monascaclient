@@ -49,6 +49,11 @@ class CommunicationError(BaseException):
     """Unable to communicate with server."""
 
 
+class RequestTimeoutError(BaseException):
+
+    """Timeout making a POST, GET, PATCH, DELETE, or PUT request to the server."""
+
+
 class HTTPException(BaseException):
 
     """Base exception for all HTTP-derived exceptions."""

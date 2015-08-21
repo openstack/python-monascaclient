@@ -54,10 +54,12 @@ def get_system_ca_file():
 
 class HTTPClient(object):
 
-    def __init__(self, endpoint, **kwargs):
+    def __init__(self, endpoint, write_timeout=None, read_timeout=None, **kwargs):
         if endpoint.endswith('/'):
             endpoint = endpoint[:-1]
         self.endpoint = endpoint
+        self.write_timeout = write_timeout
+        self.read_timeout = read_timeout
         self.auth_url = kwargs.get('auth_url')
         self.auth_token = kwargs.get('token')
         self.username = kwargs.get('username')
@@ -200,10 +202,16 @@ class HTTPClient(object):
         allow_redirects = False
 
         try:
+            timeout = None
+            if method in ['POST', 'DELETE', 'PUT', 'PATCH']:
+                timeout = self.write_timeout
+            elif method is 'GET':
+                timeout = self.read_timeout
             resp = requests.request(
                 method,
                 self.endpoint_url + url,
                 allow_redirects=allow_redirects,
+                timeout=timeout,
                 **kwargs)
         except socket.gaierror as e:
             message = ("Error finding address for %(url)s: %(e)s" %
@@ -214,6 +222,11 @@ class HTTPClient(object):
             message = ("Error communicating with %(endpoint)s %(e)s" %
                        {'endpoint': endpoint, 'e': e})
             raise exc.CommunicationError(message=message)
+        except requests.Timeout as e:
+            endpoint = self.endpoint
+            message = ("Error %(method)s timeout request to %(endpoint)s %(e)s" %
+                       {'method': method, 'endpoint': endpoint, 'e': e})
+            raise exc.RequestTimeoutError(message=message)
 
         self.log_http_response(resp)
 
