@@ -77,6 +77,7 @@ class HTTPClient(object):
         self.domain_name = kwargs.get('domain_name')
         self.endpoint_type = kwargs.get('endpoint_type')
         self.service_type = kwargs.get('service_type')
+        self.keystone_timeout = kwargs.get('keystone_timeout')
 
         self.cert_file = kwargs.get('cert_file')
         self.key_file = kwargs.get('key_file')
@@ -115,7 +116,8 @@ class HTTPClient(object):
             'domain_id': self.domain_id,
             'domain_name': self.domain_name,
             'insecure': self.ssl_connection_params['insecure'],
-            'region_name': self.region_name
+            'region_name': self.region_name,
+            'keystone_timeout': self.keystone_timeout
         }
         try:
             _ksclient = ksclient.KSClient(**ks_args)
@@ -200,13 +202,13 @@ class HTTPClient(object):
         # point version i.e: 3.x
         # See issue: https://github.com/kennethreitz/requests/issues/1704
         allow_redirects = False
+        timeout = None
+        if method in ['POST', 'DELETE', 'PUT', 'PATCH']:
+            timeout = self.write_timeout
+        elif method is 'GET':
+            timeout = self.read_timeout
 
         try:
-            timeout = None
-            if method in ['POST', 'DELETE', 'PUT', 'PATCH']:
-                timeout = self.write_timeout
-            elif method is 'GET':
-                timeout = self.read_timeout
             resp = requests.request(
                 method,
                 self.endpoint_url + url,
@@ -247,6 +249,7 @@ class HTTPClient(object):
                     method,
                     self.endpoint_url + url,
                     allow_redirects=allow_redirects,
+                    timeout=timeout,
                     **kwargs)
             except Exception as e:
                 raise exc.HTTPUnauthorized(e)

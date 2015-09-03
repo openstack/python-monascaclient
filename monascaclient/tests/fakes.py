@@ -29,6 +29,7 @@ def script_keystone_client(token=None):
                         insecure=False,
                         password='password',
                         project_name='project_name',
+                        timeout=20,
                         username='username').AndReturn(FakeKeystone(
                                                        'abcd1234', 'test'))
 
