@@ -100,9 +100,9 @@ class MonascaShell(object):
                             ' client looks for the default system CA'
                             ' certificates.')
 
-        parser.add_argument('--timeout',
-                            default=600,
-                            help='Number of seconds to wait for a response.')
+        parser.add_argument('--keystone_timeout',
+                            default=20,
+                            help='Number of seconds to wait for a response from keystone.')
 
         parser.add_argument('--os-username',
                             default=utils.env('OS_USERNAME'),
@@ -337,7 +337,8 @@ class MonascaShell(object):
             'domain_id': args.os_domain_id,
             'domain_name': args.os_domain_name,
             'insecure': args.insecure,
-            'region_name': args.os_region_name
+            'region_name': args.os_region_name,
+            'keystone_timeout': args.keystone_timeout
         }
 
         endpoint = args.monasca_api_url
@@ -363,7 +364,6 @@ class MonascaShell(object):
             kwargs = {
                 'token': token,
                 'insecure': args.insecure,
-                'timeout': args.timeout,
                 'os_cacert': args.os_cacert,
                 'cert_file': args.cert_file,
                 'key_file': args.key_file,
@@ -371,7 +371,8 @@ class MonascaShell(object):
                 'password': args.os_password,
                 'service_type': args.os_service_type,
                 'endpoint_type': args.os_endpoint_type,
-                'auth_url': args.os_auth_url
+                'auth_url': args.os_auth_url,
+                'keystone_timeout': args.keystone_timeout
             }
 
             if args.os_user_domain_name:

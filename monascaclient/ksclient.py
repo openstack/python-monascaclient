@@ -40,7 +40,8 @@ class KSClient(object):
         :param token: token to use instead of username/password
         """
         kc_args = {'auth_url': kwargs.get('auth_url'),
-                   'insecure': kwargs.get('insecure')}
+                   'insecure': kwargs.get('insecure'),
+                   'timeout': kwargs.get('keystone_timeout')}
 
         if kwargs.get('os_cacert'):
             kc_args['cacert'] = kwargs.get('os_cacert')
