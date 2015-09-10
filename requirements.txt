@@ -8,3 +8,4 @@ python-keystoneclient==1.6.0
 PyYAML>=3.1.0
 requests>=1.1
 six>=1.7.0
+oslo.serialization<1.9
