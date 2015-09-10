@@ -7,6 +7,6 @@ Standards-Version: 3.9.5
 
 Package: python-monclient
 Architecture: amd64
-Pre-Depends: dpkg (>= 1.16.1), python2.7, libyaml, ${misc:Pre-Depends}
+Pre-Depends: dpkg (>= 1.16.1), python2.7, libyaml-dev, ${misc:Pre-Depends}
 Depends: ${python:Depends}, ${misc:Depends}
 Description: CLI for Monitoring
