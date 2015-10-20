@@ -49,7 +49,7 @@ def link_formatter(links):
 
 
 def json_formatter(js):
-    return jsonutils.dumps(js, indent=2, ensure_ascii=False)
+    return (jsonutils.dumps(js, indent=2, ensure_ascii=False)).encode('utf-8')
 
 
 def text_wrap_formatter(d):
@@ -76,9 +76,9 @@ def print_list(objs, fields, field_labels=None, formatters={}, sortby=None):
                 row.append(data)
         pt.add_row(row)
     if sortby is None:
-        print(pt.get_string())
+        print(pt.get_string().encode('utf-8'))
     else:
-        print(pt.get_string(sortby=field_labels[sortby]))
+        print(pt.get_string(sortby=field_labels[sortby]).encode('utf-8'))
 
 
 def print_dict(d, formatters={}):
@@ -91,7 +91,7 @@ def print_dict(d, formatters={}):
             pt.add_row([field, formatters[field](d[field])])
         else:
             pt.add_row([field, d[field]])
-    print(pt.get_string(sortby='Property'))
+    print(pt.get_string(sortby='Property').encode('utf-8'))
 
 
 def find_resource(manager, name_or_id):
@@ -141,7 +141,7 @@ def import_versioned_module(version, submodule=None):
 
 def exit(msg=''):
     if msg:
-        print(msg, file=sys.stderr)
+        print(msg.encode('utf-8'), file=sys.stderr)
     sys.exit(1)
 
 
