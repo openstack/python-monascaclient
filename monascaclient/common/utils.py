@@ -243,3 +243,25 @@ def format_list(in_list):
             key = k
         string_list.append(key)
     return '\n'.join(string_list)
+
+
+def set_env_variables(kwargs):
+    environment_variables = {
+        'username': 'OS_USERNAME',
+        'password': 'OS_PASSWORD',
+        'token': 'OS_AUTH_TOKEN',
+        'auth_url': 'OS_AUTH_URL',
+        'service_type': 'OS_SERVICE_TYPE',
+        'endpoint_type': 'OS_ENDPOINT_TYPE',
+        'os_cacert': 'OS_CACERT',
+        'user_domain_id': 'OS_USER_DOMAIN_ID',
+        'user_domain_name': 'OS_USER_DOMAIN_NAME',
+        'project_id': 'OS_PROJECT_ID',
+        'project_name': 'OS_PROJECT_NAME',
+        'domain_id': 'OS_DOMAIN_ID',
+        'domain_name': 'OS_DOMAIN_NAME',
+        'region_name': 'OS_REGION_NAME'
+    }
+    for k, v in environment_variables.iteritems():
+        if k not in kwargs:
+            kwargs[k] = env(v)
