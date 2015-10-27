@@ -234,15 +234,8 @@ class HTTPClient(object):
 
         self.log_http_response(resp)
 
-        if 'X-Auth-Key' not in kwargs['headers'] and \
-                (resp.status_code == 401 or
-                 (resp.status_code == 500 and "(HTTP 401)" in resp.content)):
-            raise exc.HTTPUnauthorized("Authentication failed. Please try"
-                                       " again with option "
-                                       "--include-password or export "
-                                       "MONASCA_INCLUDE_PASSWORD=1\n")
-        elif (resp.status_code == 401 or
-              (resp.status_code == 500 and "(HTTP 401)" in resp.content)):
+        if (resp.status_code == 401 or
+           (resp.status_code == 500 and "(HTTP 401)" in resp.content)):
             # re-authenticate and attempt one more request
             try:
                 self.re_authenticate()
