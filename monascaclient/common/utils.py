@@ -129,7 +129,7 @@ def env(*vars, **kwargs):
         value = os.environ.get(v)
         if value:
             return value
-    return kwargs.get('default', '')
+    return kwargs.get('default', None)
 
 
 def import_versioned_module(version, submodule=None):
