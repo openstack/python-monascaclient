@@ -158,7 +158,7 @@ def format_measure_timestamp(measurements):
 
 def format_measure_value(measurements):
     # returns newline separated values for the value column
-    return '\n'.join(['{:12.2f}'.format(m[1]) for m in measurements])
+    return '\n'.join(['{:12.3f}'.format(m[1]) for m in measurements])
 
 
 def format_value_meta(measurements):
@@ -198,7 +198,7 @@ def format_statistic_value(statistics, columns, stat_type):
         stat_index = columns.index(stat_type)
     value_list = list()
     for stat in statistics:
-        value_str = '{:12.2f}'.format(stat[stat_index])
+        value_str = '{:12.3f}'.format(stat[stat_index])
         value_list.append(value_str)
     return '\n'.join(value_list)
 
