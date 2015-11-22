@@ -28,6 +28,9 @@ class MonascaManager(base.BaseManager):
     def get_dimensions_url_string(self, dimdict):
         dim_list = list()
         for k, v in dimdict.items():
+            # In case user specifies a dimension multiple times
+            if isinstance(v, (list, tuple)):
+                v = v[-1]
             dim_str = k + ':' + v
             dim_list.append(dim_str)
         return ','.join(dim_list)
