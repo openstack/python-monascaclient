@@ -129,7 +129,7 @@ class HTTPClient(object):
         curl = ['curl -i -X %s' % method]
 
         for (key, value) in kwargs['headers'].items():
-            if key == 'X-Auth-Token':
+            if key in ('X-Auth-Token', 'X-Auth-Key'):
                 value = '*****'
             header = '-H \'%s: %s\'' % (strutils.safe_decode(key),
                                         strutils.safe_decode(value))
