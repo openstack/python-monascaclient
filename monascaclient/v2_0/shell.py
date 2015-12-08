@@ -107,6 +107,10 @@ def do_metric_create_raw(mc, args):
            'Dimensions need quoting when they contain special chars [&,(,),{,},>,<] '
            'that confuse the CLI parser.',
            action='append')
+@utils.arg('--starttime', metavar='<UTC_START_TIME>',
+           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z. OR Format: -120 (previous 120 minutes')
+@utils.arg('--endtime', metavar='<UTC_END_TIME>',
+           help='measurements <= UTC time. format: 2014-01-01T00:00:00Z.')
 @utils.arg('--offset', metavar='<OFFSET LOCATION>',
            help='The offset used to paginate the return data.')
 @utils.arg('--limit', metavar='<RETURN LIMIT>',
@@ -122,6 +126,11 @@ def do_metric_list(mc, args):
         fields['limit'] = args.limit
     if args.offset:
         fields['offset'] = args.offset
+    if args.starttime:
+        _translate_starttime(args)
+        fields['start_time'] = args.starttime
+    if args.endtime:
+        fields['end_time'] = args.endtime
 
     try:
         metric = mc.metrics.list(**fields)
@@ -261,11 +270,7 @@ def do_measurement_list(mc, args):
 
     if args.dimensions:
         fields['dimensions'] = utils.format_parameters(args.dimensions)
-    if args.starttime[0] == '-':
-        deltaT = time.time() + (int(args.starttime) * 60)
-        utc = str(datetime.datetime.utcfromtimestamp(deltaT))
-        utc = utc.replace(" ", "T")[:-7] + 'Z'
-        args.starttime = utc
+    _translate_starttime(args)
     fields['start_time'] = args.starttime
     if args.endtime:
         fields['end_time'] = args.endtime
@@ -346,11 +351,7 @@ def do_metric_statistics(mc, args):
     fields['name'] = args.name
     if args.dimensions:
         fields['dimensions'] = utils.format_parameters(args.dimensions)
-    if args.starttime[0] == '-':
-        deltaT = time.time() + (int(args.starttime) * 60)
-        utc = str(datetime.datetime.utcfromtimestamp(deltaT))
-        utc = utc.replace(" ", "T")[:-7] + 'Z'
-        args.starttime = utc
+    _translate_starttime(args)
     fields['start_time'] = args.starttime
     if args.endtime:
         fields['end_time'] = args.endtime
@@ -1110,11 +1111,7 @@ def do_alarm_history_list(mc, args):
     if args.dimensions:
         fields['dimensions'] = utils.format_parameters(args.dimensions)
     if args.starttime:
-        if args.starttime[0] == '-':
-            deltaT = time.time() + (int(args.starttime) * 60)
-            utc = str(datetime.datetime.utcfromtimestamp(deltaT))
-            utc = utc.replace(" ", "T")[:-7] + 'Z'
-            args.starttime = utc
+        _translate_starttime(args)
         fields['start_time'] = args.starttime
     if args.endtime:
         fields['end_time'] = args.endtime
@@ -1130,3 +1127,11 @@ def do_alarm_history_list(mc, args):
             (he.code, he.message))
     else:
         output_alarm_history(args, alarm)
+
+
+def _translate_starttime(args):
+    if args.starttime[0] == '-':
+        deltaT = time.time() + (int(args.starttime) * 60)
+        utc = str(datetime.datetime.utcfromtimestamp(deltaT))
+        utc = utc.replace(" ", "T")[:-7] + 'Z'
+        args.starttime = utc
