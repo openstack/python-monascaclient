@@ -1,4 +1,5 @@
 oslo.config<2.5.0
+oslo.concurrency<2.7.0
 oslo.i18n<=2.6.0
 oslo.log<1.12.0
 oslo.middleware<2.9.0
