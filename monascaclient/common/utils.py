@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Hewlett-Packard Development Company, L.P.
+# Copyright (c) 2014,2016 Hewlett-Packard Development Company, L.P.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -71,6 +71,8 @@ def print_list(objs, fields, field_labels=None, formatters={}, sortby=None):
         for field in fields:
             if field in formatters:
                 row.append(formatters[field](o))
+            elif isinstance(field, int):
+                row.append(o[field])
             else:
                 data = getattr(o, field, None) or ''
                 row.append(data)
