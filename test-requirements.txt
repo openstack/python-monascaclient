@@ -1,10 +1,11 @@
-coverage>=3.6
-testtools>=0.9.34
-discover
-fixtures>=0.3.14
-hacking>=0.9.2,<0.10
-mock>=1.0
-mox3>=0.7.0
-sphinx>=1.1.2,<1.2
-testrepository>=0.0.18
-testscenarios>=0.4
+# all of the outcommented ones below crash pbr
+#mock>=1.0
+#hacking>=0.9.2,<0.10
+#sphinx>=1.1.2,<1.2
+#fixtures>=0.3.14
+#mox3>=0.7.0
+#testscenarios>=0.4
+#testtools>=0.9.34
+#coverage>=3.6
+#discover
+#testrepository>=0.0.18
