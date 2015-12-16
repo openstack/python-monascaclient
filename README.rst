@@ -364,6 +364,7 @@ The api_version matches the version of the Monasca API.  Currently it is 'v2_0'.
 
 When calling the commands, refer to monascaclient.v2_0.shell.py 'do_<command>'
 to see the required and optional fields for each command.
+https://github.com/openstack/python-monascaclient/blob/master/monascaclient/v2_0/shell.py
 
 Refer to the example in python-monascaclient/client_api_example.py for more detail::
 
@@ -386,7 +387,7 @@ Refer to the example in python-monascaclient/client_api_example.py for more deta
   fields = {}
   fields['name'] = 'cindy1'
   fields['dimensions'] = dimensions
-  fields['timestamp'] = time.time()
+  fields['timestamp'] = time.time() * 1000
   fields['value'] = 222.333
   try:
       resp = monasca_client.metrics.create(**fields)
