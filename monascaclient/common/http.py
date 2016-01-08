@@ -231,6 +231,10 @@ class HTTPClient(object):
             message = ("Error %(method)s timeout request to %(endpoint)s %(e)s" %
                        {'method': method, 'endpoint': endpoint, 'e': e})
             raise exc.RequestTimeoutError(message=message)
+        except requests.ConnectionError as ex:
+            endpoint = self.endpoint
+            message = ("Failed to connect to %s, error was %s" % (endpoint, ex.message))
+            raise exc.CommunicationError(message=message)
 
         self.log_http_response(resp)
 
