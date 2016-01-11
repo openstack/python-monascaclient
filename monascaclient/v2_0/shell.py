@@ -718,61 +718,52 @@ def do_alarm_definition_delete(mc, args):
            help='The ID of the alarm definition.')
 @utils.arg('name', metavar='<ALARM_DEFINITION_NAME>',
            help='Name of the alarm definition.')
-@utils.arg('--description', metavar='<DESCRIPTION>',
+@utils.arg('description', metavar='<DESCRIPTION>',
            help='Description of the alarm.')
 @utils.arg('expression', metavar='<EXPRESSION>',
            help='The alarm expression to evaluate. Quoted.')
-@utils.arg('--alarm-actions', metavar='<NOTIFICATION-ID>',
-           help='The notification method to use when an alarm state is ALARM. '
-           'This param may be specified multiple times.',
-           action='append')
-@utils.arg('--ok-actions', metavar='<NOTIFICATION-ID>',
-           help='The notification method to use when an alarm state is OK. '
-           'This param may be specified multiple times.',
-           action='append')
-@utils.arg('--undetermined-actions', metavar='<NOTIFICATION-ID>',
-           help='The notification method to use when an alarm state is '
-           'UNDETERMINED. This param may be specified multiple times.',
-           action='append')
+@utils.arg('alarm-actions', metavar='<ALARM-NOTIFICATION-ID1,ALARM-NOTIFICATION-ID2,...>',
+           help='The notification method(s) to use when an alarm state is ALARM '
+                'as a comma separated list.')
+@utils.arg('ok-actions', metavar='<OK-NOTIFICATION-ID1,OK-NOTIFICATION-ID2,...>',
+           help='The notification method(s) to use when an alarm state is OK '
+           'as a comma separated list.')
+@utils.arg('undetermined-actions',
+           metavar='<UNDETERMINED-NOTIFICATION-ID1,UNDETERMINED-NOTIFICATION-ID2,...>',
+           help='The notification method(s) to use when an alarm state is UNDETERMINED '
+                'as a comma separated list.')
 @utils.arg('actions_enabled', metavar='<ACTIONS-ENABLED>',
            help='The actions-enabled boolean is one of [true,false]')
-@utils.arg('--match-by', metavar='<DIMENSION_KEY1,DIMENSION_KEY2,...>',
+@utils.arg('match-by', metavar='<DIMENSION_KEY1,DIMENSION_KEY2,...>',
            help='The metric dimensions to match to the alarm dimensions. '
            'One or more dimension key names separated by a comma. '
            'Key names need quoting when they contain special chars [&,(,),{,},>,<] '
            'that confuse the CLI parser.')
-@utils.arg('--severity', metavar='<SEVERITY>',
+@utils.arg('severity', metavar='<SEVERITY>',
            help='Severity is one of [LOW, MEDIUM, HIGH, CRITICAL].')
 def do_alarm_definition_update(mc, args):
     '''Update the alarm definition.'''
     fields = {}
     fields['alarm_id'] = args.id
     fields['name'] = args.name
-    if args.description:
-        fields['description'] = args.description
+    fields['description'] = args.description
     fields['expression'] = args.expression
-    if args.alarm_actions:
-        fields['alarm_actions'] = args.alarm_actions
-    if args.ok_actions:
-        fields['ok_actions'] = args.ok_actions
-    if args.undetermined_actions:
-        fields['undetermined_actions'] = args.undetermined_actions
-    if args.actions_enabled:
-        if args.actions_enabled not in enabled_types:
-            errmsg = 'Invalid value, not one of [' + \
-                ', '.join(enabled_types) + ']'
-            print(errmsg)
-            return
-        fields['actions_enabled'] = args.actions_enabled in ['true', 'True']
-    if args.match_by:
-        fields['match_by'] = args.match_by.split(',')
-    if args.severity:
-        if args.severity.upper() not in severity_types:
-            errmsg = 'Invalid severity, not one of [' + \
-                ', '.join(severity_types) + ']'
-            print(errmsg)
-            return
-        fields['severity'] = args.severity
+    fields['alarm_actions'] = args.alarm_actions.split(',')
+    fields['ok_actions'] = args.ok_actions.split(',')
+    fields['undetermined_actions'] = args.undetermined_actions.split(',')
+    if args.actions_enabled not in enabled_types:
+        errmsg = 'Invalid value, not one of [' + \
+            ', '.join(enabled_types) + ']'
+        print(errmsg)
+        return
+    fields['actions_enabled'] = args.actions_enabled in ['true', 'True']
+    fields['match_by'] = args.match_by.split(',')
+    if args.severity.upper() not in severity_types:
+        errmsg = 'Invalid severity, not one of [' + \
+            ', '.join(severity_types) + ']'
+        print(errmsg)
+        return
+    fields['severity'] = args.severity
     try:
         alarm = mc.alarm_definitions.update(**fields)
     except exc.HTTPException as he:
