@@ -127,7 +127,7 @@ def do_metric_list(mc, args):
     if args.name:
         fields['name'] = args.name
     if args.dimensions:
-        fields['dimensions'] = utils.format_parameters(args.dimensions)
+        fields['dimensions'] = utils.format_dimensions_query(args.dimensions)
     if args.limit:
         fields['limit'] = args.limit
     if args.offset:
@@ -275,7 +275,7 @@ def do_measurement_list(mc, args):
     fields['name'] = args.name
 
     if args.dimensions:
-        fields['dimensions'] = utils.format_parameters(args.dimensions)
+        fields['dimensions'] = utils.format_dimensions_query(args.dimensions)
     _translate_starttime(args)
     fields['start_time'] = args.starttime
     if args.endtime:
@@ -356,7 +356,7 @@ def do_metric_statistics(mc, args):
     fields = {}
     fields['name'] = args.name
     if args.dimensions:
-        fields['dimensions'] = utils.format_parameters(args.dimensions)
+        fields['dimensions'] = utils.format_dimensions_query(args.dimensions)
     _translate_starttime(args)
     fields['start_time'] = args.starttime
     if args.endtime:
@@ -676,7 +676,7 @@ def do_alarm_definition_list(mc, args):
     if args.name:
         fields['name'] = args.name
     if args.dimensions:
-        fields['dimensions'] = utils.format_parameters(args.dimensions)
+        fields['dimensions'] = utils.format_dimensions_query(args.dimensions)
     if args.sort_by:
         sort_by = args.sort_by.split(',')
         for field in sort_by:
@@ -898,7 +898,7 @@ def do_alarm_list(mc, args):
     if args.metric_name:
         fields['metric_name'] = args.metric_name
     if args.metric_dimensions:
-        fields['metric_dimensions'] = utils.format_parameters(args.metric_dimensions)
+        fields['metric_dimensions'] = utils.format_dimensions_query(args.metric_dimensions)
     if args.state:
         if args.state.upper() not in state_types:
             errmsg = 'Invalid state, not one of [' + \

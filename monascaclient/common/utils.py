@@ -1,4 +1,4 @@
-# Copyright (c) 2014,2016 Hewlett-Packard Development Company, L.P.
+# Copyright (c) 2014,2016 Hewlett Packard Enterprise Development Company, L.P.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -178,6 +178,31 @@ def format_parameters(params):
             parameters[n].append(v)
 
     return parameters
+
+
+def format_dimensions_query(dims):
+    if not dims:
+        return {}
+
+    # expect multiple invocations of --parameters but fall back
+    # to ; delimited if only one --parameters is specified
+    if len(dims) == 1:
+        if dims[0].find(';') != -1:  # found
+            dims = dims[0].split(';')
+        else:
+            dims = dims[0].split(',')
+
+    dimensions = {}
+    for p in dims:
+        try:
+            (n, v) = p.split('=', 1)
+        except ValueError:
+            n = p
+            v = ""
+
+        dimensions[n] = v
+
+    return dimensions
 
 
 def format_output(output, format='yaml'):
