@@ -1,19 +1,19 @@
-oslo.config<2.5.0
-oslo.concurrency<2.7.0
-oslo.i18n<=2.6.0
-oslo.log<1.12.0
-oslo.middleware<2.9.0
-oslo.serialization<1.10.0
-oslo.service<0.10
-oslo.utils<2.6.0
+oslo.config
+oslo.concurrency
+oslo.i18n
+oslo.log
+oslo.middleware
+oslo.serialization
+oslo.service
+oslo.utils
 
-python-keystoneclient<=1.7.2
+python-keystoneclient
 
 argparse
 babel
 iso8601>=0.1.9
-pbr>=0.11,<2.0
-PrettyTable>=0.7,<0.8
+pbr>=0.11
+PrettyTable>=0.7
 PyYAML>=3.1.0
-requests>=1.1,<2.8
+requests>=1.1
 six>=1.7.0
