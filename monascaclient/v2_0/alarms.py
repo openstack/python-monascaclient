@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Hewlett-Packard Development Company, L.P.
+# Copyright (c) 2014,2016 Hewlett-Packard Development Company, L.P.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -76,6 +76,19 @@ class AlarmsManager(monasca_manager.MonascaManager):
         del kwargs['alarm_id']
         resp, body = self.client.json_request('PATCH', url_str,
                                               data=kwargs,
+                                              headers=newheaders)
+        return body
+
+    def count(self, **kwargs):
+        newheaders = self.get_headers()
+        url_str = self.base_url + '/count'
+        if 'metric_dimensions' in kwargs:
+            dimstr = self.get_dimensions_url_string(kwargs['metric_dimensions'])
+            kwargs['metric_dimensions'] = dimstr
+
+        if kwargs:
+            url_str = url_str + '?%s' % urlutils.urlencode(kwargs, True)
+        resp, body = self.client.json_request('GET', url_str,
                                               headers=newheaders)
         return body
 
