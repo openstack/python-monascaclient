@@ -129,7 +129,7 @@ class HTTPClient(object):
         curl = ['curl -i -X %s' % method]
 
         for (key, value) in kwargs['headers'].items():
-            if key == 'X-Auth-Token':
+            if key in ('X-Auth-Token', 'X-Auth-Key'):
                 value = '*****'
             header = '-H \'%s: %s\'' % (strutils.safe_decode(key),
                                         strutils.safe_decode(value))
@@ -231,18 +231,15 @@ class HTTPClient(object):
             message = ("Error %(method)s timeout request to %(endpoint)s %(e)s" %
                        {'method': method, 'endpoint': endpoint, 'e': e})
             raise exc.RequestTimeoutError(message=message)
+        except requests.ConnectionError as ex:
+            endpoint = self.endpoint
+            message = ("Failed to connect to %s, error was %s" % (endpoint, ex.message))
+            raise exc.CommunicationError(message=message)
 
         self.log_http_response(resp)
 
-        if 'X-Auth-Key' not in kwargs['headers'] and \
-                (resp.status_code == 401 or
-                 (resp.status_code == 500 and "(HTTP 401)" in resp.content)):
-            raise exc.HTTPUnauthorized("Authentication failed. Please try"
-                                       " again with option "
-                                       "--include-password or export "
-                                       "MONASCA_INCLUDE_PASSWORD=1\n")
-        elif (resp.status_code == 401 or
-              (resp.status_code == 500 and "(HTTP 401)" in resp.content)):
+        if (resp.status_code == 401 or
+           (resp.status_code == 500 and "(HTTP 401)" in resp.content)):
             # re-authenticate and attempt one more request
             try:
                 self.re_authenticate()

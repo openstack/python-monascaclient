@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Hewlett-Packard Development Company, L.P.
+# Copyright (c) 2014,2016 Hewlett Packard Enterprise Development Company, L.P.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -71,6 +71,8 @@ def print_list(objs, fields, field_labels=None, formatters={}, sortby=None):
         for field in fields:
             if field in formatters:
                 row.append(formatters[field](o))
+            elif isinstance(field, int):
+                row.append(o[field])
             else:
                 data = getattr(o, field, None) or ''
                 row.append(data)
@@ -129,7 +131,7 @@ def env(*vars, **kwargs):
         value = os.environ.get(v)
         if value:
             return value
-    return kwargs.get('default', '')
+    return kwargs.get('default', None)
 
 
 def import_versioned_module(version, submodule=None):
@@ -176,6 +178,31 @@ def format_parameters(params):
             parameters[n].append(v)
 
     return parameters
+
+
+def format_dimensions_query(dims):
+    if not dims:
+        return {}
+
+    # expect multiple invocations of --parameters but fall back
+    # to ; delimited if only one --parameters is specified
+    if len(dims) == 1:
+        if dims[0].find(';') != -1:  # found
+            dims = dims[0].split(';')
+        else:
+            dims = dims[0].split(',')
+
+    dimensions = {}
+    for p in dims:
+        try:
+            (n, v) = p.split('=', 1)
+        except ValueError:
+            n = p
+            v = ""
+
+        dimensions[n] = v
+
+    return dimensions
 
 
 def format_output(output, format='yaml'):
@@ -243,3 +270,25 @@ def format_list(in_list):
             key = k
         string_list.append(key)
     return '\n'.join(string_list)
+
+
+def set_env_variables(kwargs):
+    environment_variables = {
+        'username': 'OS_USERNAME',
+        'password': 'OS_PASSWORD',
+        'token': 'OS_AUTH_TOKEN',
+        'auth_url': 'OS_AUTH_URL',
+        'service_type': 'OS_SERVICE_TYPE',
+        'endpoint_type': 'OS_ENDPOINT_TYPE',
+        'os_cacert': 'OS_CACERT',
+        'user_domain_id': 'OS_USER_DOMAIN_ID',
+        'user_domain_name': 'OS_USER_DOMAIN_NAME',
+        'project_id': 'OS_PROJECT_ID',
+        'project_name': 'OS_PROJECT_NAME',
+        'domain_id': 'OS_DOMAIN_ID',
+        'domain_name': 'OS_DOMAIN_NAME',
+        'region_name': 'OS_REGION_NAME'
+    }
+    for k, v in environment_variables.iteritems():
+        if k not in kwargs:
+            kwargs[k] = env(v)

@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Hewlett-Packard Development Company, L.P.
+# Copyright (c) 2014,2016 Hewlett Packard Enterprise Development Company, L.P.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,6 +28,12 @@ from monascaclient.openstack.common import jsonutils
 severity_types = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
 state_types = ['UNDETERMINED', 'ALARM', 'OK']
 enabled_types = ['True', 'true', 'False', 'false']
+group_by_types = ['alarm_definition_id', 'name', 'state', 'severity',
+                  'link', 'lifecycle_state', 'metric_name',
+                  'dimension_name', 'dimension_value']
+allowed_alarm_sort_by = {'alarm_id', 'alarm_definition_id', 'state', 'severity', 'lifecycle_state', 'link',
+                         'state_updated_timestamp', 'updated_timestamp', 'created_timestamp'}
+allowed_definition_sort_by = {'id', 'name', 'severity', 'updated_at', 'created_at'}
 
 # Notification valid types
 notification_types = ['EMAIL', 'WEBHOOK', 'PAGERDUTY']
@@ -107,6 +113,10 @@ def do_metric_create_raw(mc, args):
            'Dimensions need quoting when they contain special chars [&,(,),{,},>,<] '
            'that confuse the CLI parser.',
            action='append')
+@utils.arg('--starttime', metavar='<UTC_START_TIME>',
+           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z. OR Format: -120 (previous 120 minutes')
+@utils.arg('--endtime', metavar='<UTC_END_TIME>',
+           help='measurements <= UTC time. format: 2014-01-01T00:00:00Z.')
 @utils.arg('--offset', metavar='<OFFSET LOCATION>',
            help='The offset used to paginate the return data.')
 @utils.arg('--limit', metavar='<RETURN LIMIT>',
@@ -117,11 +127,16 @@ def do_metric_list(mc, args):
     if args.name:
         fields['name'] = args.name
     if args.dimensions:
-        fields['dimensions'] = utils.format_parameters(args.dimensions)
+        fields['dimensions'] = utils.format_dimensions_query(args.dimensions)
     if args.limit:
         fields['limit'] = args.limit
     if args.offset:
         fields['offset'] = args.offset
+    if args.starttime:
+        _translate_starttime(args)
+        fields['start_time'] = args.starttime
+    if args.endtime:
+        fields['end_time'] = args.endtime
 
     try:
         metric = mc.metrics.list(**fields)
@@ -158,7 +173,7 @@ def format_measure_timestamp(measurements):
 
 def format_measure_value(measurements):
     # returns newline separated values for the value column
-    return '\n'.join(['{:12.2f}'.format(m[1]) for m in measurements])
+    return '\n'.join(['{:12.3f}'.format(m[1]) for m in measurements])
 
 
 def format_value_meta(measurements):
@@ -198,7 +213,7 @@ def format_statistic_value(statistics, columns, stat_type):
         stat_index = columns.index(stat_type)
     value_list = list()
     for stat in statistics:
-        value_str = '{:12.2f}'.format(stat[stat_index])
+        value_str = '{:12.3f}'.format(stat[stat_index])
         value_list.append(value_str)
     return '\n'.join(value_list)
 
@@ -260,12 +275,8 @@ def do_measurement_list(mc, args):
     fields['name'] = args.name
 
     if args.dimensions:
-        fields['dimensions'] = utils.format_parameters(args.dimensions)
-    if args.starttime[0] == '-':
-        deltaT = time.time() + (int(args.starttime) * 60)
-        utc = str(datetime.datetime.utcfromtimestamp(deltaT))
-        utc = utc.replace(" ", "T")[:-7] + 'Z'
-        args.starttime = utc
+        fields['dimensions'] = utils.format_dimensions_query(args.dimensions)
+    _translate_starttime(args)
     fields['start_time'] = args.starttime
     if args.endtime:
         fields['end_time'] = args.endtime
@@ -345,12 +356,8 @@ def do_metric_statistics(mc, args):
     fields = {}
     fields['name'] = args.name
     if args.dimensions:
-        fields['dimensions'] = utils.format_parameters(args.dimensions)
-    if args.starttime[0] == '-':
-        deltaT = time.time() + (int(args.starttime) * 60)
-        utc = str(datetime.datetime.utcfromtimestamp(deltaT))
-        utc = utc.replace(" ", "T")[:-7] + 'Z'
-        args.starttime = utc
+        fields['dimensions'] = utils.format_dimensions_query(args.dimensions)
+    _translate_starttime(args)
     fields['start_time'] = args.starttime
     if args.endtime:
         fields['end_time'] = args.endtime
@@ -654,6 +661,11 @@ def do_alarm_definition_show(mc, args):
            'Dimensions need quoting when they contain special chars [&,(,),{,},>,<] '
            'that confuse the CLI parser.',
            action='append')
+@utils.arg('--sort-by', metavar='<SORT BY FIELDS>',
+           help='Fields to sort by as a comma separated list. Valid values are id, '
+                'name, severity, updated_timestamp, created_timestamp. '
+                'Fields may be followed by "asc" or "desc", ex "severity desc", '
+                'to set the direction of sorting.')
 @utils.arg('--offset', metavar='<OFFSET LOCATION>',
            help='The offset used to paginate the return data.')
 @utils.arg('--limit', metavar='<RETURN LIMIT>',
@@ -664,7 +676,19 @@ def do_alarm_definition_list(mc, args):
     if args.name:
         fields['name'] = args.name
     if args.dimensions:
-        fields['dimensions'] = utils.format_parameters(args.dimensions)
+        fields['dimensions'] = utils.format_dimensions_query(args.dimensions)
+    if args.sort_by:
+        sort_by = args.sort_by.split(',')
+        for field in sort_by:
+            field_values = field.split()
+            if len(field_values) > 2:
+                print("Invalid sort_by value {}".format(field))
+            if field_values[0] not in allowed_definition_sort_by:
+                print("Sort-by field name {} is not in [{}]".format(field_values[0], allowed_definition_sort_by))
+                return
+            if len(field_values) > 1 and field_values[1] not in ['asc', 'desc']:
+                print("Invalid value {}, must be asc or desc".format(field_values[1]))
+        fields['sort_by'] = args.sort_by
     if args.limit:
         fields['limit'] = args.limit
     if args.offset:
@@ -717,61 +741,52 @@ def do_alarm_definition_delete(mc, args):
            help='The ID of the alarm definition.')
 @utils.arg('name', metavar='<ALARM_DEFINITION_NAME>',
            help='Name of the alarm definition.')
-@utils.arg('--description', metavar='<DESCRIPTION>',
+@utils.arg('description', metavar='<DESCRIPTION>',
            help='Description of the alarm.')
 @utils.arg('expression', metavar='<EXPRESSION>',
            help='The alarm expression to evaluate. Quoted.')
-@utils.arg('--alarm-actions', metavar='<NOTIFICATION-ID>',
-           help='The notification method to use when an alarm state is ALARM. '
-           'This param may be specified multiple times.',
-           action='append')
-@utils.arg('--ok-actions', metavar='<NOTIFICATION-ID>',
-           help='The notification method to use when an alarm state is OK. '
-           'This param may be specified multiple times.',
-           action='append')
-@utils.arg('--undetermined-actions', metavar='<NOTIFICATION-ID>',
-           help='The notification method to use when an alarm state is '
-           'UNDETERMINED. This param may be specified multiple times.',
-           action='append')
+@utils.arg('alarm-actions', metavar='<ALARM-NOTIFICATION-ID1,ALARM-NOTIFICATION-ID2,...>',
+           help='The notification method(s) to use when an alarm state is ALARM '
+                'as a comma separated list.')
+@utils.arg('ok-actions', metavar='<OK-NOTIFICATION-ID1,OK-NOTIFICATION-ID2,...>',
+           help='The notification method(s) to use when an alarm state is OK '
+           'as a comma separated list.')
+@utils.arg('undetermined-actions',
+           metavar='<UNDETERMINED-NOTIFICATION-ID1,UNDETERMINED-NOTIFICATION-ID2,...>',
+           help='The notification method(s) to use when an alarm state is UNDETERMINED '
+                'as a comma separated list.')
 @utils.arg('actions_enabled', metavar='<ACTIONS-ENABLED>',
            help='The actions-enabled boolean is one of [true,false]')
-@utils.arg('--match-by', metavar='<DIMENSION_KEY1,DIMENSION_KEY2,...>',
+@utils.arg('match-by', metavar='<DIMENSION_KEY1,DIMENSION_KEY2,...>',
            help='The metric dimensions to match to the alarm dimensions. '
            'One or more dimension key names separated by a comma. '
            'Key names need quoting when they contain special chars [&,(,),{,},>,<] '
            'that confuse the CLI parser.')
-@utils.arg('--severity', metavar='<SEVERITY>',
+@utils.arg('severity', metavar='<SEVERITY>',
            help='Severity is one of [LOW, MEDIUM, HIGH, CRITICAL].')
 def do_alarm_definition_update(mc, args):
     '''Update the alarm definition.'''
     fields = {}
     fields['alarm_id'] = args.id
     fields['name'] = args.name
-    if args.description:
-        fields['description'] = args.description
+    fields['description'] = args.description
     fields['expression'] = args.expression
-    if args.alarm_actions:
-        fields['alarm_actions'] = args.alarm_actions
-    if args.ok_actions:
-        fields['ok_actions'] = args.ok_actions
-    if args.undetermined_actions:
-        fields['undetermined_actions'] = args.undetermined_actions
-    if args.actions_enabled:
-        if args.actions_enabled not in enabled_types:
-            errmsg = 'Invalid value, not one of [' + \
-                ', '.join(enabled_types) + ']'
-            print(errmsg)
-            return
-        fields['actions_enabled'] = args.actions_enabled in ['true', 'True']
-    if args.match_by:
-        fields['match_by'] = args.match_by.split(',')
-    if args.severity:
-        if args.severity.upper() not in severity_types:
-            errmsg = 'Invalid severity, not one of [' + \
-                ', '.join(severity_types) + ']'
-            print(errmsg)
-            return
-        fields['severity'] = args.severity
+    fields['alarm_actions'] = args.alarm_actions.split(',')
+    fields['ok_actions'] = args.ok_actions.split(',')
+    fields['undetermined_actions'] = args.undetermined_actions.split(',')
+    if args.actions_enabled not in enabled_types:
+        errmsg = 'Invalid value, not one of [' + \
+            ', '.join(enabled_types) + ']'
+        print(errmsg)
+        return
+    fields['actions_enabled'] = args.actions_enabled in ['true', 'True']
+    fields['match_by'] = args.match_by.split(',')
+    if args.severity.upper() not in severity_types:
+        errmsg = 'Invalid severity, not one of [' + \
+            ', '.join(severity_types) + ']'
+        print(errmsg)
+        return
+    fields['severity'] = args.severity
     try:
         alarm = mc.alarm_definitions.update(**fields)
     except exc.HTTPException as he:
@@ -865,6 +880,12 @@ def do_alarm_definition_patch(mc, args):
            help='The lifecycle state of the alarm')
 @utils.arg('--link', metavar='<LINK>',
            help='The link to external data associated with the alarm')
+@utils.arg('--sort-by', metavar='<SORT BY FIELDS>',
+           help='Fields to sort by as a comma separated list. Valid values are alarm_id, '
+                'alarm_definition_id, state, severity, lifecycle_state, link, '
+                'state_updated_timestamp, updated_timestamp, created_timestamp. '
+                'Fields may be followed by "asc" or "desc", ex "severity desc", '
+                'to set the direction of sorting.')
 @utils.arg('--offset', metavar='<OFFSET LOCATION>',
            help='The offset used to paginate the return data.')
 @utils.arg('--limit', metavar='<RETURN LIMIT>',
@@ -877,7 +898,7 @@ def do_alarm_list(mc, args):
     if args.metric_name:
         fields['metric_name'] = args.metric_name
     if args.metric_dimensions:
-        fields['metric_dimensions'] = utils.format_parameters(args.metric_dimensions)
+        fields['metric_dimensions'] = utils.format_dimensions_query(args.metric_dimensions)
     if args.state:
         if args.state.upper() not in state_types:
             errmsg = 'Invalid state, not one of [' + \
@@ -895,6 +916,18 @@ def do_alarm_list(mc, args):
         fields['limit'] = args.limit
     if args.offset:
         fields['offset'] = args.offset
+    if args.sort_by:
+        sort_by = args.sort_by.split(',')
+        for field in sort_by:
+            field_values = field.split()
+            if len(field_values) > 2:
+                print("Invalid sort_by value {}".format(field))
+            if field_values[0] not in allowed_alarm_sort_by:
+                print("Sort-by field name {} is not in [{}]".format(field_values[0], allowed_alarm_sort_by))
+                return
+            if len(field_values) > 1 and field_values[1] not in ['asc', 'desc']:
+                print("Invalid value {}, must be asc or desc".format(field_values[1]))
+        fields['sort_by'] = args.sort_by
     try:
         alarm = mc.alarms.list(**fields)
     except exc.HTTPException as he:
@@ -1065,6 +1098,79 @@ def output_alarm_history(args, alarm_history):
         utils.print_list(alarm_list, cols, formatters=formatters)
 
 
+@utils.arg('--alarm-definition-id', metavar='<ALARM_DEFINITION_ID>',
+           help='The ID of the alarm definition.')
+@utils.arg('--metric-name', metavar='<METRIC_NAME>',
+           help='Name of the metric.')
+@utils.arg('--metric-dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
+           help='key value pair used to specify a metric dimension. '
+           'This can be specified multiple times, or once with parameters '
+           'separated by a comma. '
+           'Dimensions need quoting when they contain special chars [&,(,),{,},>,<] '
+           'that confuse the CLI parser.',
+           action='append')
+@utils.arg('--state', metavar='<ALARM_STATE>',
+           help='ALARM_STATE is one of [UNDETERMINED, OK, ALARM].')
+@utils.arg('--lifecycle-state', metavar='<LIFECYCLE_STATE>',
+           help='The lifecycle state of the alarm')
+@utils.arg('--link', metavar='<LINK>',
+           help='The link to external data associated with the alarm')
+@utils.arg('--group-by', metavar='<GROUP_BY>',
+           help='Comma separated list of one or more fields to group the results by.'
+                'Group by is one or more of [alarm_definition_id, name, state, link,'
+                'lifecycle_state, metric_name, dimension_name, dimension_value]')
+@utils.arg('--offset', metavar='<OFFSET LOCATION>',
+           help='The offset used to paginate the return data.')
+@utils.arg('--limit', metavar='<RETURN LIMIT>',
+           help='The amount of data to be returned up to the API maximum limit.')
+def do_alarm_count(mc, args):
+    '''Count alarms.'''
+    fields = {}
+    if args.alarm_definition_id:
+        fields['alarm_definition_id'] = args.alarm_definition_id
+    if args.metric_name:
+        fields['metric_name'] = args.metric_name
+    if args.metric_dimensions:
+        fields['metric_dimensions'] = utils.format_parameters(args.metric_dimensions)
+    if args.state:
+        if args.state.upper() not in state_types:
+            errmsg = 'Invalid state, not one of [' + \
+                ', '.join(state_types) + ']'
+            print(errmsg)
+            return
+        fields['state'] = args.state
+    if args.lifecycle_state:
+        fields['lifecycle_state'] = args.lifecycle_state
+    if args.link:
+        fields['link'] = args.link
+    if args.group_by:
+        group_by = args.group_by.split(',')
+        if not set(group_by).issubset(set(group_by_types)):
+            errmsg = 'Invalid group-by, one or more values not in [' + \
+                ','.join(group_by_types) + ']'
+            print(errmsg)
+            return
+        fields['group_by'] = args.group_by
+    if args.limit:
+        fields['limit'] = args.limit
+    if args.offset:
+        fields['offset'] = args.offset
+    try:
+        counts = mc.alarms.count(**fields)
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
+    else:
+        if args.json:
+            print(utils.json_formatter(counts))
+            return
+        cols = counts['columns']
+
+        utils.print_list(counts['counts'], [i for i in xrange(len(cols))],
+                         field_labels=cols)
+
+
 @utils.arg('id', metavar='<ALARM_ID>',
            help='The ID of the alarm.')
 @utils.arg('--offset', metavar='<OFFSET LOCATION>',
@@ -1110,11 +1216,7 @@ def do_alarm_history_list(mc, args):
     if args.dimensions:
         fields['dimensions'] = utils.format_parameters(args.dimensions)
     if args.starttime:
-        if args.starttime[0] == '-':
-            deltaT = time.time() + (int(args.starttime) * 60)
-            utc = str(datetime.datetime.utcfromtimestamp(deltaT))
-            utc = utc.replace(" ", "T")[:-7] + 'Z'
-            args.starttime = utc
+        _translate_starttime(args)
         fields['start_time'] = args.starttime
     if args.endtime:
         fields['end_time'] = args.endtime
@@ -1130,3 +1232,11 @@ def do_alarm_history_list(mc, args):
             (he.code, he.message))
     else:
         output_alarm_history(args, alarm)
+
+
+def _translate_starttime(args):
+    if args.starttime[0] == '-':
+        deltaT = time.time() + (int(args.starttime) * 60)
+        utc = str(datetime.datetime.utcfromtimestamp(deltaT))
+        utc = utc.replace(" ", "T")[:-7] + 'Z'
+        args.starttime = utc
