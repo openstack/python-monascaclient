@@ -1116,8 +1116,8 @@ def output_alarm_history(args, alarm_history):
 @utils.arg('--link', metavar='<LINK>',
            help='The link to external data associated with the alarm')
 @utils.arg('--group-by', metavar='<GROUP_BY>',
-           help='Comma separated list of one or more fields to group the results by.'
-                'Group by is one or more of [alarm_definition_id, name, state, link,'
+           help='Comma separated list of one or more fields to group the results by. '
+                'Group by is one or more of [alarm_definition_id, name, state, link, '
                 'lifecycle_state, metric_name, dimension_name, dimension_value]')
 @utils.arg('--offset', metavar='<OFFSET LOCATION>',
            help='The offset used to paginate the return data.')
