@@ -2,7 +2,7 @@
 
 # Copyright 2012 Red Hat, Inc.
 # Copyright 2013 IBM Corp.
-# (C) Copyright 2015 Hewlett-Packard Development Company, L.P.
+# (C) Copyright 2014-2015 Hewlett Packard Enterprise Development Company LP
 # All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
