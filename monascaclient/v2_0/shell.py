@@ -1,4 +1,4 @@
-# Copyright (c) 2014,2016 Hewlett Packard Enterprise Development Company, L.P.
+# (C) Copyright 2014-2016 Hewlett Packard Enterprise Development Company LP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -561,6 +561,15 @@ def do_notification_update(mc, args):
         print(jsonutils.dumps(notification, indent=2))
 
 
+def _validate_severity(severity):
+    if severity.upper() not in severity_types:
+        errmsg = 'Invalid severity, not one of [' + \
+            ', '.join(severity_types) + ']'
+        print(errmsg)
+        return False
+    return True
+
+
 @utils.arg('name', metavar='<ALARM_DEFINITION_NAME>',
            help='Name of the alarm definition to create.')
 @utils.arg('--description', metavar='<DESCRIPTION>',
@@ -600,10 +609,7 @@ def do_alarm_definition_create(mc, args):
     if args.undetermined_actions:
         fields['undetermined_actions'] = args.undetermined_actions
     if args.severity:
-        if args.severity.upper() not in severity_types:
-            errmsg = 'Invalid severity, not one of [' + \
-                ', '.join(severity_types) + ']'
-            print(errmsg)
+        if not _validate_severity(args.severity):
             return
         fields['severity'] = args.severity
     if args.match_by:
@@ -661,6 +667,8 @@ def do_alarm_definition_show(mc, args):
            'Dimensions need quoting when they contain special chars [&,(,),{,},>,<] '
            'that confuse the CLI parser.',
            action='append')
+@utils.arg('--severity', metavar='<SEVERITY>',
+           help='Severity is one of ["LOW", "MEDIUM", "HIGH", "CRITICAL"]')
 @utils.arg('--sort-by', metavar='<SORT BY FIELDS>',
            help='Fields to sort by as a comma separated list. Valid values are id, '
                 'name, severity, updated_timestamp, created_timestamp. '
@@ -677,6 +685,10 @@ def do_alarm_definition_list(mc, args):
         fields['name'] = args.name
     if args.dimensions:
         fields['dimensions'] = utils.format_dimensions_query(args.dimensions)
+    if args.severity:
+        if not _validate_severity(args.severity):
+            return
+        fields['severity'] = args.severity
     if args.sort_by:
         sort_by = args.sort_by.split(',')
         for field in sort_by:
@@ -781,10 +793,8 @@ def do_alarm_definition_update(mc, args):
         return
     fields['actions_enabled'] = args.actions_enabled in ['true', 'True']
     fields['match_by'] = args.match_by.split(',')
-    if args.severity.upper() not in severity_types:
-        errmsg = 'Invalid severity, not one of [' + \
-            ', '.join(severity_types) + ']'
-        print(errmsg)
+
+    if not _validate_severity(args.severity):
         return
     fields['severity'] = args.severity
     try:
@@ -845,10 +855,7 @@ def do_alarm_definition_patch(mc, args):
             return
         fields['actions_enabled'] = args.actions_enabled in ['true', 'True']
     if args.severity:
-        if args.severity.upper() not in severity_types:
-            errmsg = 'Invalid severity, not one of [' + \
-                ', '.join(severity_types) + ']'
-            print(errmsg)
+        if not _validate_severity(args.severity):
             return
         fields['severity'] = args.severity
     try:
@@ -874,6 +881,8 @@ def do_alarm_definition_patch(mc, args):
            action='append')
 @utils.arg('--state', metavar='<ALARM_STATE>',
            help='ALARM_STATE is one of [UNDETERMINED, OK, ALARM].')
+@utils.arg('--severity', metavar='<SEVERITY>',
+           help='Severity is one of ["LOW", "MEDIUM", "HIGH", "CRITICAL"]')
 @utils.arg('--state-updated-start-time', metavar='<UTC_STATE_UPDATED_START>',
            help='Return all alarms whose state was updated on or after the time specified')
 @utils.arg('--lifecycle-state', metavar='<LIFECYCLE_STATE>',
@@ -906,6 +915,10 @@ def do_alarm_list(mc, args):
             print(errmsg)
             return
         fields['state'] = args.state
+    if args.severity:
+        if not _validate_severity(args.severity):
+            return
+        fields['severity'] = args.severity
     if args.state_updated_start_time:
         fields['state_updated_start_time'] = args.state_updated_start_time
     if args.lifecycle_state:
@@ -1111,13 +1124,15 @@ def output_alarm_history(args, alarm_history):
            action='append')
 @utils.arg('--state', metavar='<ALARM_STATE>',
            help='ALARM_STATE is one of [UNDETERMINED, OK, ALARM].')
+@utils.arg('--severity', metavar='<SEVERITY>',
+           help='Severity is one of ["LOW", "MEDIUM", "HIGH", "CRITICAL"]')
 @utils.arg('--lifecycle-state', metavar='<LIFECYCLE_STATE>',
            help='The lifecycle state of the alarm')
 @utils.arg('--link', metavar='<LINK>',
            help='The link to external data associated with the alarm')
 @utils.arg('--group-by', metavar='<GROUP_BY>',
-           help='Comma separated list of one or more fields to group the results by.'
-                'Group by is one or more of [alarm_definition_id, name, state, link,'
+           help='Comma separated list of one or more fields to group the results by. '
+                'Group by is one or more of [alarm_definition_id, name, state, link, '
                 'lifecycle_state, metric_name, dimension_name, dimension_value]')
 @utils.arg('--offset', metavar='<OFFSET LOCATION>',
            help='The offset used to paginate the return data.')
@@ -1139,6 +1154,10 @@ def do_alarm_count(mc, args):
             print(errmsg)
             return
         fields['state'] = args.state
+    if args.severity:
+        if not _validate_severity(args.severity):
+            return
+        fields['severity'] = args.severity
     if args.lifecycle_state:
         fields['lifecycle_state'] = args.lifecycle_state
     if args.link:

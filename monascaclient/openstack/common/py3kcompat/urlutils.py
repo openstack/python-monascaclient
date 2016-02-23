@@ -1,7 +1,7 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 #
 # Copyright 2013 Canonical Ltd.
-# (C) Copyright 2015 Hewlett-Packard Development Company, L.P.
+# (C) Copyright 2014-2015 Hewlett Packard Enterprise Development Company LP
 # All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
