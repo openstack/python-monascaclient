@@ -932,7 +932,7 @@ def do_alarm_list(mc, args):
     if args.sort_by:
         sort_by = args.sort_by.split(',')
         for field in sort_by:
-            field_values = field.split()
+            field_values = field.lower().split()
             if len(field_values) > 2:
                 print("Invalid sort_by value {}".format(field))
             if field_values[0] not in allowed_alarm_sort_by:
