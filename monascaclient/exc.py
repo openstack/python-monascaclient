@@ -1,4 +1,4 @@
-# (C) Copyright 2014-2015 Hewlett Packard Enterprise Development Company LP
+# (C) Copyright 2014-2016 Hewlett Packard Enterprise Development Company LP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,6 +52,21 @@ class CommunicationError(BaseException):
 class RequestTimeoutError(BaseException):
 
     """Timeout making a POST, GET, PATCH, DELETE, or PUT request to the server."""
+
+
+class KeystoneException(BaseException):
+
+    """Base exception for all Keystone-derived exceptions."""
+    code = 'N/A'
+
+    def __init__(self, message=None):
+        super(KeystoneException, self).__init__(message)
+        try:
+            log.error("exception: {}".format(message))
+            self.error = jsonutils.loads(message)
+        except Exception:
+            self.error = {'error':
+                          {'message': self.message or self.__class__.__doc__}}
 
 
 class HTTPException(BaseException):

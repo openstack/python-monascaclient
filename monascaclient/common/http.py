@@ -1,4 +1,4 @@
-# (C) Copyright 2014-2015 Hewlett Packard Enterprise Development Company LP
+# (C) Copyright 2014-2016 Hewlett Packard Enterprise Development Company LP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -123,7 +123,7 @@ class HTTPClient(object):
             _ksclient = ksclient.KSClient(**ks_args)
             self.auth_token = _ksclient.token
         except Exception as e:
-            raise e
+            raise exc.KeystoneException(e)
 
     def log_curl_request(self, method, url, kwargs):
         curl = ['curl -i -X %s' % method]
@@ -210,6 +210,50 @@ class HTTPClient(object):
         elif method is 'GET':
             timeout = self.read_timeout
 
+        resp = self._make_request(method, url, allow_redirects, timeout,
+                                  **kwargs)
+        if self._unauthorized(resp):
+            try:
+                # re-authenticate and attempt one more request
+                self.re_authenticate()
+                kwargs['headers']['X-Auth-Token'] = self.auth_token
+                resp = self._make_request(method, url, allow_redirects,
+                                          timeout, **kwargs)
+                self._check_status_code(resp, method, **kwargs)
+            except exc.KeystoneException as e:
+                raise e
+        else:
+            self._check_status_code(resp, method, **kwargs)
+        return resp
+
+    def _unauthorized(self, resp):
+        status401 = (resp.status_code == 401)
+        status500 = (resp.status_code == 500 and "(HTTP 401)" in resp.content)
+        return status401 or status500
+
+    def _check_status_code(self, resp, method, **kwargs):
+        if self._unauthorized(resp):
+            message = "Unauthorized error"
+            raise exc.HTTPUnauthorized(message=message)
+        elif 400 <= resp.status_code < 600:
+            raise exc.from_response(resp)
+        elif resp.status_code in (301, 302, 305):
+            # Redirected. Reissue the request to the new location.
+            location = resp.headers.get('location')
+            if location is None:
+                message = "Location not returned with 302"
+                raise exc.InvalidEndpoint(message=message)
+            elif location.startswith(self.endpoint):
+                # shave off the endpoint, it will be prepended when we recurse
+                location = location[len(self.endpoint):]
+            else:
+                message = "Prohibited endpoint redirect %s" % location
+                raise exc.InvalidEndpoint(message=message)
+            return self._http_request(location, method, **kwargs)
+        elif resp.status_code == 300:
+            raise exc.from_response(resp)
+
+    def _make_request(self, method, url, allow_redirects, timeout, **kwargs):
         try:
             resp = requests.request(
                 method,
@@ -235,42 +279,7 @@ class HTTPClient(object):
             endpoint = self.endpoint
             message = ("Failed to connect to %s, error was %s" % (endpoint, ex.message))
             raise exc.CommunicationError(message=message)
-
         self.log_http_response(resp)
-
-        if (resp.status_code == 401 or
-           (resp.status_code == 500 and "(HTTP 401)" in resp.content)):
-            # re-authenticate and attempt one more request
-            try:
-                self.re_authenticate()
-                kwargs['headers']['X-Auth-Token'] = self.auth_token
-                resp = requests.request(
-                    method,
-                    self.endpoint_url + url,
-                    allow_redirects=allow_redirects,
-                    timeout=timeout,
-                    **kwargs)
-            except Exception as e:
-                raise exc.HTTPUnauthorized(e)
-
-        elif 400 <= resp.status_code < 600:
-            raise exc.from_response(resp)
-        elif resp.status_code in (301, 302, 305):
-            # Redirected. Reissue the request to the new location.
-            location = resp.headers.get('location')
-            if location is None:
-                message = "Location not returned with 302"
-                raise exc.InvalidEndpoint(message=message)
-            elif location.startswith(self.endpoint):
-                # shave off the endpoint, it will be prepended when we recurse
-                location = location[len(self.endpoint):]
-            else:
-                message = "Prohibited endpoint redirect %s" % location
-                raise exc.InvalidEndpoint(message=message)
-            return self._http_request(location, method, **kwargs)
-        elif resp.status_code == 300:
-            raise exc.from_response(resp)
-
         return resp
 
     def credentials_headers(self):
