@@ -180,7 +180,7 @@ def do_metric_list(mc, args):
            help='The offset used to paginate the return data.')
 @utils.arg('--limit', metavar='<RETURN LIMIT>',
            help='The amount of data to be returned up to the API maximum limit.')
-def do_metric_list_names(mc, args):
+def do_metric_name_list(mc, args):
     '''List metric names for this tenant.'''
     fields = {}
     if args.dimensions:
