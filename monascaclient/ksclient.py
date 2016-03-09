@@ -34,8 +34,8 @@ class KSClient(object):
         :param user_domain_name: name of domain for username (optional), if user_domain_id not specified
         :param project_id: unique identifier of project
         :param project_name: name of project
-        :param domain_name: name of domain project is in
-        :param domain_id: id of domain project is in
+        :param project_domain_name: name of domain project is in
+        :param project_domain_id: id of domain project is in
         :param auth_url: endpoint to authenticate against
         :param token: token to use instead of username/password
         """
@@ -49,10 +49,14 @@ class KSClient(object):
             kc_args['project_id'] = kwargs.get('project_id')
         elif kwargs.get('project_name'):
             kc_args['project_name'] = kwargs.get('project_name')
-            if kwargs.get('domain_name'):
-                kc_args['project_domain_name'] = kwargs.get('domain_name')
-            if kwargs.get('domain_id'):
-                kc_args['project_domain_id'] = kwargs.get('domain_id')
+            if kwargs.get('project_domain_name'):
+                kc_args['project_domain_name'] = kwargs.get('project_domain_name')
+            elif kwargs.get('domain_name'):
+                kc_args['project_domain_name'] = kwargs.get('domain_name')  # backwards compat to 1.0.30 API
+            if kwargs.get('project_domain_id'):
+                kc_args['project_domain_id'] = kwargs.get('project_domain_id')
+            elif kwargs.get('domain_id'):
+                kc_args['project_domain_id'] = kwargs.get('domain_id')  # backwards compat to 1.0.30 API
 
         if kwargs.get('token'):
             kc_args['token'] = kwargs.get('token')

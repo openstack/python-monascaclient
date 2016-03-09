@@ -140,19 +140,13 @@ class MonascaShell(object):
         parser.add_argument('--os_project_name',
                             help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-domain-id',
-                            default=utils.env('OS_DOMAIN_ID'),
-                            help='Defaults to env[OS_DOMAIN_ID].')
+        parser.add_argument('--os-project-domain-id',
+                            default=utils.env('OS_PROJECT_DOMAIN_ID'),
+                            help='Defaults to env[OS_PROJECT_DOMAIN_ID].')
 
-        parser.add_argument('--os_domain_id',
-                            help=argparse.SUPPRESS)
-
-        parser.add_argument('--os-domain-name',
-                            default=utils.env('OS_DOMAIN_NAME'),
-                            help='Defaults to env[OS_DOMAIN_NAME].')
-
-        parser.add_argument('--os_domain_name',
-                            help=argparse.SUPPRESS)
+        parser.add_argument('--os-project-domain-name',
+                            default=utils.env('OS_PROJECT_DOMAIN_NAME'),
+                            help='Defaults to env[OS_PROJECT_DOMAIN_NAME].')
 
         parser.add_argument('--os-auth-url',
                             default=utils.env('OS_AUTH_URL'),
@@ -209,6 +203,20 @@ class MonascaShell(object):
                             help='Defaults to env[OS_ENDPOINT_TYPE].')
 
         parser.add_argument('--os_endpoint_type',
+                            help=argparse.SUPPRESS)
+
+        # In OpenStack, the parameters below are intended for domain-scoping, i.e. authorize
+        # the user against a domain instead of a project. Previous versions of the agent used these
+        # to qualify the project name, leading to confusion and preventing reuse of typical RC files.
+        # Since domain scoping is not supported by Monasca, we can still support the old variable
+        # names for the time being. If the project-name is not scoped using the correct project
+        # domain name parameter, the code falls back to  the domain scoping parameters.
+        parser.add_argument('--os-domain-id',
+                            default=utils.env('OS_DOMAIN_ID'),
+                            help=argparse.SUPPRESS)
+
+        parser.add_argument('--os-domain-name',
+                            default=utils.env('OS_DOMAIN_NAME'),
                             help=argparse.SUPPRESS)
 
         return parser
@@ -334,8 +342,9 @@ class MonascaShell(object):
             'user_domain_name': args.os_user_domain_name,
             'project_id': args.os_project_id,
             'project_name': args.os_project_name,
-            'domain_id': args.os_domain_id,
-            'domain_name': args.os_domain_name,
+            #  if project name is not scoped, fall back to  previous behaviour (see above)
+            'project_domain_id': args.os_project_domain_id if args.os_project_domain_id else args.os_domain_id,
+            'project_domain_name': args.os_project_domain_name if args.os_project_domain_name else args.os_domain_name,
             'insecure': args.insecure,
             'region_name': args.os_region_name,
             'keystone_timeout': args.keystone_timeout
@@ -357,9 +366,9 @@ class MonascaShell(object):
                         "--os-project-id or via env[OS_PROJECT_ID], "
                         "or you must provide a project name using "
                         "--os-project-name or via env[OS_PROJECT_NAME] "
-                        "and a project domain using --os-domain-name, via "
-                        "env[OS_DOMAIN_NAME],  using --os-domain-id or "
-                        "via env[OS_DOMAIN_ID]")
+                        "and a project domain using --os-project-domain-name, via "
+                        "env[OS_PROJECT_DOMAIN_NAME],  using --os-project-domain-id or "
+                        "via env[OS_PROJECT_DOMAIN_ID]")
 
             kwargs = {
                 'token': token,
@@ -385,10 +394,14 @@ class MonascaShell(object):
                 kwargs['project_name'] = args.os_project_name
             if args.os_project_id:
                 kwargs['project_id'] = args.os_project_id
+            # Monasca API uses domain_id/name for project_domain_id/name
+            # We cannot change this and therefore still use the misleading parameter names
             if args.os_domain_name:
-                kwargs['domain_name'] = args.os_domain_name
+                kwargs['domain_name'] = args.os_project_domain_name if args.os_project_domain_name \
+                    else args.os_domain_name
             if args.os_domain_id:
-                kwargs['domain_id'] = args.os_domain_id
+                kwargs['domain_id'] = args.os_project_domain_id if args.os_project_domain_id \
+                    else args.os_domain_id
 
             if not endpoint:
                 endpoint = _ksclient.monasca_url
