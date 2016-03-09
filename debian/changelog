@@ -1,4 +1,4 @@
-python-monclient (0.0.1) precise; urgency=low
+python-monclient (1.0.30-%BUILD_ID%) trusty; urgency=low
 
   * Initial Package creation
 
