@@ -315,6 +315,8 @@ def format_metric_dimensions(metrics):
 @utils.arg('--merge_metrics', action='store_const',
            const=True,
            help='Merge multiple metrics into a single result.')
+@utils.arg('--group_by', metavar='<KEY1,KEY2,...>',
+           help='Select which keys to use for grouping. A \'*\' groups by all keys.')
 @utils.arg('--tenant-id', metavar='<TENANT_ID>',
            help="Retrieve data for the specified tenant/project id instead of "
                 "the tenant/project from the user's Keystone credentials.")
@@ -335,6 +337,8 @@ def do_measurement_list(mc, args):
         fields['offset'] = args.offset
     if args.merge_metrics:
         fields['merge_metrics'] = args.merge_metrics
+    if args.group_by:
+        fields['group_by'] = args.group_by
     if args.tenant_id:
         fields['tenant_id'] = args.tenant_id
 
@@ -394,6 +398,8 @@ def do_measurement_list(mc, args):
 @utils.arg('--merge_metrics', action='store_const',
            const=True,
            help='Merge multiple metrics into a single result.')
+@utils.arg('--group_by', metavar='<KEY1,KEY2,...>',
+           help='Select which keys to use for grouping. A \'*\' groups by all keys.')
 @utils.arg('--tenant-id', metavar='<TENANT_ID>',
            help="Retrieve data for the specified tenant/project id instead of "
                 "the tenant/project from the user's Keystone credentials.")
@@ -424,6 +430,8 @@ def do_metric_statistics(mc, args):
         fields['offset'] = args.offset
     if args.merge_metrics:
         fields['merge_metrics'] = args.merge_metrics
+    if args.group_by:
+        fields['group_by'] = args.group_by
     if args.tenant_id:
         fields['tenant_id'] = args.tenant_id
 
