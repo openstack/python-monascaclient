@@ -757,19 +757,19 @@ def do_alarm_definition_delete(mc, args):
            help='Description of the alarm.')
 @utils.arg('expression', metavar='<EXPRESSION>',
            help='The alarm expression to evaluate. Quoted.')
-@utils.arg('alarm-actions', metavar='<ALARM-NOTIFICATION-ID1,ALARM-NOTIFICATION-ID2,...>',
+@utils.arg('alarm_actions', metavar='<ALARM-NOTIFICATION-ID1,ALARM-NOTIFICATION-ID2,...>',
            help='The notification method(s) to use when an alarm state is ALARM '
                 'as a comma separated list.')
-@utils.arg('ok-actions', metavar='<OK-NOTIFICATION-ID1,OK-NOTIFICATION-ID2,...>',
+@utils.arg('ok_actions', metavar='<OK-NOTIFICATION-ID1,OK-NOTIFICATION-ID2,...>',
            help='The notification method(s) to use when an alarm state is OK '
            'as a comma separated list.')
-@utils.arg('undetermined-actions',
+@utils.arg('undetermined_actions',
            metavar='<UNDETERMINED-NOTIFICATION-ID1,UNDETERMINED-NOTIFICATION-ID2,...>',
            help='The notification method(s) to use when an alarm state is UNDETERMINED '
                 'as a comma separated list.')
 @utils.arg('actions_enabled', metavar='<ACTIONS-ENABLED>',
-           help='The actions-enabled boolean is one of [true,false].')
-@utils.arg('match-by', metavar='<DIMENSION_KEY1,DIMENSION_KEY2,...>',
+           help='The actions-enabled boolean is one of [true,false]')
+@utils.arg('match_by', metavar='<DIMENSION_KEY1,DIMENSION_KEY2,...>',
            help='The metric dimensions to match to the alarm dimensions. '
            'One or more dimension key names separated by a comma. '
            'Key names need quoting when they contain special chars [&,(,),{,},>,<] '

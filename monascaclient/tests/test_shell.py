@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Hewlett-Packard Development Company, L.P.
+# (C) Copyright 2014-2016 Hewlett Packard Enterprise Development Company LP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -278,3 +278,44 @@ class ShellTestMonascaCommands(ShellBase):
         for argstr in argstrings:
             retvalue = self.shell(argstr)
             self.assertRegexpMatches(retvalue, "id")
+
+    def test_good_alarm_definition_update(self):
+        self._script_keystone_client()
+
+        cmd = 'alarm-definition-update'
+        id = '0495340b-58fd-4e1c-932b-5e6f9cc96490'
+        name = 'alarm_name'
+        description = 'test_alarm_definition'
+        expression = 'avg(Test_Metric_1)>=10'
+        notif_id = '16012650-0b62-4692-9103-2d04fe81cc93'
+        enabled = 'True'
+        match_by = 'hostname'
+        severity = 'CRITICAL'
+        resp = fakes.FakeHTTPResponse(
+            201,
+            'Created',
+            {'location': 'http://no.where/v2.0/notification-methods'},
+            None)
+        http.HTTPClient.json_request(
+            'PUT',
+            '/alarm-definitions/' + id,
+            data={'name': name,
+                  'description': description,
+                  'expression': expression,
+                  'alarm_actions': [notif_id],
+                  'undetermined_actions': [notif_id],
+                  'ok_actions': [notif_id],
+                  'match_by': [match_by],
+                  'actions_enabled': bool(enabled),
+                  'severity': severity
+                  },
+            headers={'X-Auth-Key': 'password',
+                     'X-Auth-User': 'username'}).AndReturn((resp, 'id'))
+
+        self.m.ReplayAll()
+
+        args = [cmd, id, name, description, expression, notif_id,
+                notif_id, notif_id, enabled, match_by, severity]
+        argstring = " ".join(args)
+        retvalue = self.shell(argstring)
+        self.assertRegexpMatches(retvalue, "id")
