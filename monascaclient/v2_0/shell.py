@@ -114,7 +114,7 @@ def do_metric_create_raw(mc, args):
            'that confuse the CLI parser.',
            action='append')
 @utils.arg('--starttime', metavar='<UTC_START_TIME>',
-           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z. OR Format: -120 (previous 120 minutes')
+           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z. OR Format: -120 (previous 120 minutes).')
 @utils.arg('--endtime', metavar='<UTC_END_TIME>',
            help='measurements <= UTC time. format: 2014-01-01T00:00:00Z.')
 @utils.arg('--offset', metavar='<OFFSET LOCATION>',
@@ -259,7 +259,7 @@ def format_metric_dimensions(metrics):
            'that confuse the CLI parser.',
            action='append')
 @utils.arg('starttime', metavar='<UTC_START_TIME>',
-           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z. OR Format: -120 (previous 120 minutes')
+           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z. OR Format: -120 (previous 120 minutes).')
 @utils.arg('--endtime', metavar='<UTC_END_TIME>',
            help='measurements <= UTC time. format: 2014-01-01T00:00:00Z.')
 @utils.arg('--offset', metavar='<OFFSET LOCATION>',
@@ -331,7 +331,7 @@ def do_measurement_list(mc, args):
            'that confuse the CLI parser.',
            action='append')
 @utils.arg('starttime', metavar='<UTC_START_TIME>',
-           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z. OR Format: -120 (previous 120 minutes')
+           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z. OR Format: -120 (previous 120 minutes).')
 @utils.arg('--endtime', metavar='<UTC_END_TIME>',
            help='measurements <= UTC time. format: 2014-01-01T00:00:00Z.')
 @utils.arg('--period', metavar='<PERIOD>',
@@ -426,7 +426,7 @@ def do_metric_statistics(mc, args):
 @utils.arg('type', metavar='<TYPE>',
            help='The notification type. Type must be EMAIL, WEBHOOK, or PAGERDUTY.')
 @utils.arg('address', metavar='<ADDRESS>',
-           help='A valid EMAIL Address, URL, or SERVICE KEY')
+           help='A valid EMAIL Address, URL, or SERVICE KEY.')
 def do_notification_create(mc, args):
     '''Create notification.'''
     if args.type.upper() not in notification_types:
@@ -538,7 +538,7 @@ def do_notification_delete(mc, args):
 @utils.arg('type', metavar='<TYPE>',
            help='The notification type. Type must be either EMAIL, WEBHOOK, or PAGERDUTY.')
 @utils.arg('address', metavar='<ADDRESS>',
-           help='A valid EMAIL Address, URL, or SERVICE KEY')
+           help='A valid EMAIL Address, URL, or SERVICE KEY.')
 def do_notification_update(mc, args):
     '''Update notification.'''
     fields = {}
@@ -668,7 +668,7 @@ def do_alarm_definition_show(mc, args):
            'that confuse the CLI parser.',
            action='append')
 @utils.arg('--severity', metavar='<SEVERITY>',
-           help='Severity is one of ["LOW", "MEDIUM", "HIGH", "CRITICAL"]')
+           help='Severity is one of ["LOW", "MEDIUM", "HIGH", "CRITICAL"].')
 @utils.arg('--sort-by', metavar='<SORT BY FIELDS>',
            help='Fields to sort by as a comma separated list. Valid values are id, '
                 'name, severity, updated_timestamp, created_timestamp. '
@@ -768,7 +768,7 @@ def do_alarm_definition_delete(mc, args):
            help='The notification method(s) to use when an alarm state is UNDETERMINED '
                 'as a comma separated list.')
 @utils.arg('actions_enabled', metavar='<ACTIONS-ENABLED>',
-           help='The actions-enabled boolean is one of [true,false]')
+           help='The actions-enabled boolean is one of [true,false].')
 @utils.arg('match-by', metavar='<DIMENSION_KEY1,DIMENSION_KEY2,...>',
            help='The metric dimensions to match to the alarm dimensions. '
            'One or more dimension key names separated by a comma. '
@@ -828,7 +828,7 @@ def do_alarm_definition_update(mc, args):
            'UNDETERMINED. This param may be specified multiple times.',
            action='append')
 @utils.arg('--actions-enabled', metavar='<ACTIONS-ENABLED>',
-           help='The actions-enabled boolean is one of [true,false]')
+           help='The actions-enabled boolean is one of [true,false].')
 @utils.arg('--severity', metavar='<SEVERITY>',
            help='Severity is one of [LOW, MEDIUM, HIGH, CRITICAL].')
 def do_alarm_definition_patch(mc, args):
@@ -882,13 +882,13 @@ def do_alarm_definition_patch(mc, args):
 @utils.arg('--state', metavar='<ALARM_STATE>',
            help='ALARM_STATE is one of [UNDETERMINED, OK, ALARM].')
 @utils.arg('--severity', metavar='<SEVERITY>',
-           help='Severity is one of ["LOW", "MEDIUM", "HIGH", "CRITICAL"]')
+           help='Severity is one of ["LOW", "MEDIUM", "HIGH", "CRITICAL"].')
 @utils.arg('--state-updated-start-time', metavar='<UTC_STATE_UPDATED_START>',
-           help='Return all alarms whose state was updated on or after the time specified')
+           help='Return all alarms whose state was updated on or after the time specified.')
 @utils.arg('--lifecycle-state', metavar='<LIFECYCLE_STATE>',
-           help='The lifecycle state of the alarm')
+           help='The lifecycle state of the alarm.')
 @utils.arg('--link', metavar='<LINK>',
-           help='The link to external data associated with the alarm')
+           help='The link to external data associated with the alarm.')
 @utils.arg('--sort-by', metavar='<SORT BY FIELDS>',
            help='Fields to sort by as a comma separated list. Valid values are alarm_id, '
                 'alarm_definition_id, state, severity, lifecycle_state, link, '
@@ -1010,9 +1010,9 @@ def do_alarm_show(mc, args):
 @utils.arg('state', metavar='<ALARM_STATE>',
            help='ALARM_STATE is one of [UNDETERMINED, OK, ALARM].')
 @utils.arg('lifecycle_state', metavar='<LIFECYCLE_STATE>',
-           help='The lifecycle state of the alarm')
+           help='The lifecycle state of the alarm.')
 @utils.arg('link', metavar='<LINK>',
-           help='A link to an external resource with information about the alarm')
+           help='A link to an external resource with information about the alarm.')
 def do_alarm_update(mc, args):
     '''Update the alarm state.'''
     fields = {}
@@ -1040,9 +1040,9 @@ def do_alarm_update(mc, args):
 @utils.arg('--state', metavar='<ALARM_STATE>',
            help='ALARM_STATE is one of [UNDETERMINED, OK, ALARM].')
 @utils.arg('--lifecycle-state', metavar='<LIFECYCLE_STATE>',
-           help='The lifecycle state of the alarm')
+           help='The lifecycle state of the alarm.')
 @utils.arg('--link', metavar='<LINK>',
-           help='A link to an external resource with information about the alarm')
+           help='A link to an external resource with information about the alarm.')
 def do_alarm_patch(mc, args):
     '''Patch the alarm state.'''
     fields = {}
@@ -1125,15 +1125,15 @@ def output_alarm_history(args, alarm_history):
 @utils.arg('--state', metavar='<ALARM_STATE>',
            help='ALARM_STATE is one of [UNDETERMINED, OK, ALARM].')
 @utils.arg('--severity', metavar='<SEVERITY>',
-           help='Severity is one of ["LOW", "MEDIUM", "HIGH", "CRITICAL"]')
+           help='Severity is one of ["LOW", "MEDIUM", "HIGH", "CRITICAL"].')
 @utils.arg('--lifecycle-state', metavar='<LIFECYCLE_STATE>',
-           help='The lifecycle state of the alarm')
+           help='The lifecycle state of the alarm.')
 @utils.arg('--link', metavar='<LINK>',
-           help='The link to external data associated with the alarm')
+           help='The link to external data associated with the alarm.')
 @utils.arg('--group-by', metavar='<GROUP_BY>',
            help='Comma separated list of one or more fields to group the results by. '
                 'Group by is one or more of [alarm_definition_id, name, state, link, '
-                'lifecycle_state, metric_name, dimension_name, dimension_value]')
+                'lifecycle_state, metric_name, dimension_name, dimension_value].')
 @utils.arg('--offset', metavar='<OFFSET LOCATION>',
            help='The offset used to paginate the return data.')
 @utils.arg('--limit', metavar='<RETURN LIMIT>',
@@ -1222,7 +1222,7 @@ def do_alarm_history(mc, args):
            'that confuse the CLI parser.',
            action='append')
 @utils.arg('--starttime', metavar='<UTC_START_TIME>',
-           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z. OR format: -120 (for previous 2 hours)')
+           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z. OR format: -120 (previous 120 minutes).')
 @utils.arg('--endtime', metavar='<UTC_END_TIME>',
            help='measurements <= UTC time. format: 2014-01-01T00:00:00Z.')
 @utils.arg('--offset', metavar='<OFFSET LOCATION>',
