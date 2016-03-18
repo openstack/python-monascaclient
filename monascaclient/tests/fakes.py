@@ -14,8 +14,7 @@
 # limitations under the License.
 
 from keystoneclient.v3 import client as ksclient
-
-from monascaclient.openstack.common import jsonutils
+from oslo_serialization import jsonutils
 
 
 def script_keystone_client(token=None):

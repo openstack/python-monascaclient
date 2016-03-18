@@ -27,7 +27,8 @@ import yaml
 
 from monascaclient import exc
 from monascaclient.openstack.common import importutils
-from monascaclient.openstack.common import jsonutils
+
+from oslo_serialization import jsonutils
 
 supported_formats = {
     "json": lambda x: jsonutils.dumps(x, indent=2),

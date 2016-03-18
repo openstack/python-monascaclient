@@ -16,7 +16,7 @@
 import logging
 import sys
 
-from monascaclient.openstack.common import jsonutils
+from oslo_serialization import jsonutils
 
 verbose = 0
 
