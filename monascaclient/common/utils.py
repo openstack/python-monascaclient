@@ -26,9 +26,9 @@ import six
 import yaml
 
 from monascaclient import exc
-from monascaclient.openstack.common import importutils
 
 from oslo_serialization import jsonutils
+from oslo_utils import importutils
 
 supported_formats = {
     "json": lambda x: jsonutils.dumps(x, indent=2),
