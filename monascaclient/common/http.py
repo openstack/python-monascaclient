@@ -24,9 +24,9 @@ import six
 from monascaclient import exc
 from monascaclient import ksclient
 from monascaclient.openstack.common.py3kcompat import urlutils
-from monascaclient.openstack.common import strutils
 
 from oslo_serialization import jsonutils
+from oslo_utils import strutils
 
 LOG = logging.getLogger(__name__)
 if not LOG.handlers:

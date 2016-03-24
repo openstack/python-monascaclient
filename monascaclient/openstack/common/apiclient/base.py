@@ -31,7 +31,8 @@ import six
 
 from monascaclient.openstack.common.apiclient import exceptions
 from monascaclient.openstack.common.py3kcompat import urlutils
-from monascaclient.openstack.common import strutils
+
+from oslo_utils import strutils
 
 
 def getid(obj):
