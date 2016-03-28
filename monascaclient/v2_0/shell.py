@@ -1019,12 +1019,13 @@ def do_alarm_definition_patch(mc, args):
            help='The ID of the alarm definition.')
 @utils.arg('--metric-name', metavar='<METRIC_NAME>',
            help='Name of the metric.')
-@utils.arg('--metric-dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
-           help='key value pair used to specify a metric dimension. '
-           'This can be specified multiple times, or once with parameters '
-           'separated by a comma. '
-           'Dimensions need quoting when they contain special chars [&,(,),{,},>,<] '
-           'that confuse the CLI parser.',
+@utils.arg('--metric-dimensions', metavar='<KEY1=VALUE1,KEY2,KEY3=VALUE2...>',
+           help='key value pair used to specify a metric dimension or '
+                'just key to select all values of that dimension.'
+                'This can be specified multiple times, or once with parameters '
+                'separated by a comma. '
+                'Dimensions need quoting when they contain special chars [&,(,),{,},>,<] '
+                'that confuse the CLI parser.',
            action='append')
 @utils.arg('--state', metavar='<ALARM_STATE>',
            help='ALARM_STATE is one of [UNDETERMINED, OK, ALARM].')
@@ -1262,12 +1263,13 @@ def output_alarm_history(args, alarm_history):
            help='The ID of the alarm definition.')
 @utils.arg('--metric-name', metavar='<METRIC_NAME>',
            help='Name of the metric.')
-@utils.arg('--metric-dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
-           help='key value pair used to specify a metric dimension. '
-           'This can be specified multiple times, or once with parameters '
-           'separated by a comma. '
-           'Dimensions need quoting when they contain special chars [&,(,),{,},>,<] '
-           'that confuse the CLI parser.',
+@utils.arg('--metric-dimensions', metavar='<KEY1=VALUE1,KEY2,KEY3=VALUE2...>',
+           help='key value pair used to specify a metric dimension or '
+                'just key to select all values of that dimension.'
+                'This can be specified multiple times, or once with parameters '
+                'separated by a comma. '
+                'Dimensions need quoting when they contain special chars [&,(,),{,},>,<] '
+                'that confuse the CLI parser.',
            action='append')
 @utils.arg('--state', metavar='<ALARM_STATE>',
            help='ALARM_STATE is one of [UNDETERMINED, OK, ALARM].')
@@ -1293,7 +1295,7 @@ def do_alarm_count(mc, args):
     if args.metric_name:
         fields['metric_name'] = args.metric_name
     if args.metric_dimensions:
-        fields['metric_dimensions'] = utils.format_parameters(args.metric_dimensions)
+        fields['metric_dimensions'] = utils.format_dimensions_query(args.metric_dimensions)
     if args.state:
         if args.state.upper() not in state_types:
             errmsg = ('Invalid state, not one of [' +
