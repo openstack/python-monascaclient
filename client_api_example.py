@@ -16,6 +16,7 @@
 """ An example using monascaclient via the Python API """
 
 from monascaclient import client
+from monascaclient import ksclient
 import monascaclient.exc as exc
 import time
 
@@ -27,15 +28,14 @@ endpoint = 'http://192.168.10.4:8080/v2.0'
 api_version = '2_0'
 
 # Pass in the keystone authentication kwargs to construct a monasca client.
-# The monasca_client will try to authenticate with keystone one time
-# when it sees a 401 unauthorized resp, to take care of a stale token.
-# In this example no token is input, so it will get a 401 when executing the
-# first metrics.create request, and will authenticate and try again.
 auth_kwargs = {'username': 'mini-mon',
                'password': 'password',
+               'user_domain_name': 'mini-mon',
                'project_name': 'mini-mon',
+               'project_domain_name': 'mini-mon',
                'auth_url': 'http://192.168.10.5:35357/v3/'}
-monasca_client = client.Client(api_version, endpoint, **auth_kwargs)
+ksclient = ksclient.KSClient(**auth_kwargs)
+monasca_client = client.Client(api_version, session=ksclient.session)
 
 # you can reference the monascaclient.v2_0.shell.py
 # do_commands for command field initialization.

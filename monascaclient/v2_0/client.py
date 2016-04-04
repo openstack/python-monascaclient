@@ -15,6 +15,7 @@
 import string
 
 from monascaclient.common import http
+from monascaclient import exc
 from monascaclient.v2_0 import alarm_definitions
 from monascaclient.v2_0 import alarms
 from monascaclient.v2_0 import metrics
@@ -25,6 +26,7 @@ class Client(object):
 
     """Client for the Monasca v2_0 API.
 
+    :param session: a keystoneauth session object
     :param string endpoint: A user-supplied endpoint URL for the monasca api
                             service.
     :param string token: Token for authentication.
@@ -37,7 +39,21 @@ class Client(object):
         if 'auth_url' in kwargs and 'v2.0' in kwargs['auth_url']:
             kwargs['auth_url'] = string.replace(
                 kwargs['auth_url'], 'v2.0', 'v3')
-        self.http_client = http.HTTPClient(*args, **kwargs)
+
+        session = kwargs.get('session')
+
+        if session:
+            self.http_client = http.SessionClient(
+                session=session,
+                service_type=kwargs.get('service_type', 'monitoring'),
+                service_name=kwargs.get('service_name', 'monasca'),
+                interface=kwargs.get('endpoint_type', 'public'),
+                region_name=kwargs.get('region_name'),
+                endpoint_override=kwargs.get('endpoint'))
+        else:
+            # For backward compatibility in case no session is passed
+            self.http_client = http.HTTPClient(*args, **kwargs)
+
         self.metrics = metrics.MetricsManager(self.http_client)
         self.notifications = notifications.NotificationsManager(
             self.http_client)
@@ -46,4 +62,8 @@ class Client(object):
             self.http_client)
 
     def replace_token(self, token):
-        self.http_client.replace_token(token)
+        if isinstance(self.http_client, http.SessionClient):
+            raise exc.CommandError(message='Token replacement is not '
+                                           'supported for session client.')
+        else:
+            self.http_client.replace_token(token)

@@ -80,10 +80,13 @@ When using Keystone to obtain the token and endpoint::
   export OS_PASSWORD=
   export OS_USER_DOMAIN_NAME=
   export OS_PROJECT_NAME=
+  export OS_PROJECT_DOMAIN_NAME=
+  export OS_PROJECT_NAME=
   export OS_AUTH_URL=
   export OS_REGION_NAME=
 
-When OS_USER_DOMAIN_NAME is not set, then 'Default' is assumed. Alternatively IDs can be used instead of names.
+When OS_USER_DOMAIN_NAME and OS_PROJECT_DOMAIN_NAME are not set, then 'Default'
+is assumed. Alternatively IDs can be used instead of names.
 
 When using Vagrant Environment with middleware disabled::
 
@@ -102,7 +105,7 @@ You'll find complete documentation on the shell by running
                [--os-password OS_PASSWORD] [--os-project-id OS_PROJECT_ID]
                [--os-user-domain-id OS_USER_DOMAIN_ID] [--os-user-domain-name OS_USER_DOMAIN_NAME]
                [--os-project-name OS_PROJECT_NAME]
-               [--os-domain-id OS_DOMAIN_ID] [--os-domain-name OS_DOMAIN_NAME]
+               [--os-project-domain-id OS_PROJECT_DOMAIN_ID] [--os-project-domain-name OS_PROJECT_DOMAIN_NAME]
                [--os-auth-url OS_AUTH_URL] [--os-region-name OS_REGION_NAME]
                [--os-auth-token OS_AUTH_TOKEN] [--os-no-client-auth]
                [--monasca-api-url MONASCA_API_URL]
@@ -169,10 +172,10 @@ You'll find complete documentation on the shell by running
                                Defaults to env[OS_PROJECT_ID].
     --os-project-name OS_PROJECT_NAME
                                Defaults to env[OS_PROJECT_NAME].
-    --os-domain-id OS_DOMAIN_ID
-                               Defaults to env[OS_DOMAIN_ID].
-    --os-domain-name OS_DOMAIN_NAME
-                               Defaults to env[OS_DOMAIN_NAME].
+    --os-project-domain-id OS_PROJECT_DOMAIN_ID
+                               Defaults to env[OS_PROJECT_DOMAIN_ID].
+    --os-project-domain-name OS_PROJECT_DOMAIN_NAME
+                               Defaults to env[OS_PROJECT_DOMAIN_NAME].
     --os-auth-url OS_AUTH_URL  Defaults to env[OS_AUTH_URL].
     --os-region-name OS_REGION_NAME
                                Defaults to env[OS_REGION_NAME].
@@ -340,14 +343,20 @@ Python API
 There's also a complete Python API.
 
 In order to use the python api directly, you must pass in a valid auth token and
-monasca api endpoint, or you can pass in the credentials required by the keystone
-client and let the Python API do the authentication.  The user can obtain the token
-and endpoint using the keystone client api:
-http://docs.openstack.org/developer/python-keystoneclient/.
+monasca api endpoint or, preferably, a `keystoneauth session
+<http://docs.openstack.org/developer/keystoneauth/using-sessions.html>`.
+Alternatively, you can pass in the credentials required by the keystoneauth
+and let the Python API do the authentication. The user can obtain the session,
+token and endpoint using the keystoneauth api:
+http://docs.openstack.org/developer/keystoneauth.
 The service catalog name for our API endpoint is "monasca".
 
 Start using the monascaclient API by constructing the monascaclient client.Client class.
-The Client class takes these parameters: api_version, endpoint, and token.
+The Client class takes these parameters:
+
+#. api_version, session
+#. api_version, endpoint, and token (when using the client without a session)
+
 The Client class is used to call all monasca-api resource commands (i.e.
 client.Client.metrics.create(fields)).
 
@@ -358,7 +367,9 @@ up to the user to get a new token from keystone which can be passed
 into the client.Client.replace_token(token) method.  If you constructed
 the Client with all the keystone credentials needed to authenticate,
 then the API will automatically try one time to re-authenticate with
-keystone whenever the token expires.
+keystone whenever the token expires. When using a session, though, this case
+will be handled by keystoneauth and replacing the session token will
+not be supported.
 
 The api_version matches the version of the Monasca API.  Currently it is 'v2_0'.
 
@@ -377,10 +388,13 @@ Refer to the example in python-monascaclient/client_api_example.py for more deta
 
   # Authenticate to Keystone
   keystone_url = 'http://keystone:5000/v3'
-  ks = ksclient.KSClient(auth_url=keystone_url, username='user', password='password')
+  ks = ksclient.KSClient(auth_url=keystone_url, username='user',
+                         password='password', project_name='project_name',
+                         project_domain_name='project_domain_name',
+                         user_domain_name='user_domain_name')
 
   # construct the mon client
-  monasca_client = client.Client(api_version, ks.monasca_url, token=ks.token)
+  monasca_client = client.Client(api_version, session=ks.session)
 
   # call the metric-create command
   dimensions = {'instance_id': '12345', 'service': 'hello'}

@@ -140,18 +140,18 @@ class MonascaShell(object):
         parser.add_argument('--os_project_name',
                             help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-domain-id',
-                            default=utils.env('OS_DOMAIN_ID'),
-                            help='Defaults to env[OS_DOMAIN_ID].')
+        parser.add_argument('--os-project-domain-id',
+                            default=utils.env('OS_PROJECT_DOMAIN_ID'),
+                            help='Defaults to env[OS_PROJECT_DOMAIN_ID].')
 
-        parser.add_argument('--os_domain_id',
+        parser.add_argument('--os_project_domain_id',
                             help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-domain-name',
-                            default=utils.env('OS_DOMAIN_NAME'),
-                            help='Defaults to env[OS_DOMAIN_NAME].')
+        parser.add_argument('--os-project-domain-name',
+                            default=utils.env('OS_PROJECT_DOMAIN_NAME'),
+                            help='Defaults to env[OS_PROJECT_DOMAIN_NAME].')
 
-        parser.add_argument('--os_domain_name',
+        parser.add_argument('--os_project_domain_name',
                             help=argparse.SUPPRESS)
 
         parser.add_argument('--os-auth-url',
@@ -329,71 +329,50 @@ class MonascaShell(object):
             'auth_url': args.os_auth_url,
             'service_type': args.os_service_type,
             'endpoint_type': args.os_endpoint_type,
-            'os_cacert': args.os_cacert,
             'user_domain_id': args.os_user_domain_id,
             'user_domain_name': args.os_user_domain_name,
             'project_id': args.os_project_id,
             'project_name': args.os_project_name,
-            'domain_id': args.os_domain_id,
-            'domain_name': args.os_domain_name,
+            'project_domain_id': args.os_project_domain_id,
+            'project_domain_name': args.os_project_domain_name,
             'insecure': args.insecure,
+            'os_cacert': args.os_cacert,
+            'cert_file': args.cert_file,
+            'key_file': args.key_file,
             'region_name': args.os_region_name,
             'keystone_timeout': args.keystone_timeout
         }
 
         endpoint = args.monasca_api_url
+        session = None
 
         if not args.os_no_client_auth:
             _ksclient = ksclient.KSClient(**kwargs)
-            if args.os_auth_token:
-                token = args.os_auth_token
-            else:
-                try:
-                    token = _ksclient.token
-                except exc.CommandError:
-                    raise exc.CommandError(
-                        "User does not have a default project. "
-                        "You must provide a project id using "
-                        "--os-project-id or via env[OS_PROJECT_ID], "
-                        "or you must provide a project name using "
-                        "--os-project-name or via env[OS_PROJECT_NAME] "
-                        "and a project domain using --os-domain-name, via "
-                        "env[OS_DOMAIN_NAME],  using --os-domain-id or "
-                        "via env[OS_DOMAIN_ID]")
 
-            kwargs = {
-                'token': token,
-                'insecure': args.insecure,
-                'os_cacert': args.os_cacert,
-                'cert_file': args.cert_file,
-                'key_file': args.key_file,
-                'username': args.os_username,
-                'password': args.os_password,
-                'service_type': args.os_service_type,
-                'endpoint_type': args.os_endpoint_type,
-                'auth_url': args.os_auth_url,
-                'keystone_timeout': args.keystone_timeout
-            }
-
-            if args.os_user_domain_name:
-                kwargs['user_domain_name'] = args.os_user_domain_name
-            if args.os_user_domain_id:
-                kwargs['user_domain_id'] = args.os_user_domain_id
-            if args.os_region_name:
-                kwargs['region_name'] = args.os_region_name
-            if args.os_project_name:
-                kwargs['project_name'] = args.os_project_name
-            if args.os_project_id:
-                kwargs['project_id'] = args.os_project_id
-            if args.os_domain_name:
-                kwargs['domain_name'] = args.os_domain_name
-            if args.os_domain_id:
-                kwargs['domain_id'] = args.os_domain_id
+            # Kept to check whether the token is indeed project scoped
+            try:
+                _ksclient.token
+            except exc.CommandError:
+                raise exc.CommandError(
+                    "User does not have a default project. "
+                    "You must provide a project id using "
+                    "--os-project-id or via env[OS_PROJECT_ID], "
+                    "or you must provide a project name using "
+                    "--os-project-name or via env[OS_PROJECT_NAME] "
+                    "and a project domain using --os-project-domain-name, "
+                    "via env[OS_PROJECT_DOMAIN_NAME],  using "
+                    "--os-project-domain-id or via "
+                    "env[OS_PROJECT_DOMAIN_ID]")
 
             if not endpoint:
                 endpoint = _ksclient.monasca_url
 
-        client = monasca_client.Client(api_version, endpoint, **kwargs)
+            session = _ksclient.session
+
+        if session:
+            client = monasca_client.Client(api_version, session=session)
+        else:
+            client = monasca_client.Client(api_version, endpoint, **kwargs)
 
         args.func(client, args)
 
