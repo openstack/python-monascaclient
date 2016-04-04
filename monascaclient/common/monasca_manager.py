@@ -31,6 +31,9 @@ class MonascaManager(base.BaseManager):
             # In case user specifies a dimension multiple times
             if isinstance(v, (list, tuple)):
                 v = v[-1]
-            dim_str = k + ':' + v
+            if v:
+                dim_str = k + ':' + v
+            else:
+                dim_str = k
             dim_list.append(dim_str)
         return ','.join(dim_list)
