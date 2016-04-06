@@ -31,6 +31,7 @@ enabled_types = ['True', 'true', 'False', 'false']
 group_by_types = ['alarm_definition_id', 'name', 'state', 'severity',
                   'link', 'lifecycle_state', 'metric_name',
                   'dimension_name', 'dimension_value']
+allowed_notification_sort_by = {'id', 'name', 'type', 'address', 'created_at', 'updated_at'}
 allowed_alarm_sort_by = {'alarm_id', 'alarm_definition_id', 'state', 'severity', 'lifecycle_state', 'link',
                          'state_updated_timestamp', 'updated_timestamp', 'created_timestamp'}
 allowed_definition_sort_by = {'id', 'name', 'severity', 'updated_at', 'created_at'}
@@ -474,6 +475,11 @@ def do_notification_show(mc, args):
         utils.print_dict(notification, formatters=formatters)
 
 
+@utils.arg('--sort-by', metavar='<SORT BY FIELDS>',
+           help='Fields to sort by as a comma separated list. Valid values are id, '
+                'name, type, address, created_at, updated_at. '
+                'Fields may be followed by "asc" or "desc", ex "address desc", '
+                'to set the direction of sorting.')
 @utils.arg('--offset', metavar='<OFFSET LOCATION>',
            help='The offset used to paginate the return data.')
 @utils.arg('--limit', metavar='<RETURN LIMIT>',
@@ -485,6 +491,19 @@ def do_notification_list(mc, args):
         fields['limit'] = args.limit
     if args.offset:
         fields['offset'] = args.offset
+    if args.sort_by:
+        sort_by = args.sort_by.split(',')
+        for field in sort_by:
+            field_values = field.lower().split()
+            if len(field_values) > 2:
+                print("Invalid sort_by value {}".format(field))
+            if field_values[0] not in allowed_notification_sort_by:
+                print("Sort-by field name {} is not in [{}]".format(field_values[0],
+                                                                    allowed_notification_sort_by))
+                return
+            if len(field_values) > 1 and field_values[1] not in ['asc', 'desc']:
+                print("Invalid value {}, must be asc or desc".format(field_values[1]))
+        fields['sort_by'] = args.sort_by
 
     try:
         notification = mc.notifications.list(**fields)
@@ -671,7 +690,7 @@ def do_alarm_definition_show(mc, args):
            help='Severity is one of ["LOW", "MEDIUM", "HIGH", "CRITICAL"].')
 @utils.arg('--sort-by', metavar='<SORT BY FIELDS>',
            help='Fields to sort by as a comma separated list. Valid values are id, '
-                'name, severity, updated_timestamp, created_timestamp. '
+                'name, severity, created_at, updated_at. '
                 'Fields may be followed by "asc" or "desc", ex "severity desc", '
                 'to set the direction of sorting.')
 @utils.arg('--offset', metavar='<OFFSET LOCATION>',
