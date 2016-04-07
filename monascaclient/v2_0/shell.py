@@ -23,6 +23,7 @@ from monascaclient.common import utils
 import monascaclient.exc as exc
 from monascaclient.openstack.common import jsonutils
 
+from six.moves import xrange
 
 # Alarm valid types
 severity_types = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
