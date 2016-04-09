@@ -105,6 +105,41 @@ def do_metric_create_raw(mc, args):
         print('Successfully created metric')
 
 
+@utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
+           help='key value pair used to specify a metric dimension. '
+           'This can be specified multiple times, or once with parameters '
+           'separated by a comma. '
+           'Dimensions need quoting when they contain special chars [&,(,),{,},>,<] '
+           'that confuse the CLI parser.',
+           action='append')
+@utils.arg('--offset', metavar='<OFFSET LOCATION>',
+           help='The offset used to paginate the return data.')
+@utils.arg('--limit', metavar='<RETURN LIMIT>',
+           help='The amount of data to be returned up to the API maximum limit.')
+def do_metric_name_list(mc, args):
+    fields = {}
+    if args.dimensions:
+        fields['dimensions'] = utils.format_dimensions_query(args.dimensions)
+    if args.limit:
+        fields['limit'] = args.limit
+    if args.offset:
+        fields['offset'] = args.offset
+
+    try:
+        metric_names = mc.metrics.list_names(**fields)
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
+
+    if args.json:
+        print(utils.json_formatter(metric_names))
+        return
+
+    if isinstance(metric_names, list):
+        utils.print_list(metric_names, ['Name'], formatters={'Name': lambda x: x['name']})
+
+
 @utils.arg('--name', metavar='<METRIC_NAME>',
            help='Name of the metric to list.')
 @utils.arg('--dimensions', metavar='<KEY1=VALUE1,KEY2=VALUE2...>',
