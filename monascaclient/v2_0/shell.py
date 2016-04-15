@@ -632,8 +632,9 @@ def _validate_severity(severity):
            help='The alarm expression to evaluate. Quoted.')
 @utils.arg('--severity', metavar='<SEVERITY>',
            help='Severity is one of [LOW, MEDIUM, HIGH, CRITICAL].')
-@utils.arg('--match-by', metavar='<DIMENSION_KEY1,DIMENSION_KEY2,...>',
-           help='The metric dimensions to match to the alarm dimensions. '
+@utils.arg('--match-by', metavar='<MATCH_BY_DIMENSION_KEY1,MATCH_BY_DIMENSION_KEY2,'
+                                 '...>',
+           help='The metric dimensions to use to create unique alarms. '
            'One or more dimension key names separated by a comma. '
            'Key names need quoting when they contain special chars [&,(,),{,},>,<] '
            'that confuse the CLI parser.')
@@ -823,8 +824,8 @@ def do_alarm_definition_delete(mc, args):
                 'as a comma separated list.')
 @utils.arg('actions_enabled', metavar='<ACTIONS-ENABLED>',
            help='The actions-enabled boolean is one of [true,false]')
-@utils.arg('match_by', metavar='<DIMENSION_KEY1,DIMENSION_KEY2,...>',
-           help='The metric dimensions to match to the alarm dimensions. '
+@utils.arg('match_by', metavar='<MATCH_BY_DIMENSION_KEY1,MATCH_BY_DIMENSION_KEY2,...>',
+           help='The metric dimensions to use to create unique alarms. '
            'One or more dimension key names separated by a comma. '
            'Key names need quoting when they contain special chars [&,(,),{,},>,<] '
            'that confuse the CLI parser.')
