@@ -116,6 +116,9 @@ def do_metric_create_raw(mc, args):
            help='The offset used to paginate the return data.')
 @utils.arg('--limit', metavar='<RETURN LIMIT>',
            help='The amount of data to be returned up to the API maximum limit.')
+@utils.arg('--tenant-id', metavar='<TENANT_ID>',
+           help="Retrieve data for the specified tenant/project id instead of "
+                "the tenant/project from the user's Keystone credentials.")
 def do_metric_name_list(mc, args):
     fields = {}
     if args.dimensions:
@@ -124,6 +127,8 @@ def do_metric_name_list(mc, args):
         fields['limit'] = args.limit
     if args.offset:
         fields['offset'] = args.offset
+    if args.tenant_id:
+        fields['tenant_id'] = args.tenant_id
 
     try:
         metric_names = mc.metrics.list_names(**fields)
@@ -157,6 +162,9 @@ def do_metric_name_list(mc, args):
            help='The offset used to paginate the return data.')
 @utils.arg('--limit', metavar='<RETURN LIMIT>',
            help='The amount of data to be returned up to the API maximum limit.')
+@utils.arg('--tenant-id', metavar='<TENANT_ID>',
+           help="Retrieve data for the specified tenant/project id instead of "
+                "the tenant/project from the user's Keystone credentials.")
 def do_metric_list(mc, args):
     '''List metrics for this tenant.'''
     fields = {}
@@ -173,6 +181,8 @@ def do_metric_list(mc, args):
         fields['start_time'] = args.starttime
     if args.endtime:
         fields['end_time'] = args.endtime
+    if args.tenant_id:
+        fields['tenant_id'] = args.tenant_id
 
     try:
         metric = mc.metrics.list(**fields)
@@ -305,6 +315,9 @@ def format_metric_dimensions(metrics):
 @utils.arg('--merge_metrics', action='store_const',
            const=True,
            help='Merge multiple metrics into a single result.')
+@utils.arg('--tenant-id', metavar='<TENANT_ID>',
+           help="Retrieve data for the specified tenant/project id instead of "
+                "the tenant/project from the user's Keystone credentials.")
 def do_measurement_list(mc, args):
     '''List measurements for the specified metric.'''
     fields = {}
@@ -322,6 +335,8 @@ def do_measurement_list(mc, args):
         fields['offset'] = args.offset
     if args.merge_metrics:
         fields['merge_metrics'] = args.merge_metrics
+    if args.tenant_id:
+        fields['tenant_id'] = args.tenant_id
 
     try:
         metric = mc.metrics.list_measurements(**fields)
@@ -379,6 +394,9 @@ def do_measurement_list(mc, args):
 @utils.arg('--merge_metrics', action='store_const',
            const=True,
            help='Merge multiple metrics into a single result.')
+@utils.arg('--tenant-id', metavar='<TENANT_ID>',
+           help="Retrieve data for the specified tenant/project id instead of "
+                "the tenant/project from the user's Keystone credentials.")
 def do_metric_statistics(mc, args):
     '''List measurement statistics for the specified metric.'''
     statistic_types = ['AVG', 'MIN', 'MAX', 'COUNT', 'SUM']
@@ -406,6 +424,8 @@ def do_metric_statistics(mc, args):
         fields['offset'] = args.offset
     if args.merge_metrics:
         fields['merge_metrics'] = args.merge_metrics
+    if args.tenant_id:
+        fields['tenant_id'] = args.tenant_id
 
     try:
         metric = mc.metrics.list_statistics(**fields)
