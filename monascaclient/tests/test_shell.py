@@ -227,6 +227,16 @@ class ShellTestMonascaCommands(ShellBase):
             retvalue = self.shell(argstr)
             self.assertRegexpMatches(retvalue, "^Invalid type")
 
+    def test_notifications_create_email_with_non_zero_period(self):
+        self._script_keystone_client()
+        argstrings = [
+            'notification-create nm1 email metric1@hp.com --period 60',
+        ]
+        self.m.ReplayAll()
+        for argstr in argstrings:
+            retvalue = self.shell(argstr)
+            self.assertRegexpMatches(retvalue, "^Invalid period")
+
     def test_good_notifications_create_subcommand(self):
         self._script_keystone_client()
 
@@ -266,14 +276,15 @@ class ShellTestMonascaCommands(ShellBase):
             '/notification-methods',
             data={'name': 'mypost',
                   'type': 'WEBHOOK',
-                  'address': 'http://localhost:8080'},
+                  'address': 'http://localhost:8080',
+                  'period': 60},
             headers={'X-Auth-Key': 'password',
                      'X-Auth-User': 'username'}).AndReturn((resp, 'id'))
 
         self.m.ReplayAll()
 
         argstrings = [
-            'notification-create mypost WEBHOOK http://localhost:8080',
+            'notification-create mypost WEBHOOK http://localhost:8080 --period 60',
         ]
         for argstr in argstrings:
             retvalue = self.shell(argstr)
