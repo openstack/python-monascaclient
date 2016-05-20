@@ -866,17 +866,16 @@ def do_alarm_definition_update(mc, args):
     fields['name'] = args.name
     fields['description'] = args.description
     fields['expression'] = args.expression
-    fields['alarm_actions'] = args.alarm_actions.split(',')
-    fields['ok_actions'] = args.ok_actions.split(',')
-    fields['undetermined_actions'] = args.undetermined_actions.split(',')
+    fields['alarm_actions'] = _arg_split_patch_update(args.alarm_actions)
+    fields['ok_actions'] = _arg_split_patch_update(args.ok_actions)
+    fields['undetermined_actions'] = _arg_split_patch_update(args.undetermined_actions)
     if args.actions_enabled not in enabled_types:
         errmsg = 'Invalid value, not one of [' + \
             ', '.join(enabled_types) + ']'
         print(errmsg)
         return
     fields['actions_enabled'] = args.actions_enabled in ['true', 'True']
-    fields['match_by'] = args.match_by.split(',')
-
+    fields['match_by'] = _arg_split_patch_update(args.match_by)
     if not _validate_severity(args.severity):
         return
     fields['severity'] = args.severity
@@ -925,11 +924,11 @@ def do_alarm_definition_patch(mc, args):
     if args.expression:
         fields['expression'] = args.expression
     if args.alarm_actions:
-        fields['alarm_actions'] = args.alarm_actions
+        fields['alarm_actions'] = _arg_split_patch_update(args.alarm_actions, patch=True)
     if args.ok_actions:
-        fields['ok_actions'] = args.ok_actions
+        fields['ok_actions'] = _arg_split_patch_update(args.ok_actions, patch=True)
     if args.undetermined_actions:
-        fields['undetermined_actions'] = args.undetermined_actions
+        fields['undetermined_actions'] = _arg_split_patch_update(args.undetermined_actions, patch=True)
     if args.actions_enabled:
         if args.actions_enabled not in enabled_types:
             errmsg = 'Invalid value, not one of [' + \
@@ -1342,3 +1341,13 @@ def _translate_starttime(args):
         utc = str(datetime.datetime.utcfromtimestamp(deltaT))
         utc = utc.replace(" ", "T")[:-7] + 'Z'
         args.starttime = utc
+
+
+def _arg_split_patch_update(arg, patch=False):
+    if patch:
+        arg = ','.join(arg)
+    if not arg or arg == "[]":
+        arg_split = []
+    else:
+        arg_split = arg.split(',')
+    return arg_split
