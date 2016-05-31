@@ -22,6 +22,7 @@ import textwrap
 import uuid
 
 import prettytable
+import six
 import yaml
 
 from monascaclient import exc
@@ -289,6 +290,6 @@ def set_env_variables(kwargs):
         'domain_name': 'OS_DOMAIN_NAME',
         'region_name': 'OS_REGION_NAME'
     }
-    for k, v in environment_variables.iteritems():
+    for k, v in six.iteritems(environment_variables):
         if k not in kwargs:
             kwargs[k] = env(v)
