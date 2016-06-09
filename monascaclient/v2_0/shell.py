@@ -486,12 +486,21 @@ def do_metric_statistics(mc, args):
                 formatters=formatters)
 
 
+def _validate_notification_period(period, notification_type):
+    if notification_type != 'WEBHOOK' and period != 0:
+        print("Invalid period, can only be non zero for webhooks")
+        return False
+    return True
+
+
 @utils.arg('name', metavar='<NOTIFICATION_NAME>',
            help='Name of the notification to create.')
 @utils.arg('type', metavar='<TYPE>',
            help='The notification type. Type must be EMAIL, WEBHOOK, or PAGERDUTY.')
 @utils.arg('address', metavar='<ADDRESS>',
            help='A valid EMAIL Address, URL, or SERVICE KEY.')
+@utils.arg('--period', metavar='<PERIOD>', type=int, default=0,
+           help='A period for the notification method. Can only be non zero with webhooks')
 def do_notification_create(mc, args):
     '''Create notification.'''
     if args.type.upper() not in notification_types:
@@ -503,6 +512,10 @@ def do_notification_create(mc, args):
     fields['name'] = args.name
     fields['type'] = args.type
     fields['address'] = args.address
+    if args.period:
+        if not _validate_notification_period(args.period, args.type.upper()):
+            return
+        fields['period'] = args.period
     try:
         notification = mc.notifications.create(**fields)
     except exc.HTTPException as he:
@@ -534,6 +547,7 @@ def do_notification_show(mc, args):
             'id': utils.json_formatter,
             'type': utils.json_formatter,
             'address': utils.json_formatter,
+            'period': utils.json_formatter,
             'links': utils.format_dictlist,
         }
         utils.print_dict(notification, formatters=formatters)
@@ -579,12 +593,13 @@ def do_notification_list(mc, args):
         if args.json:
             print(utils.json_formatter(notification))
             return
-        cols = ['name', 'id', 'type', 'address']
+        cols = ['name', 'id', 'type', 'address', 'period']
         formatters = {
             'name': lambda x: x['name'],
             'id': lambda x: x['id'],
             'type': lambda x: x['type'],
             'address': lambda x: x['address'],
+            'period': lambda x: x['period'],
         }
         if isinstance(notification, list):
 
@@ -622,6 +637,8 @@ def do_notification_delete(mc, args):
            help='The notification type. Type must be either EMAIL, WEBHOOK, or PAGERDUTY.')
 @utils.arg('address', metavar='<ADDRESS>',
            help='A valid EMAIL Address, URL, or SERVICE KEY.')
+@utils.arg('period', metavar='<PERIOD>', type=int,
+           help='A period for the notification method. Can only be non zero with webhooks')
 def do_notification_update(mc, args):
     '''Update notification.'''
     fields = {}
@@ -634,6 +651,9 @@ def do_notification_update(mc, args):
         return
     fields['type'] = args.type
     fields['address'] = args.address
+    if not _validate_notification_period(args.period, args.type.upper()):
+        return
+    fields['period'] = args.period
     try:
         notification = mc.notifications.update(**fields)
     except exc.HTTPException as he:
