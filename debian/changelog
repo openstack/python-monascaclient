@@ -1,6 +1,0 @@
-python-monclient (0.0.1) precise; urgency=low
-
-  * Initial Package creation
-
- -- Tim Kuhlman <tim.kuhlman@hp.com>  Mon, 24 Mar 2014 04:12:44 -0600
-
