@@ -26,7 +26,7 @@ from monascaclient import ksclient
 from monascaclient.openstack.common.py3kcompat import urlutils
 
 from oslo_serialization import jsonutils
-from oslo_utils import strutils
+from oslo_utils import encodeutils
 
 LOG = logging.getLogger(__name__)
 if not LOG.handlers:
@@ -132,8 +132,8 @@ class HTTPClient(object):
         for (key, value) in kwargs['headers'].items():
             if key in ('X-Auth-Token', 'X-Auth-Key'):
                 value = '*****'
-            header = '-H \'%s: %s\'' % (strutils.safe_decode(key),
-                                        strutils.safe_decode(value))
+            header = '-H \'%s: %s\'' % (encodeutils.safe_decode(key),
+                                        encodeutils.safe_decode(value))
             curl.append(header)
 
         conn_params_fmt = [
