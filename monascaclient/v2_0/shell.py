@@ -33,8 +33,11 @@ group_by_types = ['alarm_definition_id', 'name', 'state', 'severity',
                   'link', 'lifecycle_state', 'metric_name',
                   'dimension_name', 'dimension_value']
 allowed_notification_sort_by = {'id', 'name', 'type', 'address', 'created_at', 'updated_at'}
-allowed_alarm_sort_by = {'alarm_id', 'alarm_definition_id', 'state', 'severity', 'lifecycle_state', 'link',
-                         'state_updated_timestamp', 'updated_timestamp', 'created_timestamp'}
+allowed_alarm_sort_by = {'alarm_id', 'alarm_definition_id',
+                         'alarm_definition_name', 'state', 'severity',
+                         'lifecycle_state', 'link',
+                         'state_updated_timestamp', 'updated_timestamp',
+                         'created_timestamp'}
 allowed_definition_sort_by = {'id', 'name', 'severity', 'updated_at', 'created_at'}
 
 # Notification valid types
