@@ -18,6 +18,7 @@ import logging
 import os
 import socket
 
+from keystoneauth1 import adapter
 import requests
 import six
 
@@ -53,6 +54,12 @@ def get_system_ca_file():
     LOG.warn("System ca file could not be found.")
 
 
+def unauthorized(resp):
+    status401 = (resp.status_code == 401)
+    status500 = (resp.status_code == 500 and "(HTTP 401)" in resp.content)
+    return status401 or status500
+
+
 class HTTPClient(object):
 
     def __init__(self, endpoint, write_timeout=None, read_timeout=None, **kwargs):
@@ -74,8 +81,8 @@ class HTTPClient(object):
         self.project_name = kwargs.get('project_name')
         self.region_name = kwargs.get('region_name')
         self.project_id = kwargs.get('project_id')
-        self.domain_id = kwargs.get('domain_id')
-        self.domain_name = kwargs.get('domain_name')
+        self.project_domain_id = kwargs.get('project_domain_id')
+        self.project_domain_name = kwargs.get('project_domain_name')
         self.endpoint_type = kwargs.get('endpoint_type')
         self.service_type = kwargs.get('service_type')
         self.keystone_timeout = kwargs.get('keystone_timeout')
@@ -114,8 +121,8 @@ class HTTPClient(object):
             'os_cacert': self.ssl_connection_params['os_cacert'],
             'project_id': self.project_id,
             'project_name': self.project_name,
-            'domain_id': self.domain_id,
-            'domain_name': self.domain_name,
+            'project_domain_id': self.project_domain_id,
+            'project_domain_name': self.project_domain_name,
             'insecure': self.ssl_connection_params['insecure'],
             'region_name': self.region_name,
             'keystone_timeout': self.keystone_timeout
@@ -213,7 +220,7 @@ class HTTPClient(object):
 
         resp = self._make_request(method, url, allow_redirects, timeout,
                                   **kwargs)
-        if self._unauthorized(resp):
+        if unauthorized(resp):
             try:
                 # re-authenticate and attempt one more request
                 self.re_authenticate()
@@ -227,13 +234,8 @@ class HTTPClient(object):
             self._check_status_code(resp, method, **kwargs)
         return resp
 
-    def _unauthorized(self, resp):
-        status401 = (resp.status_code == 401)
-        status500 = (resp.status_code == 500 and "(HTTP 401)" in resp.content)
-        return status401 or status500
-
     def _check_status_code(self, resp, method, **kwargs):
-        if self._unauthorized(resp):
+        if unauthorized(resp):
             message = "Unauthorized error"
             raise exc.HTTPUnauthorized(message=message)
         elif 400 <= resp.status_code < 600:
@@ -338,3 +340,81 @@ class HTTPClient(object):
 
     def patch(self, url, **kwargs):
         return self.client_request("PATCH", url, **kwargs)
+
+
+class SessionClient(adapter.LegacyJsonAdapter):
+    """HTTP client based on keystoneauth session."""
+
+    def __init__(self, user_agent=USER_AGENT, logger=LOG, *args, **kwargs):
+        super(SessionClient, self).__init__(*args, **kwargs)
+
+    def _http_request(self, url, method, **kwargs):
+        kwargs.setdefault('user_agent', self.user_agent)
+        kwargs.setdefault('auth', self.auth)
+        kwargs.setdefault('endpoint_override', self.endpoint_override)
+
+        endpoint_filter = kwargs.setdefault('endpoint_filter', {})
+        endpoint_filter.setdefault('interface', self.interface)
+        endpoint_filter.setdefault('service_type', self.service_type)
+        endpoint_filter.setdefault('region_name', self.region_name)
+
+        resp = self.session.request(url, method, raise_exc=False, **kwargs)
+
+        if unauthorized(resp):
+            message = "Unauthorized error"
+            raise exc.HTTPUnauthorized(message=message)
+        if 400 <= resp.status_code < 600:
+            raise exc.from_response(resp)
+        elif resp.status_code in (301, 302, 305):
+            # Redirected. Reissue the request to the new location.
+            location = resp.headers.get('location')
+            resp = self._http_request(location, method, **kwargs)
+        elif resp.status_code == 300:
+            raise exc.from_response(resp)
+
+        return resp
+
+    def json_request(self, method, url, **kwargs):
+        kwargs.setdefault('headers', {})
+        kwargs['headers'].setdefault('Content-Type', 'application/json')
+        kwargs['headers'].setdefault('Accept', 'application/json')
+
+        if 'data' in kwargs:
+            kwargs['data'] = jsonutils.dumps(kwargs['data'])
+
+        resp = self._http_request(url, method, **kwargs)
+        body = resp.content
+        content_type = resp.headers.get('content-type', None)
+        status = resp.status_code
+
+        if status == 204 or status == 205 or content_type is None:
+            return resp, list()
+
+        if 'application/json' in content_type:
+            try:
+                body = resp.json()
+            except ValueError:
+                LOG.error('Could not decode response body as JSON')
+        else:
+            body = None
+
+        return resp, body
+
+    def raw_request(self, method, url, **kwargs):
+        kwargs.setdefault('headers', {})
+        kwargs['headers'].setdefault('Content-Type',
+                                     'application/octet-stream')
+        self._http_request(url, method, **kwargs)
+
+    def credentials_headers(self):
+        credentials = self.session.auth.get_cache_id_elements()
+        username = credentials.get('password_username')
+        password = credentials.get('password_password')
+        creds = {}
+
+        if username:
+            creds['X-Auth-User'] = username
+        if password:
+            creds['X-Auth-Key'] = password
+
+        return creds

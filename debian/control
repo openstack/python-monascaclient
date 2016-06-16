@@ -11,5 +11,5 @@ X-Python-Version: >= 2.6
 Package: python-monclient
 Architecture: all
 Section: python
-Depends: ${misc:Depends}, ${python:Depends}, libpython2.7, python-pkg-resources, python-pbr, python-keystoneclient, python-yaml, python-requests, python-prettytable, python-six
+Depends: ${misc:Depends}, ${python:Depends}, libpython2.7, python-pkg-resources, python-pbr, keystoneauth1, python-yaml, python-requests, python-prettytable, python-six
 Description: CLI for Monitoring
