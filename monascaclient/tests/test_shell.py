@@ -17,8 +17,7 @@ import re
 import sys
 
 import fixtures
-from keystoneauth1.identity import v3
-from keystoneauth1.loading import session
+from keystoneclient.v3 import client as ksclient
 from mox3 import mox
 import six
 import testtools
@@ -36,7 +35,7 @@ class TestCase(testtools.TestCase):
                       'OS_USER_DOMAIN_NAME', 'OS_PROJECT_ID',
                       'OS_PROJECT_NAME', 'OS_AUTH_URL', 'OS_REGION_NAME',
                       'OS_AUTH_TOKEN', 'OS_NO_CLIENT_AUTH', 'OS_SERVICE_TYPE',
-                      'OS_PROJECT_DOMAIN_NAME', 'OS_PROJECT_DOMAIN_ID',
+                      'OS_DOMAIN_NAME', 'OS_DOMAIN_ID',
                       'OS_ENDPOINT_TYPE', 'MONASCA_API_URL')
 
         for key in client_env:
@@ -71,11 +70,9 @@ class ShellBase(TestCase):
     def setUp(self):
         super(ShellBase, self).setUp()
         self.m = mox.Mox()
-        self.m.StubOutWithMock(v3, 'Password')
-        self.m.StubOutWithMock(v3, 'Token')
-        self.m.StubOutWithMock(session.Session, 'load_from_options')
-        self.m.StubOutWithMock(http.SessionClient, 'json_request')
-        self.m.StubOutWithMock(http.SessionClient, 'raw_request')
+        self.m.StubOutWithMock(ksclient, 'Client')
+        self.m.StubOutWithMock(http.HTTPClient, 'json_request')
+        self.m.StubOutWithMock(http.HTTPClient, 'raw_request')
         self.addCleanup(self.m.VerifyAll)
         self.addCleanup(self.m.UnsetStubs)
 
@@ -158,12 +155,7 @@ class ShellTestMonascaCommands(ShellBase):
             'OS_USERNAME': 'username',
             'OS_PASSWORD': 'password',
             'OS_PROJECT_NAME': 'project_name',
-            'OS_PROJECT_ID': 'project_id',
             'OS_AUTH_URL': 'http://no.where',
-            'OS_PROJECT_DOMAIN_ID': 'project_domain_id',
-            'OS_PROJECT_DOMAIN_NAME': 'project_domain_name',
-            'OS_USER_DOMAIN_ID': 'user_domain_id',
-            'OS_USER_DOMAIN_NAME': 'user_domain_name',
         }
         self.set_fake_env(fake_env)
 
@@ -188,7 +180,7 @@ class ShellTestMonascaCommands(ShellBase):
             'Created',
             {'location': 'http://no.where/v2.0/metrics'},
             None)
-        http.SessionClient.json_request(
+        http.HTTPClient.json_request(
             'POST',
             '/metrics',
             data={'timestamp': 1395691090,
@@ -235,16 +227,6 @@ class ShellTestMonascaCommands(ShellBase):
             retvalue = self.shell(argstr)
             self.assertRegexpMatches(retvalue, "^Invalid type")
 
-    def test_notifications_create_email_with_non_zero_period(self):
-        self._script_keystone_client()
-        argstrings = [
-            'notification-create nm1 email metric1@hp.com --period 60',
-        ]
-        self.m.ReplayAll()
-        for argstr in argstrings:
-            retvalue = self.shell(argstr)
-            self.assertRegexpMatches(retvalue, "^Invalid period")
-
     def test_good_notifications_create_subcommand(self):
         self._script_keystone_client()
 
@@ -253,7 +235,7 @@ class ShellTestMonascaCommands(ShellBase):
             'Created',
             {'location': 'http://no.where/v2.0/notification-methods'},
             None)
-        http.SessionClient.json_request(
+        http.HTTPClient.json_request(
             'POST',
             '/notification-methods',
             data={'name': 'email1',
@@ -279,20 +261,19 @@ class ShellTestMonascaCommands(ShellBase):
             'Created',
             {'location': 'http://no.where/v2.0/notification-methods'},
             None)
-        http.SessionClient.json_request(
+        http.HTTPClient.json_request(
             'POST',
             '/notification-methods',
             data={'name': 'mypost',
                   'type': 'WEBHOOK',
-                  'address': 'http://localhost:8080',
-                  'period': 60},
+                  'address': 'http://localhost:8080'},
             headers={'X-Auth-Key': 'password',
                      'X-Auth-User': 'username'}).AndReturn((resp, 'id'))
 
         self.m.ReplayAll()
 
         argstrings = [
-            'notification-create mypost WEBHOOK http://localhost:8080 --period 60',
+            'notification-create mypost WEBHOOK http://localhost:8080',
         ]
         for argstr in argstrings:
             retvalue = self.shell(argstr)
@@ -315,7 +296,7 @@ class ShellTestMonascaCommands(ShellBase):
             'Created',
             {'location': 'http://no.where/v2.0/notification-methods'},
             None)
-        http.SessionClient.json_request(
+        http.HTTPClient.json_request(
             'PUT',
             '/alarm-definitions/' + id,
             data={'name': name,

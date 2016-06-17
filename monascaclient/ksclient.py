@@ -14,15 +14,11 @@
 # limitations under the License.
 
 """
-Wrapper around keystoneauth to assist in getting a session, a properly scoped
-token and the registered service endpoint for Monasca.
-
-# FIXME(pauloewerton): this is not an appropriate name for this module nor
-# for the class. Kept for backwards compatibility.
+Wrapper around python keystone client to assist in getting a properly scoped token and the registered service
+endpoint for Monasca.
 """
 
-from keystoneauth1.identity import v3
-from keystoneauth1 import loading
+from keystoneclient.v3 import client
 
 from monascaclient import exc
 
@@ -30,74 +26,60 @@ from monascaclient import exc
 class KSClient(object):
 
     def __init__(self, **kwargs):
-        """Get a session, an endpoint and auth token from Keystone.
+        """Get an endpoint and auth token from Keystone.
 
         :param username: name of user
         :param password: user's password
-        :param user_domain_id: unique identifier of domain the username
-                               resides in (optional)
-        :param user_domain_name: name of domain for username (optional),
-                                 if user_domain_id not specified
+        :param user_domain_id: unique identifier of domain username resides in (optional)
+        :param user_domain_name: name of domain for username (optional), if user_domain_id not specified
         :param project_id: unique identifier of project
         :param project_name: name of project
-        :param project_domain_name: name of domain project is in
-        :param project_domain_id: id of domain project is in
+        :param domain_name: name of domain project is in
+        :param domain_id: id of domain project is in
         :param auth_url: endpoint to authenticate against
         :param token: token to use instead of username/password
         """
-        auth_params = {
-            'auth_url': kwargs.get('auth_url'),
-            'project_id': kwargs.get('project_id'),
-            'project_name': kwargs.get('project_name'),
-            'project_domain_id': kwargs.get('project_domain_id'),
-            'project_domain_name': kwargs.get('project_domain_name')
-        }
+        kc_args = {'auth_url': kwargs.get('auth_url'),
+                   'insecure': kwargs.get('insecure'),
+                   'timeout': kwargs.get('keystone_timeout')}
 
-        password_params = {
-            'username': kwargs.get('username'),
-            'password': kwargs.get('password'),
-            'user_domain_id': kwargs.get('user_domain_id'),
-            'user_domain_name': kwargs.get('user_domain_name')
-        }
+        if kwargs.get('os_cacert'):
+            kc_args['cacert'] = kwargs.get('os_cacert')
+        if kwargs.get('project_id'):
+            kc_args['project_id'] = kwargs.get('project_id')
+        elif kwargs.get('project_name'):
+            kc_args['project_name'] = kwargs.get('project_name')
+            if kwargs.get('domain_name'):
+                kc_args['project_domain_name'] = kwargs.get('domain_name')
+            if kwargs.get('domain_id'):
+                kc_args['project_domain_id'] = kwargs.get('domain_id')
 
-        token = kwargs.get('token')
-
-        if token:
-            auth_params['token'] = token
-            auth = v3.Token(**auth_params)
+        if kwargs.get('token'):
+            kc_args['token'] = kwargs.get('token')
         else:
-            auth_params.update(password_params)
-            auth = v3.Password(**auth_params)
-
-        session_params = {
-            'insecure': kwargs.get('insecure'),
-            'cacert': kwargs.get('os_cacert'),
-            'cert': kwargs.get('cert_file'),
-            'key': kwargs.get('key_file')
-        }
-
-        self._session = loading.session.Session().load_from_options(
-            auth=auth, **session_params)
+            kc_args['username'] = kwargs.get('username')
+            kc_args['password'] = kwargs.get('password')
+            # when username not in the default domain (id='default'), supply user domain (as namespace)
+            if kwargs.get('user_domain_name'):
+                kc_args['user_domain_name'] = kwargs.get('user_domain_name')
+            if kwargs.get('user_domain_id'):
+                kc_args['user_domain_id'] = kwargs.get('user_domain_id')
 
         self._kwargs = kwargs
+        self._keystone = client.Client(**kc_args)
         self._token = None
         self._monasca_url = None
-
-    @property
-    def session(self):
-        """Return the keystoneauth session object used for authentication."""
-        return self._session
 
     @property
     def token(self):
         """Token property
 
-        Validate token is project scoped and return it if its project_id and
-        token were fetched when keystoneauth session was created
+        Validate token is project scoped and return it if it is
+        project_id and auth_token were fetched when keystone client was created
         """
         if self._token is None:
-            if self._session.get_project_id():
-                self._token = self._session.get_token()
+            if self._keystone.project_id:
+                self._token = self._keystone.auth_token
             else:
                 raise exc.CommandError("No project id or project name.")
         return self._token
@@ -105,13 +87,15 @@ class KSClient(object):
     @property
     def monasca_url(self):
         """Return the monasca publicURL registered in keystone."""
-        service_type = self._kwargs.get('service_type', 'monitoring')
-        service_name = self._kwargs.get('service_name', 'monasca')
-        interface = self._kwargs.get('endpoint_type', 'public')
-        region_name = self._kwargs.get('region_name')
-
-        if not self._monasca_url:
-            self._monasca_url = self._session.get_endpoint(
-                service_type=service_type, service_name=service_name,
-                interface=interface, region_name=region_name)
+        if self._monasca_url is None:
+            if self._kwargs.get('region_name'):
+                self._monasca_url = self._keystone.service_catalog.url_for(
+                    service_type=self._kwargs.get('service_type') or 'monitoring',
+                    attr='region',
+                    filter_value=self._kwargs.get('region_name'),
+                    endpoint_type=self._kwargs.get('endpoint_type') or 'publicURL')
+            else:
+                self._monasca_url = self._keystone.service_catalog.url_for(
+                    service_type=self._kwargs.get('service_type') or 'monitoring',
+                    endpoint_type=self._kwargs.get('endpoint_type') or 'publicURL')
         return self._monasca_url

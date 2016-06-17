@@ -13,34 +13,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from keystoneauth1.identity import v3
-from keystoneauth1.loading import session
+from keystoneclient.v3 import client as ksclient
 from oslo_serialization import jsonutils
 
 
 def script_keystone_client(token=None):
-    auth_params = {'auth_url': 'http://no.where',
-                   'project_id': 'project_id',
-                   'project_name': 'project_name',
-                   'project_domain_id': 'project_domain_id',
-                   'project_domain_name': 'project_domain_name'}
-
-    password_params = {'username': 'username',
-                       'password': 'password',
-                       'user_domain_id': 'user_domain_id',
-                       'user_domain_name': 'user_domain_name'}
-
     if token:
-        auth_params['token'] = token
-        auth = v3.Token(**auth_params).AndReturn(FakeKeystoneAuth(token, None))
+        ksclient.Client(auth_url='http://no.where',
+                        insecure=False,
+                        tenant_id='tenant_id',
+                        token=token).AndReturn(FakeKeystone(token, None))
     else:
-        auth_params.update(password_params)
-        auth = v3.Password(**auth_params).AndReturn(
-            FakeKeystoneAuth('abcd1234', 'test'))
-
-    session.Session().load_from_options(
-        auth=auth, insecure=False, cacert=None, cert=None, key=None).AndReturn(
-            FakeSession(auth))
+        ksclient.Client(auth_url='http://no.where',
+                        insecure=False,
+                        password='password',
+                        project_name='project_name',
+                        timeout=20,
+                        username='username').AndReturn(FakeKeystone(
+                                                       'abcd1234', 'test'))
 
 
 def fake_headers():
@@ -50,33 +40,18 @@ def fake_headers():
             'User-Agent': 'python-monascaclient'}
 
 
-class FakeSession():
+class FakeServiceCatalog(object):
 
-    def __init__(self, auth):
-        self.auth = auth
-
-    def get_token(self):
-        return self.auth.auth_token
-
-    def get_project_id(self):
-        return self.auth.project_id
-
-    def get_endpoint(self, service_type, service_name, interface, region_name):
+    def url_for(self, endpoint_type, service_type):
         return 'http://192.168.1.5:8004/v1/f14b41234'
 
 
-class FakeKeystoneAuth():
+class FakeKeystone(object):
+    service_catalog = FakeServiceCatalog()
 
     def __init__(self, auth_token, project_id):
         self.auth_token = auth_token
         self.project_id = project_id
-
-    def get_cache_id_elements(self):
-        creds = {
-            'password_username': 'username',
-            'password_password': 'password'
-        }
-        return creds
 
 
 class FakeRaw(object):
