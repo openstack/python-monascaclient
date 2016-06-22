@@ -124,6 +124,7 @@ def do_metric_create_raw(mc, args):
            help="Retrieve data for the specified tenant/project id instead of "
                 "the tenant/project from the user's Keystone credentials.")
 def do_metric_name_list(mc, args):
+    '''List names of metrics.'''
     fields = {}
     if args.dimensions:
         fields['dimensions'] = utils.format_dimensions_query(args.dimensions)

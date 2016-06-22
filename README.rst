@@ -132,6 +132,7 @@ You'll find complete documentation on the shell by running
       metric-create            Create metric.
       metric-create-raw        Create metric from raw json body.
       metric-list              List metrics for this tenant.
+      metric-name-list         List names of metrics.
       metric-statistics        List measurement statistics for the specified metric.
       notification-create      Create notification.
       notification-delete      Delete notification.
