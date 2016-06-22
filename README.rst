@@ -137,6 +137,7 @@ You'll find complete documentation on the shell by running
       notification-create      Create notification.
       notification-delete      Delete notification.
       notification-list        List notifications for this tenant.
+      notification-patch       Patch notification.
       notification-show        Describe the notification.
       notification-update      Update notification.
       bash-completion          Prints all of the commands and options to stdout.
