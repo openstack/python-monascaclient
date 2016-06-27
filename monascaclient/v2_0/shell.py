@@ -414,8 +414,8 @@ def do_metric_statistics(mc, args):
     statlist = args.statistics.split(',')
     for stat in statlist:
         if stat.upper() not in statistic_types:
-            errmsg = 'Invalid type, not one of [' + \
-                ', '.join(statistic_types) + ']'
+            errmsg = ('Invalid type, not one of [' +
+                      ', '.join(statistic_types) + ']')
             print(errmsg)
             return
     fields = {}
@@ -508,8 +508,8 @@ def _validate_notification_period(period, notification_type):
 def do_notification_create(mc, args):
     '''Create notification.'''
     if args.type.upper() not in notification_types:
-        errmsg = 'Invalid type, not one of [' + \
-            ', '.join(notification_types) + ']'
+        errmsg = ('Invalid type, not one of [' +
+                  ', '.join(notification_types) + ']')
         print(errmsg)
         return
     fields = {}
@@ -649,8 +649,8 @@ def do_notification_update(mc, args):
     fields['notification_id'] = args.id
     fields['name'] = args.name
     if args.type.upper() not in notification_types:
-        errmsg = 'Invalid type, not one of [' + \
-                 ', '.join(state_types) + ']'
+        errmsg = ('Invalid type, not one of [' +
+                  ', '.join(state_types) + ']')
         print(errmsg)
         return
     fields['type'] = args.type
@@ -686,8 +686,8 @@ def do_notification_patch(mc, args):
         fields['name'] = args.name
     if args.type:
         if args.type.upper() not in notification_types:
-            errmsg = 'Invalid type, not one of [' + \
-                     ', '.join(notification_types) + ']'
+            errmsg = ('Invalid type, not one of [' +
+                      ', '.join(notification_types) + ']')
             print(errmsg)
             return
         fields['type'] = args.type
@@ -710,8 +710,8 @@ def do_notification_patch(mc, args):
 
 def _validate_severity(severity):
     if severity.upper() not in severity_types:
-        errmsg = 'Invalid severity, not one of [' + \
-            ', '.join(severity_types) + ']'
+        errmsg = ('Invalid severity, not one of [' +
+                  ', '.join(severity_types) + ']')
         print(errmsg)
         return False
     return True
@@ -935,8 +935,8 @@ def do_alarm_definition_update(mc, args):
     fields['ok_actions'] = _arg_split_patch_update(args.ok_actions)
     fields['undetermined_actions'] = _arg_split_patch_update(args.undetermined_actions)
     if args.actions_enabled not in enabled_types:
-        errmsg = 'Invalid value, not one of [' + \
-            ', '.join(enabled_types) + ']'
+        errmsg = ('Invalid value, not one of [' +
+                  ', '.join(enabled_types) + ']')
         print(errmsg)
         return
     fields['actions_enabled'] = args.actions_enabled in ['true', 'True']
@@ -996,8 +996,8 @@ def do_alarm_definition_patch(mc, args):
         fields['undetermined_actions'] = _arg_split_patch_update(args.undetermined_actions, patch=True)
     if args.actions_enabled:
         if args.actions_enabled not in enabled_types:
-            errmsg = 'Invalid value, not one of [' + \
-                ', '.join(enabled_types) + ']'
+            errmsg = ('Invalid value, not one of [' +
+                      ', '.join(enabled_types) + ']')
             print(errmsg)
             return
         fields['actions_enabled'] = args.actions_enabled in ['true', 'True']
@@ -1057,8 +1057,8 @@ def do_alarm_list(mc, args):
         fields['metric_dimensions'] = utils.format_dimensions_query(args.metric_dimensions)
     if args.state:
         if args.state.upper() not in state_types:
-            errmsg = 'Invalid state, not one of [' + \
-                ', '.join(state_types) + ']'
+            errmsg = ('Invalid state, not one of [' +
+                      ', '.join(state_types) + ']')
             print(errmsg)
             return
         fields['state'] = args.state
@@ -1165,8 +1165,8 @@ def do_alarm_update(mc, args):
     fields = {}
     fields['alarm_id'] = args.id
     if args.state.upper() not in state_types:
-            errmsg = 'Invalid state, not one of [' + \
-                ', '.join(state_types) + ']'
+            errmsg = ('Invalid state, not one of [' +
+                      ', '.join(state_types) + ']')
             print(errmsg)
             return
     fields['state'] = args.state
@@ -1196,8 +1196,8 @@ def do_alarm_patch(mc, args):
     fields['alarm_id'] = args.id
     if args.state:
         if args.state.upper() not in state_types:
-            errmsg = 'Invalid state, not one of [' + \
-                ', '.join(state_types) + ']'
+            errmsg = ('Invalid state, not one of [' +
+                      ', '.join(state_types) + ']')
             print(errmsg)
             return
         fields['state'] = args.state
@@ -1296,8 +1296,8 @@ def do_alarm_count(mc, args):
         fields['metric_dimensions'] = utils.format_parameters(args.metric_dimensions)
     if args.state:
         if args.state.upper() not in state_types:
-            errmsg = 'Invalid state, not one of [' + \
-                ', '.join(state_types) + ']'
+            errmsg = ('Invalid state, not one of [' +
+                      ', '.join(state_types) + ']')
             print(errmsg)
             return
         fields['state'] = args.state
@@ -1312,8 +1312,8 @@ def do_alarm_count(mc, args):
     if args.group_by:
         group_by = args.group_by.split(',')
         if not set(group_by).issubset(set(group_by_types)):
-            errmsg = 'Invalid group-by, one or more values not in [' + \
-                ','.join(group_by_types) + ']'
+            errmsg = ('Invalid group-by, one or more values not in [' +
+                      ','.join(group_by_types) + ']')
             print(errmsg)
             return
         fields['group_by'] = args.group_by
