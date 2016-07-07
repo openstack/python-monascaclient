@@ -531,7 +531,7 @@ def do_notification_create(mc, args):
 
 
 @utils.arg('id', metavar='<NOTIFICATION_ID>',
-           help='The ID of the notification. If not specified returns all.')
+           help='The ID of the notification.')
 def do_notification_show(mc, args):
     '''Describe the notification.'''
     fields = {}
