@@ -1,4 +1,4 @@
-# (C) Copyright 2014-2016 Hewlett Packard Enterprise Development Company LP
+# (C) Copyright 2014-2016 Hewlett Packard Enterprise Development LP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,8 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from copy import deepcopy
 
 from monascaclient.common import monasca_manager
 from monascaclient.openstack.common.apiclient import base
@@ -64,23 +66,25 @@ class NotificationsManager(monasca_manager.MonascaManager):
         return resp
 
     def update(self, **kwargs):
+        local_kwargs = deepcopy(kwargs)
         """Update a notification."""
         newheaders = self.get_headers()
-        url_str = self.base_url + '/%s' % kwargs['notification_id']
-        del kwargs['notification_id']
+        url_str = self.base_url + '/%s' % local_kwargs['notification_id']
+        del local_kwargs['notification_id']
         resp, body = self.client.json_request(
             'PUT', url_str,
-            data=kwargs,
+            data=local_kwargs,
             headers=newheaders)
         return body
 
     def patch(self, **kwargs):
+        local_kwargs = deepcopy(kwargs)
         """Patch a notification."""
         newheaders = self.get_headers()
-        url_str = self.base_url + '/%s' % kwargs['notification_id']
-        del kwargs['notification_id']
+        url_str = self.base_url + '/%s' % local_kwargs['notification_id']
+        del local_kwargs['notification_id']
         resp, body = self.client.json_request(
             'PATCH', url_str,
-            data=kwargs,
+            data=local_kwargs,
             headers=newheaders)
         return body
