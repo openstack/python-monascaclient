@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Hewlett-Packard Development Company, L.P.
+# (C) Copyright 2014,2016 Hewlett Packard Enterprise Development LP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ class FakeHTTPResponse(object):
 
     version = 1.1
 
-    def __init__(self, status_code, reason, headers, content):
+    def __init__(self, status_code=None, reason=None, headers=None, content=None):
         self.headers = headers
         self.content = content
         self.status_code = status_code
