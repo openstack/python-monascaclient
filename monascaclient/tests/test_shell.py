@@ -1,4 +1,4 @@
-# (C) Copyright 2014-2016 Hewlett Packard Enterprise Development Company LP
+# (C) Copyright 2014-2016 Hewlett Packard Enterprise Development LP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -207,26 +207,6 @@ class ShellTestMonascaCommands(ShellBase):
         for argstr in argstrings:
             self.assertRaises(SystemExit, _shell.main, argstr.split())
 
-    def test_bad_notifications_create_type_subcommand(self):
-        self._script_keystone_client()
-        argstrings = [
-            'notification-create email1 DOG metric1@hp.com',
-        ]
-        self.m.ReplayAll()
-        for argstr in argstrings:
-            retvalue = self.shell(argstr)
-            self.assertRegexpMatches(retvalue, "^Invalid type")
-
-    def test_notifications_create_type_sms(self):
-        self._script_keystone_client()
-        argstrings = [
-            'notification-create sms1 SMS myphonenumber',
-        ]
-        self.m.ReplayAll()
-        for argstr in argstrings:
-            retvalue = self.shell(argstr)
-            self.assertRegexpMatches(retvalue, "^Invalid type")
-
     def test_good_notifications_create_subcommand(self):
         self._script_keystone_client()
 
@@ -319,3 +299,23 @@ class ShellTestMonascaCommands(ShellBase):
         argstring = " ".join(args)
         retvalue = self.shell(argstring)
         self.assertRegexpMatches(retvalue, "id")
+
+    def test_notifications_types_list(self):
+        self._script_keystone_client()
+
+        resp_body = [{"type": "WEBHOOK"}, {"type": "EMAIL"}, {"type": "PAGERDUTY"}]
+        resp = fakes.FakeHTTPResponse(
+            status_code=200,
+            content=resp_body)
+        http.HTTPClient.json_request(
+            'GET',
+            '/notification-methods/types',
+            headers={'X-Auth-Key': 'password',
+                     'X-Auth-User': 'username'}).AndReturn(((resp, resp_body)))
+
+        self.m.ReplayAll()
+
+        argstrings = ["notification-type-list"]
+
+        retvalue = self.shell("".join(argstrings))
+        self.assertRegexpMatches(retvalue, "types")
