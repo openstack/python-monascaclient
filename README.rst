@@ -72,7 +72,7 @@ It is easiest to source them first and then use the CLI.
 When token and endpoint are known::
 
   export OS_AUTH_TOKEN=XXX
-  export MONASCA_API_URL=http://192.168.10.4:8080/v2.0/
+  export MONASCA_API_URL=http://192.168.10.4:8070/v2.0/
 
 When using Keystone to obtain the token and endpoint::
 
@@ -89,7 +89,7 @@ When using Vagrant Environment with middleware disabled::
 
   export OS_AUTH_TOKEN=82510970543135
   export OS_NO_CLIENT_AUTH=1
-  export MONASCA_API_URL=http://192.168.10.4:8080/v2.0/
+  export MONASCA_API_URL=http://192.168.10.4:8070/v2.0/
 
 The Monasca API will treat the auth token as the tenant ID when Keystone is not enabled.
 
@@ -295,7 +295,7 @@ alarm-definition-show::
   | description          | ""                                                                                                 |
   | expression           | "max(cpu.load_avg_1_min) > 0"                                                                      |
   | id                   | "4bf6bfc2-c5ac-4d57-b7db-cf5313b05412"                                                             |
-  | links                | href:http://192.168.10.4:8080/v2.0/alarm-definitions/4bf6bfc2-c5ac-4d57-b7db-cf5313b05412,rel:self |
+  | links                | href:http://192.168.10.4:8070/v2.0/alarm-definitions/4bf6bfc2-c5ac-4d57-b7db-cf5313b05412,rel:self |
   | match_by             | [                                                                                                  |
   |                      |   "hostname"                                                                                       |
   |                      | ]                                                                                                  |
