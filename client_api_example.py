@@ -21,7 +21,7 @@ import time
 
 # In order to use the python api directly, you must first obtain an
 # auth token and identify which endpoint you wish to speak to.
-endpoint = 'http://192.168.10.4:8080/v2.0'
+endpoint = 'http://192.168.10.4:8070/v2.0'
 
 # The api version of monasca-api
 api_version = '2_0'
