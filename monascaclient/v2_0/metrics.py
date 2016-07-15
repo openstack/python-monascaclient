@@ -1,4 +1,4 @@
-# (C) Copyright 2014-2015 Hewlett Packard Enterprise Development Company LP
+# (C) Copyright 2014-2016 Hewlett Packard Enterprise Development LP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,8 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from copy import deepcopy
 
 from monascaclient.common import monasca_manager
 from monascaclient.openstack.common.apiclient import base
@@ -29,19 +31,20 @@ class MetricsManager(monasca_manager.MonascaManager):
     base_url = '/metrics'
 
     def create(self, **kwargs):
+        local_kwargs = deepcopy(kwargs)
         """Create a metric."""
         url_str = self.base_url
         newheaders = self.get_headers()
-        if 'tenant_id' in kwargs:
-            url_str = url_str + '?tenant_id=%s' % kwargs['tenant_id']
-            del kwargs['tenant_id']
-        if 'jsonbody' in kwargs:
+        if 'tenant_id' in local_kwargs:
+            url_str = url_str + '?tenant_id=%s' % local_kwargs['tenant_id']
+            del local_kwargs['tenant_id']
+        if 'jsonbody' in local_kwargs:
             resp, body = self.client.json_request('POST', url_str,
-                                                  data=kwargs['jsonbody'],
+                                                  data=local_kwargs['jsonbody'],
                                                   headers=newheaders)
         else:
             resp, body = self.client.json_request('POST', url_str,
-                                                  data=kwargs,
+                                                  data=local_kwargs,
                                                   headers=newheaders)
         return resp
 
