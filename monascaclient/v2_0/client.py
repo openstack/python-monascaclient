@@ -19,6 +19,7 @@ from monascaclient.v2_0 import alarm_definitions
 from monascaclient.v2_0 import alarms
 from monascaclient.v2_0 import metrics
 from monascaclient.v2_0 import notifications
+from monascaclient.v2_0 import notificationtypes
 
 
 class Client(object):
@@ -43,6 +44,8 @@ class Client(object):
             self.http_client)
         self.alarms = alarms.AlarmsManager(self.http_client)
         self.alarm_definitions = alarm_definitions.AlarmDefinitionsManager(
+            self.http_client)
+        self.notificationtypes = notificationtypes.NotificationTypesManager(
             self.http_client)
 
     def replace_token(self, token):

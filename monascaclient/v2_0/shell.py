@@ -507,11 +507,7 @@ def _validate_notification_period(period, notification_type):
            help='A period for the notification method. Can only be non zero with webhooks')
 def do_notification_create(mc, args):
     '''Create notification.'''
-    if args.type.upper() not in notification_types:
-        errmsg = ('Invalid type, not one of [' +
-                  ', '.join(notification_types) + ']')
-        print(errmsg)
-        return
+
     fields = {}
     fields['name'] = args.name
     fields['type'] = args.type
@@ -648,11 +644,7 @@ def do_notification_update(mc, args):
     fields = {}
     fields['notification_id'] = args.id
     fields['name'] = args.name
-    if args.type.upper() not in notification_types:
-        errmsg = ('Invalid type, not one of [' +
-                  ', '.join(state_types) + ']')
-        print(errmsg)
-        return
+
     fields['type'] = args.type
     fields['address'] = args.address
     if not _validate_notification_period(args.period, args.type.upper()):
@@ -684,13 +676,8 @@ def do_notification_patch(mc, args):
     fields['notification_id'] = args.id
     if args.name:
         fields['name'] = args.name
-    if args.type:
-        if args.type.upper() not in notification_types:
-            errmsg = ('Invalid type, not one of [' +
-                      ', '.join(notification_types) + ']')
-            print(errmsg)
-            return
-        fields['type'] = args.type
+
+    fields['type'] = args.type
     if args.address:
         fields['address'] = args.address
     if args.period or args.period == 0:
@@ -1398,6 +1385,25 @@ def do_alarm_history_list(mc, args):
             (he.code, he.message))
     else:
         output_alarm_history(args, alarm)
+
+
+def do_notification_type_list(mc, args):
+    '''List notification types supported by monasca.'''
+
+    try:
+        notification_types = mc.notificationtypes.list()
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
+    else:
+        if args.json:
+            print(utils.json_formatter(notification_types))
+            return
+        else:
+            formatters = {'types': lambda x: x["type"]}
+            # utils.print_list(notification_types['types'], ["types"], formatters=formatters)
+            utils.print_list(notification_types, ["types"], formatters=formatters)
 
 
 def _translate_starttime(args):
