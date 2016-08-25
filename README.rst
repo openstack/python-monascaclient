@@ -128,6 +128,8 @@ You'll find complete documentation on the shell by running
       alarm-patch              Patch the alarm.
       alarm-show               Describe the alarm.
       alarm-update             Update the alarm.
+      dimension-name-list      List names of dimensions.
+      dimension-value-list     List the dimension values for a given dimension name.
       measurement-list         List measurements for the specified metric.
       metric-create            Create metric.
       metric-create-raw        Create metric from raw json body.
@@ -404,7 +406,7 @@ Refer to the example in python-monascaclient/client_api_example.py for more deta
 License
 -------
 
-Copyright (c) 2014 Hewlett-Packard Development Company, L.P.
+(C) Copyright 2014-2016 Hewlett Packard Enterprise Development LP
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

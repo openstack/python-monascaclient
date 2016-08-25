@@ -107,3 +107,25 @@ class MetricsManager(monasca_manager.MonascaManager):
         resp, body = self.client.json_request(
             'GET', url_str, headers=newheaders)
         return body['elements'] if type(body) is dict else body
+
+    def list_dimension_names(self, **kwargs):
+        """Get a list of metric dimension names."""
+        url_str = self.base_url + '/dimensions/names'
+        new_headers = self.get_headers()
+        if kwargs:
+            url_str += '?%s' % urlutils.urlencode(kwargs, True)
+        # print url_str
+        resp, body = self.client.json_request(
+            'GET', url_str, headers=new_headers)
+        return body['elements'] if type(body) is dict else body
+
+    def list_dimension_values(self, **kwargs):
+        """Get a list of metric dimension values."""
+        url_str = self.base_url + '/dimensions/names/values'
+        new_headers = self.get_headers()
+        if kwargs:
+            url_str += '?%s' % urlutils.urlencode(kwargs, True)
+        # print url_str
+        resp, body = self.client.json_request(
+            'GET', url_str, headers=new_headers)
+        return body['elements'] if type(body) is dict else body

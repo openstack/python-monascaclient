@@ -217,6 +217,87 @@ def do_metric_list(mc, args):
                 formatters=formatters)
 
 
+@utils.arg('--metric-name', metavar='<METRIC_NAME>',
+           help='Name of the metric to report dimension name list.',
+           action='append')
+@utils.arg('--offset', metavar='<OFFSET LOCATION>',
+           help='The offset used to paginate the return data.')
+@utils.arg('--limit', metavar='<RETURN LIMIT>',
+           help='The amount of data to be returned up to the API maximum '
+                'limit.')
+@utils.arg('--tenant-id', metavar='<TENANT_ID>',
+           help="Retrieve data for the specified tenant/project id instead of "
+                "the tenant/project from the user's Keystone credentials.")
+def do_dimension_name_list(mc, args):
+    '''List names of metric dimensions.'''
+    fields = {}
+    if args.metric_name:
+        fields['metric_name'] = args.metric_name
+    if args.limit:
+        fields['limit'] = args.limit
+    if args.offset:
+        fields['offset'] = args.offset
+    if args.tenant_id:
+        fields['tenant_id'] = args.tenant_id
+
+    try:
+        dimension_names = mc.metrics.list_dimension_names(**fields)
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
+
+    if args.json:
+        print(utils.json_formatter(dimension_names))
+        return
+
+    if isinstance(dimension_names, list):
+        utils.print_list(dimension_names, ['Dimension Names'], formatters={
+            'Dimension Names': lambda x: x['dimension_name']})
+
+
+@utils.arg('dimension-name', metavar='<DIMENSION_NAME>',
+           help='Name of the dimension to list dimension values.')
+@utils.arg('--metric-name', metavar='<METRIC_NAME>',
+           help='Name of the metric to report dimension value list.',
+           action='append')
+@utils.arg('--offset', metavar='<OFFSET LOCATION>',
+           help='The offset used to paginate the return data.')
+@utils.arg('--limit', metavar='<RETURN LIMIT>',
+           help='The amount of data to be returned up to the API maximum '
+                'limit.')
+@utils.arg('--tenant-id', metavar='<TENANT_ID>',
+           help="Retrieve data for the specified tenant/project id instead of "
+                "the tenant/project from the user's Keystone credentials.")
+def do_dimension_value_list(mc, args):
+    '''List names of metric dimensions.'''
+    fields = {}
+    fields['dimension_name'] = args.dimension_name
+    if args.metric_name:
+        fields['metric_name'] = args.metric_name
+    if args.limit:
+        fields['limit'] = args.limit
+    if args.offset:
+        fields['offset'] = args.offset
+    if args.tenant_id:
+        fields['tenant_id'] = args.tenant_id
+
+    try:
+        dimension_values = mc.metrics.list_dimension_values(**fields)
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
+
+    if args.json:
+        print(utils.json_formatter(dimension_values))
+        return
+
+    if isinstance(dimension_values, list):
+        utils.print_list(dimension_values, ['Dimension Values'], formatters={
+            'Dimension Values': lambda x: x['dimension_value']})
+
+
 def format_measure_timestamp(measurements):
     # returns newline separated times for the timestamp column
     return '\n'.join([str(m[0]) for m in measurements])
