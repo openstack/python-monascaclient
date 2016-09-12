@@ -68,7 +68,6 @@ class HTTPClient(object):
         self.user_domain_id = kwargs.get('user_domain_id')
         self.user_domain_name = kwargs.get('user_domain_name')
         self.region_name = kwargs.get('region_name')
-        self.include_pass = kwargs.get('include_pass')
         self.endpoint_url = endpoint
         # adding for re-authenticate
         self.project_name = kwargs.get('project_name')
@@ -130,7 +129,7 @@ class HTTPClient(object):
         curl = ['curl -i -X %s' % method]
 
         for (key, value) in kwargs['headers'].items():
-            if key in ('X-Auth-Token', 'X-Auth-Key'):
+            if key in ('X-Auth-Token'):
                 value = '*****'
             header = '-H \'%s: %s\'' % (encodeutils.safe_decode(key),
                                         encodeutils.safe_decode(value))
@@ -179,14 +178,6 @@ class HTTPClient(object):
         kwargs['headers'].setdefault('User-Agent', USER_AGENT)
         if self.auth_token:
             kwargs['headers'].setdefault('X-Auth-Token', self.auth_token)
-        else:
-            kwargs['headers'].update(self.credentials_headers())
-        if self.auth_url:
-            kwargs['headers'].setdefault('X-Auth-Url', self.auth_url)
-        if self.region_name:
-            kwargs['headers'].setdefault('X-Region-Name', self.region_name)
-        if self.include_pass and 'X-Auth-Key' not in kwargs['headers']:
-            kwargs['headers'].update(self.credentials_headers())
 
         self.log_curl_request(method, url, kwargs)
 
@@ -282,14 +273,6 @@ class HTTPClient(object):
             raise exc.CommunicationError(message=message)
         self.log_http_response(resp)
         return resp
-
-    def credentials_headers(self):
-        creds = {}
-        if self.username:
-            creds['X-Auth-User'] = self.username
-        if self.password:
-            creds['X-Auth-Key'] = self.password
-        return creds
 
     def json_request(self, method, url, **kwargs):
         kwargs.setdefault('headers', {})
