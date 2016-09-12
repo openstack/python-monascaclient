@@ -14,7 +14,6 @@
 # limitations under the License.
 
 from keystoneclient.v3 import client as ksclient
-from oslo_serialization import jsonutils
 
 
 def script_keystone_client(token=None):
@@ -33,13 +32,6 @@ def script_keystone_client(token=None):
                                                        'abcd1234', 'test'))
 
 
-def fake_headers():
-    return {'X-Auth-Token': 'abcd1234',
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'User-Agent': 'python-monascaclient'}
-
-
 class FakeServiceCatalog(object):
 
     def url_for(self, endpoint_type, service_type):
@@ -52,36 +44,3 @@ class FakeKeystone(object):
     def __init__(self, auth_token, project_id):
         self.auth_token = auth_token
         self.project_id = project_id
-
-
-class FakeRaw(object):
-    version = 110
-
-
-class FakeHTTPResponse(object):
-
-    version = 1.1
-
-    def __init__(self, status_code=None, reason=None, headers=None, content=None):
-        self.headers = headers
-        self.content = content
-        self.status_code = status_code
-        self.reason = reason
-        self.raw = FakeRaw()
-
-    def getheader(self, name, default=None):
-        return self.headers.get(name, default)
-
-    def getheaders(self):
-        return self.headers.items()
-
-    def read(self, amt=None):
-        b = self.content
-        self.content = None
-        return b
-
-    def iter_content(self, chunksize):
-        return self.content
-
-    def json(self):
-        return jsonutils.loads(self.content)

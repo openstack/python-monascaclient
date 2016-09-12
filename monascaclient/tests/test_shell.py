@@ -19,10 +19,10 @@ import sys
 import fixtures
 from keystoneclient.v3 import client as ksclient
 from mox3 import mox
+from requests_mock.contrib import fixture as requests_mock_fixture
 import six
 import testtools
 
-from monascaclient.common import http
 from monascaclient import exc
 import monascaclient.shell
 from monascaclient.tests import fakes
@@ -69,10 +69,10 @@ class ShellBase(TestCase):
 
     def setUp(self):
         super(ShellBase, self).setUp()
+        self.requests_mock = self.useFixture(requests_mock_fixture.Fixture())
+
         self.m = mox.Mox()
         self.m.StubOutWithMock(ksclient, 'Client')
-        self.m.StubOutWithMock(http.HTTPClient, 'json_request')
-        self.m.StubOutWithMock(http.HTTPClient, 'raw_request')
         self.addCleanup(self.m.VerifyAll)
         self.addCleanup(self.m.UnsetStubs)
 
@@ -150,6 +150,18 @@ class ShellTestMonascaCommands(ShellBase):
         super(ShellTestMonascaCommands, self).setUp()
         self._set_fake_env()
 
+    def assertHeaders(self, req=None, **kwargs):
+        if not req:
+            req = self.requests_mock.last_request
+
+        self.assertEqual('password', req.headers['X-Auth-Key'])
+        self.assertEqual('username', req.headers['X-Auth-User'])
+        self.assertEqual('abcd1234', req.headers['X-Auth-Token'])
+        self.assertEqual('python-monascaclient', req.headers['User-Agent'])
+
+        for k, v in kwargs.items():
+            self.assertEqual(v, req.headers[k])
+
     def _set_fake_env(self):
         fake_env = {
             'OS_USERNAME': 'username',
@@ -174,23 +186,12 @@ class ShellTestMonascaCommands(ShellBase):
 
     def test_good_metrics_create_subcommand(self):
         self._script_keystone_client()
-
-        resp = fakes.FakeHTTPResponse(
-            204,
-            'Created',
-            {'location': 'http://no.where/v2.0/metrics'},
-            None)
-        http.HTTPClient.json_request(
-            'POST',
-            '/metrics',
-            data={'timestamp': 1395691090,
-                  'name': 'metric1',
-                  'value': 123.0},
-            headers={'X-Auth-Key': 'password',
-                     'X-Auth-User': 'username'}).AndReturn((resp,
-                                                            None))
-
         self.m.ReplayAll()
+
+        headers = {'location': 'http://no.where/v2.0/metrics'}
+        self.requests_mock.post('http://192.168.1.5:8004/v1/f14b41234/metrics',
+                                status_code=204,
+                                headers=headers)
 
         argstrings = [
             'metric-create metric1 123 --time 1395691090',
@@ -198,6 +199,13 @@ class ShellTestMonascaCommands(ShellBase):
         for argstr in argstrings:
             retvalue = self.shell(argstr)
             self.assertRegexpMatches(retvalue, "^Success")
+
+        data = {'timestamp': 1395691090,
+                'name': 'metric1',
+                'value': 123.0}
+
+        self.assertHeaders()
+        self.assertEqual(data, self.requests_mock.last_request.json())
 
     def test_bad_notifications_create_missing_args_subcommand(self):
         argstrings = [
@@ -209,22 +217,15 @@ class ShellTestMonascaCommands(ShellBase):
 
     def test_good_notifications_create_subcommand(self):
         self._script_keystone_client()
-
-        resp = fakes.FakeHTTPResponse(
-            201,
-            'Created',
-            {'location': 'http://no.where/v2.0/notification-methods'},
-            None)
-        http.HTTPClient.json_request(
-            'POST',
-            '/notification-methods',
-            data={'name': 'email1',
-                  'type': 'EMAIL',
-                  'address': 'john.doe@hp.com'},
-            headers={'X-Auth-Key': 'password',
-                     'X-Auth-User': 'username'}).AndReturn((resp, 'id'))
-
         self.m.ReplayAll()
+
+        url = 'http://192.168.1.5:8004/v1/f14b41234/notification-methods'
+        headers = {'location': 'http://no.where/v2.0/notification-methods',
+                   'Content-Type': 'application/json'}
+        self.requests_mock.post(url,
+                                status_code=201,
+                                headers=headers,
+                                json='id')
 
         argstrings = [
             'notification-create email1 EMAIL john.doe@hp.com',
@@ -233,24 +234,24 @@ class ShellTestMonascaCommands(ShellBase):
             retvalue = self.shell(argstr)
             self.assertRegexpMatches(retvalue, "id")
 
+        data = {'name': 'email1',
+                'type': 'EMAIL',
+                'address': 'john.doe@hp.com'}
+
+        self.assertHeaders()
+        self.assertEqual(data, self.requests_mock.last_request.json())
+
     def test_good_notifications_create_subcommand_webhook(self):
         self._script_keystone_client()
-
-        resp = fakes.FakeHTTPResponse(
-            201,
-            'Created',
-            {'location': 'http://no.where/v2.0/notification-methods'},
-            None)
-        http.HTTPClient.json_request(
-            'POST',
-            '/notification-methods',
-            data={'name': 'mypost',
-                  'type': 'WEBHOOK',
-                  'address': 'http://localhost:8080'},
-            headers={'X-Auth-Key': 'password',
-                     'X-Auth-User': 'username'}).AndReturn((resp, 'id'))
-
         self.m.ReplayAll()
+
+        url = 'http://192.168.1.5:8004/v1/f14b41234/notification-methods'
+        headers = {'location': 'http://no.where/v2.0/notification-methods',
+                   'Content-Type': 'application/json'}
+        self.requests_mock.post(url,
+                                status_code=201,
+                                headers=headers,
+                                json='id')
 
         argstrings = [
             'notification-create mypost WEBHOOK http://localhost:8080',
@@ -259,71 +260,92 @@ class ShellTestMonascaCommands(ShellBase):
             retvalue = self.shell(argstr)
             self.assertRegexpMatches(retvalue, "id")
 
+        data = {'name': 'mypost',
+                'type': 'WEBHOOK',
+                'address': 'http://localhost:8080'}
+
+        self.assertHeaders()
+        self.assertEqual(data, self.requests_mock.last_request.json())
+
     def test_good_notifications_patch(self):
         self._script_keystone_client()
+        self.m.ReplayAll()
 
         id_str = '0495340b-58fd-4e1c-932b-5e6f9cc96490'
-        resp = fakes.FakeHTTPResponse(
-            201,
-            'Created',
-            {'location': 'http://no.where/v2.0/notification-methods'},
-            None)
-        http.HTTPClient.json_request(
-            'PATCH',
-            '/notification-methods/' + id_str,
-            data={'type': 'EMAIL',
-                  'address': 'john.doe@hpe.com',
-                  'period': 0},
-            headers={'X-Auth-Key': 'password',
-                     'X-Auth-User': 'username'}).AndReturn((resp, 'id'))
-        self.m.ReplayAll()
+        url = 'http://192.168.1.5:8004/v1/f14b41234/notification-methods/'
+        headers = {'location': 'http://no.where/v2.0/notification-methods',
+                   'Content-Type': 'application/json'}
+
+        self.requests_mock.patch(url + id_str,
+                                 status_code=201,
+                                 headers=headers,
+                                 json='id')
 
         argstring = 'notification-patch {0} --type EMAIL --address' \
                     ' john.doe@hpe.com --period 0'.format(id_str)
         retvalue = self.shell(argstring)
         self.assertRegexpMatches(retvalue, "id")
 
+        data = {'type': 'EMAIL',
+                'address': 'john.doe@hpe.com',
+                'period': 0}
+
+        self.assertHeaders()
+        self.assertEqual(data, self.requests_mock.last_request.json())
+
     def test_bad_notifications_patch(self):
         self._script_keystone_client()
+        self.m.ReplayAll()
 
         id_str = '0495340b-58fd-4e1c-932b-5e6f9cc96490'
         argstring = 'notification-patch {0} --type EMAIL --address' \
                     ' john.doe@hpe.com --period 60'.format(id_str)
-        self.m.ReplayAll()
 
         retvalue = self.shell(argstring)
         self.assertRegexpMatches(retvalue, "^Invalid")
 
     def test_good_notifications_update(self):
         self._script_keystone_client()
+        self.m.ReplayAll()
 
         id_str = '0495340b-58fd-4e1c-932b-5e6f9cc96491'
-        resp = fakes.FakeHTTPResponse(
-            201,
-            'Created',
-            {'location': 'http://no.where/v2.0/notification-methods'},
-            None)
-        http.HTTPClient.json_request(
-            'PUT',
-            '/notification-methods/' + id_str,
-            data={'name': 'notification_updated_name',
-                  'type': 'EMAIL',
-                  'address': 'john.doe@hpe.com',
-                  'period': 0},
-            headers={'X-Auth-Key': 'password',
-                     'X-Auth-User': 'username'}).AndReturn((resp, 'id'))
-        self.m.ReplayAll()
+        url = 'http://192.168.1.5:8004/v1/f14b41234/notification-methods/'
+        headers = {'location': 'http://no.where/v2.0/notification-methods',
+                   'Content-Type': 'application/json'}
+
+        self.requests_mock.put(url + id_str,
+                               status_code=201,
+                               headers=headers,
+                               json='id')
 
         argstring = 'notification-update {0} notification_updated_name ' \
                     'EMAIL john.doe@hpe.com 0'.format(id_str)
         retvalue = self.shell(argstring)
         self.assertRegexpMatches(retvalue, "id")
 
+        data = {'name': 'notification_updated_name',
+                'type': 'EMAIL',
+                'address': 'john.doe@hpe.com',
+                'period': 0}
+
+        self.assertHeaders()
+        self.assertEqual(data, self.requests_mock.last_request.json())
+
     def test_good_alarm_definition_update(self):
         self._script_keystone_client()
+        self.m.ReplayAll()
+
+        id_str = '0495340b-58fd-4e1c-932b-5e6f9cc96490'
+        url = 'http://192.168.1.5:8004/v1/f14b41234/alarm-definitions/'
+        headers = {'location': 'http://no.where/v2.0/notification-methods',
+                   'Content-Type': 'application/json'}
+
+        self.requests_mock.put(url + id_str,
+                               status_code=201,
+                               headers=headers,
+                               json='id')
 
         cmd = 'alarm-definition-update'
-        id = '0495340b-58fd-4e1c-932b-5e6f9cc96490'
         name = 'alarm_name'
         description = 'test_alarm_definition'
         expression = 'avg(Test_Metric_1)>=10'
@@ -331,51 +353,38 @@ class ShellTestMonascaCommands(ShellBase):
         enabled = 'True'
         match_by = 'hostname'
         severity = 'CRITICAL'
-        resp = fakes.FakeHTTPResponse(
-            201,
-            'Created',
-            {'location': 'http://no.where/v2.0/notification-methods'},
-            None)
-        http.HTTPClient.json_request(
-            'PUT',
-            '/alarm-definitions/' + id,
-            data={'name': name,
-                  'description': description,
-                  'expression': expression,
-                  'alarm_actions': [notif_id],
-                  'undetermined_actions': [notif_id],
-                  'ok_actions': [notif_id],
-                  'match_by': [match_by],
-                  'actions_enabled': bool(enabled),
-                  'severity': severity
-                  },
-            headers={'X-Auth-Key': 'password',
-                     'X-Auth-User': 'username'}).AndReturn((resp, 'id'))
 
-        self.m.ReplayAll()
-
-        args = [cmd, id, name, description, expression, notif_id,
+        args = [cmd, id_str, name, description, expression, notif_id,
                 notif_id, notif_id, enabled, match_by, severity]
         argstring = " ".join(args)
         retvalue = self.shell(argstring)
         self.assertRegexpMatches(retvalue, "id")
 
+        data = {'name': name,
+                'description': description,
+                'expression': expression,
+                'alarm_actions': [notif_id],
+                'undetermined_actions': [notif_id],
+                'ok_actions': [notif_id],
+                'match_by': [match_by],
+                'actions_enabled': bool(enabled),
+                'severity': severity}
+
+        self.assertHeaders()
+        self.assertEqual(data, self.requests_mock.last_request.json())
+
     def test_notifications_types_list(self):
         self._script_keystone_client()
-
-        resp_body = [{"type": "WEBHOOK"}, {"type": "EMAIL"}, {"type": "PAGERDUTY"}]
-        resp = fakes.FakeHTTPResponse(
-            status_code=200,
-            content=resp_body)
-        http.HTTPClient.json_request(
-            'GET',
-            '/notification-methods/types',
-            headers={'X-Auth-Key': 'password',
-                     'X-Auth-User': 'username'}).AndReturn(((resp, resp_body)))
-
         self.m.ReplayAll()
+
+        url = 'http://192.168.1.5:8004/v1/f14b41234/notification-methods/'
+        headers = {'Content-Type': 'application/json'}
+        body = [{"type": "WEBHOOK"}, {"type": "EMAIL"}, {"type": "PAGERDUTY"}]
+        self.requests_mock.get(url + 'types', headers=headers, json=body)
 
         argstrings = ["notification-type-list"]
 
         retvalue = self.shell("".join(argstrings))
         self.assertRegexpMatches(retvalue, "types")
+
+        self.assertHeaders()
