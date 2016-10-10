@@ -256,7 +256,7 @@ def do_dimension_name_list(mc, args):
             'Dimension Names': lambda x: x['dimension_name']})
 
 
-@utils.arg('dimension-name', metavar='<DIMENSION_NAME>',
+@utils.arg('dimension_name', metavar='<DIMENSION_NAME>',
            help='Name of the dimension to list dimension values.')
 @utils.arg('--metric-name', metavar='<METRIC_NAME>',
            help='Name of the metric to report dimension value list.',
