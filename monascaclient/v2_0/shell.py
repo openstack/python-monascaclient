@@ -668,6 +668,46 @@ def do_notification_update(mc, args):
         print(jsonutils.dumps(notification, indent=2))
 
 
+@utils.arg('id', metavar='<NOTIFICATION_ID>',
+           help='The ID of the notification.')
+@utils.arg('--name', metavar='<NOTIFICATION_NAME>',
+           help='Name of the notification.')
+@utils.arg('--type', metavar='<TYPE>',
+           help='The notification type. Type must be either EMAIL, WEBHOOK, or PAGERDUTY.')
+@utils.arg('--address', metavar='<ADDRESS>',
+           help='A valid EMAIL Address, URL, or SERVICE KEY.')
+@utils.arg('--period', metavar='<PERIOD>', type=int,
+           help='A period for the notification method. Can only be non zero with webhooks')
+def do_notification_patch(mc, args):
+    '''Patch notification.'''
+    fields = {}
+    fields['notification_id'] = args.id
+    if args.name:
+        fields['name'] = args.name
+    if args.type:
+        if args.type.upper() not in notification_types:
+            errmsg = 'Invalid type, not one of [' + \
+                     ', '.join(notification_types) + ']'
+            print(errmsg)
+            return
+        fields['type'] = args.type
+    if args.address:
+        fields['address'] = args.address
+    if args.period:
+        if args.type and not _validate_notification_period(
+                args.period, args.type.upper()):
+            return
+        fields['period'] = args.period
+    try:
+        notification = mc.notifications.patch(**fields)
+    except exc.HTTPException as he:
+        raise exc.CommandError(
+            'HTTPException code=%s message=%s' %
+            (he.code, he.message))
+    else:
+        print(jsonutils.dumps(notification, indent=2))
+
+
 def _validate_severity(severity):
     if severity.upper() not in severity_types:
         errmsg = 'Invalid severity, not one of [' + \
