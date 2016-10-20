@@ -71,7 +71,7 @@ else:
     print(resp)
     print('Successfully created metric')
 
-print ('Giving the DB time to update...')
+print('Giving the DB time to update...')
 time.sleep(5)
 
 # metric-list
