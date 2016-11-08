@@ -20,10 +20,10 @@ import socket
 
 import requests
 import six
+from six.moves.urllib import parse
 
 from monascaclient import exc
 from monascaclient import ksclient
-from monascaclient.openstack.common.py3kcompat import urlutils
 
 from oslo_serialization import jsonutils
 from oslo_utils import encodeutils
@@ -91,7 +91,7 @@ class HTTPClient(object):
         }
 
         self.verify_cert = None
-        if urlutils.urlparse(endpoint).scheme == "https":
+        if parse.urlparse(endpoint).scheme == "https":
             if kwargs.get('insecure'):
                 self.verify_cert = False
             else:

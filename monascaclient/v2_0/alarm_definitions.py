@@ -13,9 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from six.moves.urllib import parse
+
 from monascaclient.common import monasca_manager
 from monascaclient.openstack.common.apiclient import base
-from monascaclient.openstack.common.py3kcompat import urlutils
 
 
 class AlarmDefinitions(base.Resource):
@@ -53,7 +54,7 @@ class AlarmDefinitionsManager(monasca_manager.MonascaManager):
             kwargs['dimensions'] = dimstr
 
         if kwargs:
-            url_str = url_str + '?%s' % urlutils.urlencode(kwargs, True)
+            url_str = url_str + '?%s' % parse.urlencode(kwargs, True)
         # print url_str
         resp, body = self.client.json_request(
             'GET', url_str, headers=newheaders)

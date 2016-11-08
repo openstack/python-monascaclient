@@ -15,9 +15,10 @@
 
 from copy import deepcopy
 
+from six.moves.urllib import parse
+
 from monascaclient.common import monasca_manager
 from monascaclient.openstack.common.apiclient import base
-from monascaclient.openstack.common.py3kcompat import urlutils
 
 
 class Metrics(base.Resource):
@@ -57,7 +58,7 @@ class MetricsManager(monasca_manager.MonascaManager):
             kwargs['dimensions'] = dimstr
 
         if kwargs:
-            url_str = url_str + '?%s' % urlutils.urlencode(kwargs, True)
+            url_str = url_str + '?%s' % parse.urlencode(kwargs, True)
         # print url_str
         resp, body = self.client.json_request(
             'GET', url_str, headers=newheaders)
@@ -72,7 +73,7 @@ class MetricsManager(monasca_manager.MonascaManager):
             kwargs['dimensions'] = dimstr
 
         if kwargs:
-            url_str = url_str + '?%s' % urlutils.urlencode(kwargs, True)
+            url_str = url_str + '?%s' % parse.urlencode(kwargs, True)
         # print url_str
         resp, body = self.client.json_request(
             'GET', url_str, headers=newheaders)
@@ -87,7 +88,7 @@ class MetricsManager(monasca_manager.MonascaManager):
             kwargs['dimensions'] = dimstr
 
         if kwargs:
-            url_str = url_str + '?%s' % urlutils.urlencode(kwargs, True)
+            url_str = url_str + '?%s' % parse.urlencode(kwargs, True)
         # print url_str
         resp, body = self.client.json_request(
             'GET', url_str, headers=newheaders)
@@ -102,7 +103,7 @@ class MetricsManager(monasca_manager.MonascaManager):
             kwargs['dimensions'] = dimstr
 
         if kwargs:
-            url_str = url_str + '?%s' % urlutils.urlencode(kwargs, True)
+            url_str = url_str + '?%s' % parse.urlencode(kwargs, True)
         # print url_str
         resp, body = self.client.json_request(
             'GET', url_str, headers=newheaders)
@@ -113,7 +114,7 @@ class MetricsManager(monasca_manager.MonascaManager):
         url_str = self.base_url + '/dimensions/names'
         new_headers = self.get_headers()
         if kwargs:
-            url_str += '?%s' % urlutils.urlencode(kwargs, True)
+            url_str += '?%s' % parse.urlencode(kwargs, True)
         # print url_str
         resp, body = self.client.json_request(
             'GET', url_str, headers=new_headers)
@@ -124,7 +125,7 @@ class MetricsManager(monasca_manager.MonascaManager):
         url_str = self.base_url + '/dimensions/names/values'
         new_headers = self.get_headers()
         if kwargs:
-            url_str += '?%s' % urlutils.urlencode(kwargs, True)
+            url_str += '?%s' % parse.urlencode(kwargs, True)
         # print url_str
         resp, body = self.client.json_request(
             'GET', url_str, headers=new_headers)
