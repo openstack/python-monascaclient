@@ -31,7 +31,7 @@ from oslo_utils import strutils
 import six
 from six.moves.urllib import parse
 
-from monascaclient.openstack.common.apiclient import exceptions
+from monascaclient.apiclient import exceptions
 
 
 def getid(obj):
@@ -440,8 +440,7 @@ class Resource(object):
 
     @property
     def human_id(self):
-        """Human-readable ID which can be used for bash completion.
-        """
+        """Human-readable ID which can be used for bash completion."""
         if self.NAME_ATTR in self.__dict__ and self.HUMAN_ID:
             return strutils.to_slug(getattr(self, self.NAME_ATTR))
         return None

@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from monascaclient.openstack.common.apiclient import base
+from monascaclient.apiclient import base
 
 
 class MonascaManager(base.BaseManager):

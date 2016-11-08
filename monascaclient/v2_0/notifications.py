@@ -17,8 +17,8 @@ from copy import deepcopy
 
 from six.moves.urllib import parse
 
+from monascaclient.apiclient import base
 from monascaclient.common import monasca_manager
-from monascaclient.openstack.common.apiclient import base
 
 
 class Notifications(base.Resource):
