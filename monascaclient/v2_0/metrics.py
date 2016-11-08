@@ -15,8 +15,6 @@
 
 from copy import deepcopy
 
-from six.moves.urllib import parse
-
 from monascaclient.apiclient import base
 from monascaclient.common import monasca_manager
 
@@ -51,82 +49,24 @@ class MetricsManager(monasca_manager.MonascaManager):
 
     def list(self, **kwargs):
         """Get a list of metrics."""
-        url_str = self.base_url
-        newheaders = self.get_headers()
-        if 'dimensions' in kwargs:
-            dimstr = self.get_dimensions_url_string(kwargs['dimensions'])
-            kwargs['dimensions'] = dimstr
-
-        if kwargs:
-            url_str = url_str + '?%s' % parse.urlencode(kwargs, True)
-        # print url_str
-        resp, body = self.client.json_request(
-            'GET', url_str, headers=newheaders)
-        return body['elements'] if type(body) is dict else body
+        return self._list('', 'dimensions', **kwargs)
 
     def list_names(self, **kwargs):
         """Get a list of metric names."""
-        url_str = self.base_url + '/names'
-        newheaders = self.get_headers()
-        if 'dimensions' in kwargs:
-            dimstr = self.get_dimensions_url_string(kwargs['dimensions'])
-            kwargs['dimensions'] = dimstr
-
-        if kwargs:
-            url_str = url_str + '?%s' % parse.urlencode(kwargs, True)
-        # print url_str
-        resp, body = self.client.json_request(
-            'GET', url_str, headers=newheaders)
-        return body['elements'] if type(body) is dict else body
+        return self._list('/names', 'dimensions', **kwargs)
 
     def list_measurements(self, **kwargs):
         """Get a list of measurements based on metric definition filters."""
-        url_str = self.base_url + '/measurements'
-        newheaders = self.get_headers()
-        if 'dimensions' in kwargs:
-            dimstr = self.get_dimensions_url_string(kwargs['dimensions'])
-            kwargs['dimensions'] = dimstr
-
-        if kwargs:
-            url_str = url_str + '?%s' % parse.urlencode(kwargs, True)
-        # print url_str
-        resp, body = self.client.json_request(
-            'GET', url_str, headers=newheaders)
-        return body['elements'] if type(body) is dict else body
+        return self._list('/measurements', 'dimensions', **kwargs)
 
     def list_statistics(self, **kwargs):
         """Get a list of measurement statistics based on metric def filters."""
-        url_str = self.base_url + '/statistics'
-        newheaders = self.get_headers()
-        if 'dimensions' in kwargs:
-            dimstr = self.get_dimensions_url_string(kwargs['dimensions'])
-            kwargs['dimensions'] = dimstr
-
-        if kwargs:
-            url_str = url_str + '?%s' % parse.urlencode(kwargs, True)
-        # print url_str
-        resp, body = self.client.json_request(
-            'GET', url_str, headers=newheaders)
-        return body['elements'] if type(body) is dict else body
+        return self._list('/statistics', 'dimensions', **kwargs)
 
     def list_dimension_names(self, **kwargs):
         """Get a list of metric dimension names."""
-        url_str = self.base_url + '/dimensions/names'
-        new_headers = self.get_headers()
-        if kwargs:
-            url_str += '?%s' % parse.urlencode(kwargs, True)
-        # print url_str
-        resp, body = self.client.json_request(
-            'GET', url_str, headers=new_headers)
-        return body['elements'] if type(body) is dict else body
+        return self._list('/dimensions/names', **kwargs)
 
     def list_dimension_values(self, **kwargs):
         """Get a list of metric dimension values."""
-        url_str = self.base_url + '/dimensions/names/values'
-        new_headers = self.get_headers()
-        if kwargs:
-            url_str += '?%s' % parse.urlencode(kwargs, True)
-        # print url_str
-        resp, body = self.client.json_request(
-            'GET', url_str, headers=new_headers)
-        return body['elements'] if type(body) is dict else body
+        return self._list('/dimensions/names/values', **kwargs)

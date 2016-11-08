@@ -15,11 +15,38 @@
 
 from monascaclient.apiclient import base
 
+from six.moves.urllib import parse
+from six.moves.urllib_parse import unquote
+
 
 class MonascaManager(base.BaseManager):
 
     def __init__(self, client, **kwargs):
         super(MonascaManager, self).__init__(client)
+
+    def _parse_body(self, body):
+        if type(body) is dict:
+            self.next = None
+            for link in body['links']:
+                if link['rel'] == 'next':
+                    self.next = link['href']
+            return body['elements']
+        else:
+            return body
+
+    def _list(self, path, dim_key=None, **kwargs):
+        """Get a list of metrics."""
+        url_str = self.base_url + path
+        newheaders = self.get_headers()
+        if dim_key and dim_key in kwargs:
+            dimstr = self.get_dimensions_url_string(kwargs[dim_key])
+            kwargs[dim_key] = dimstr
+
+        if kwargs:
+            url_str += '?%s' % parse.urlencode(kwargs, True)
+        resp, body = self.client.json_request(
+            'GET', url_str, headers=newheaders)
+        return self._parse_body(body)
 
     def get_headers(self):
         headers = self.client.credentials_headers()
@@ -37,3 +64,10 @@ class MonascaManager(base.BaseManager):
                 dim_str = k
             dim_list.append(dim_str)
         return ','.join(dim_list)
+
+    def list_next(self):
+        if hasattr(self, 'next') and self.next:
+            self.next = unquote(self.next)
+            path = self.next.split(self.base_url, 1)[-1]
+            return self._list(path)
+        return None
