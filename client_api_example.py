@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" An example using monascaclient via the Python API """
+"""An example using monascaclient via the Python API"""
 
 from monascaclient import client
 import monascaclient.exc as exc
