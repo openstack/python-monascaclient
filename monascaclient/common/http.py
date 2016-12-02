@@ -221,8 +221,8 @@ class HTTPClient(object):
                 resp = self._make_request(method, url, allow_redirects,
                                           timeout, **kwargs)
                 self._check_status_code(resp, method, **kwargs)
-            except exc.KeystoneException as e:
-                raise e
+            except exc.KeystoneException:
+                raise
         else:
             self._check_status_code(resp, method, **kwargs)
         return resp
