@@ -1343,6 +1343,8 @@ def output_alarm_history(args, alarm_history):
            help='ALARM_STATE is one of [UNDETERMINED, OK, ALARM].')
 @utils.arg('--severity', metavar='<SEVERITY>',
            help='Severity is one of ["LOW", "MEDIUM", "HIGH", "CRITICAL"].')
+@utils.arg('--state-updated-start-time', metavar='<UTC_STATE_UPDATED_START>',
+           help='Return all alarms whose state was updated on or after the time specified.')
 @utils.arg('--lifecycle-state', metavar='<LIFECYCLE_STATE>',
            help='The lifecycle state of the alarm.')
 @utils.arg('--link', metavar='<LINK>',
@@ -1375,6 +1377,8 @@ def do_alarm_count(mc, args):
         if not _validate_severity(args.severity):
             return
         fields['severity'] = args.severity
+    if args.state_updated_start_time:
+        fields['state_updated_start_time'] = args.state_updated_start_time
     if args.lifecycle_state:
         fields['lifecycle_state'] = args.lifecycle_state
     if args.link:
