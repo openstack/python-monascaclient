@@ -29,18 +29,14 @@ class AlarmDefinitionsManager(monasca_manager.MonascaManager):
 
     def create(self, **kwargs):
         """Create an alarm definition."""
-        newheaders = self.get_headers()
         resp, body = self.client.json_request('POST', self.base_url,
-                                              data=kwargs,
-                                              headers=newheaders)
+                                              data=kwargs)
         return body
 
     def get(self, **kwargs):
         """Get the details for a specific alarm definition."""
-        newheaders = self.get_headers()
         url_str = self.base_url + '/%s' % kwargs['alarm_id']
-        resp, body = self.client.json_request('GET', url_str,
-                                              headers=newheaders)
+        resp, body = self.client.json_request('GET', url_str)
         return body
 
     def list(self, **kwargs):
@@ -49,28 +45,20 @@ class AlarmDefinitionsManager(monasca_manager.MonascaManager):
 
     def delete(self, **kwargs):
         """Delete a specific alarm definition."""
-        newheaders = self.get_headers()
         url_str = self.base_url + '/%s' % kwargs['alarm_id']
-        resp, body = self.client.json_request('DELETE', url_str,
-                                              headers=newheaders)
+        resp, body = self.client.json_request('DELETE', url_str)
         return resp
 
     def update(self, **kwargs):
         """Update a specific alarm definition."""
-        newheaders = self.get_headers()
         url_str = self.base_url + '/%s' % kwargs['alarm_id']
         del kwargs['alarm_id']
-        resp, body = self.client.json_request('PUT', url_str,
-                                              data=kwargs,
-                                              headers=newheaders)
+        resp, body = self.client.json_request('PUT', url_str, data=kwargs)
         return body
 
     def patch(self, **kwargs):
         """Patch a specific alarm definition."""
-        newheaders = self.get_headers()
         url_str = self.base_url + '/%s' % kwargs['alarm_id']
         del kwargs['alarm_id']
-        resp, body = self.client.json_request('PATCH', url_str,
-                                              data=kwargs,
-                                              headers=newheaders)
+        resp, body = self.client.json_request('PATCH', url_str, data=kwargs)
         return body

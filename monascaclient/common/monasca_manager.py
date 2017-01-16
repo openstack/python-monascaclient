@@ -37,7 +37,6 @@ class MonascaManager(base.BaseManager):
     def _list(self, path, dim_key=None, **kwargs):
         """Get a list of metrics."""
         url_str = self.base_url + path
-        newheaders = self.get_headers()
         if dim_key and dim_key in kwargs:
             dimstr = self.get_dimensions_url_string(kwargs[dim_key])
             kwargs[dim_key] = dimstr
@@ -45,12 +44,8 @@ class MonascaManager(base.BaseManager):
         if kwargs:
             url_str += '?%s' % parse.urlencode(kwargs, True)
         resp, body = self.client.json_request(
-            'GET', url_str, headers=newheaders)
+            'GET', url_str)
         return self._parse_body(body)
-
-    def get_headers(self):
-        headers = self.client.credentials_headers()
-        return headers
 
     def get_dimensions_url_string(self, dimdict):
         dim_list = list()

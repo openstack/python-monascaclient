@@ -33,18 +33,15 @@ class MetricsManager(monasca_manager.MonascaManager):
         local_kwargs = deepcopy(kwargs)
         """Create a metric."""
         url_str = self.base_url
-        newheaders = self.get_headers()
         if 'tenant_id' in local_kwargs:
             url_str = url_str + '?tenant_id=%s' % local_kwargs['tenant_id']
             del local_kwargs['tenant_id']
         if 'jsonbody' in local_kwargs:
             resp, body = self.client.json_request('POST', url_str,
-                                                  data=local_kwargs['jsonbody'],
-                                                  headers=newheaders)
+                                                  data=local_kwargs['jsonbody'])
         else:
             resp, body = self.client.json_request('POST', url_str,
-                                                  data=local_kwargs,
-                                                  headers=newheaders)
+                                                  data=local_kwargs)
         return resp
 
     def list(self, **kwargs):

@@ -154,8 +154,6 @@ class ShellTestMonascaCommands(ShellBase):
         if not req:
             req = self.requests_mock.last_request
 
-        self.assertEqual('password', req.headers['X-Auth-Key'])
-        self.assertEqual('username', req.headers['X-Auth-User'])
         self.assertEqual('abcd1234', req.headers['X-Auth-Token'])
         self.assertEqual('python-monascaclient', req.headers['User-Agent'])
 

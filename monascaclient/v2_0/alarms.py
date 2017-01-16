@@ -31,10 +31,8 @@ class AlarmsManager(monasca_manager.MonascaManager):
 
     def get(self, **kwargs):
         """Get the details for a specific alarm."""
-        newheaders = self.get_headers()
         url_str = self.base_url + '/%s' % kwargs['alarm_id']
-        resp, body = self.client.json_request('GET', url_str,
-                                              headers=newheaders)
+        resp, body = self.client.json_request('GET', url_str)
         return body
 
     def list(self, **kwargs):
@@ -43,34 +41,27 @@ class AlarmsManager(monasca_manager.MonascaManager):
 
     def delete(self, **kwargs):
         """Delete a specific alarm."""
-        newheaders = self.get_headers()
         url_str = self.base_url + '/%s' % kwargs['alarm_id']
-        resp, body = self.client.json_request('DELETE', url_str,
-                                              headers=newheaders)
+        resp, body = self.client.json_request('DELETE', url_str)
         return resp
 
     def update(self, **kwargs):
         """Update a specific alarm."""
-        newheaders = self.get_headers()
         url_str = self.base_url + '/%s' % kwargs['alarm_id']
         del kwargs['alarm_id']
         resp, body = self.client.json_request('PUT', url_str,
-                                              data=kwargs,
-                                              headers=newheaders)
+                                              data=kwargs)
         return body
 
     def patch(self, **kwargs):
         """Patch a specific alarm."""
-        newheaders = self.get_headers()
         url_str = self.base_url + '/%s' % kwargs['alarm_id']
         del kwargs['alarm_id']
         resp, body = self.client.json_request('PATCH', url_str,
-                                              data=kwargs,
-                                              headers=newheaders)
+                                              data=kwargs)
         return body
 
     def count(self, **kwargs):
-        newheaders = self.get_headers()
         url_str = self.base_url + '/count'
         if 'metric_dimensions' in kwargs:
             dimstr = self.get_dimensions_url_string(kwargs['metric_dimensions'])
@@ -78,30 +69,25 @@ class AlarmsManager(monasca_manager.MonascaManager):
 
         if kwargs:
             url_str = url_str + '?%s' % parse.urlencode(kwargs, True)
-        resp, body = self.client.json_request('GET', url_str,
-                                              headers=newheaders)
+        resp, body = self.client.json_request('GET', url_str)
         return body
 
     def history(self, **kwargs):
         """History of a specific alarm."""
-        newheaders = self.get_headers()
         url_str = self.base_url + '/%s/state-history' % kwargs['alarm_id']
         del kwargs['alarm_id']
         if kwargs:
             url_str = url_str + '?%s' % parse.urlencode(kwargs, True)
-        resp, body = self.client.json_request('GET', url_str,
-                                              headers=newheaders)
+        resp, body = self.client.json_request('GET', url_str)
         return body['elements'] if type(body) is dict else body
 
     def history_list(self, **kwargs):
         """History list of alarm state."""
         url_str = self.base_url + '/state-history/'
-        newheaders = self.get_headers()
         if 'dimensions' in kwargs:
             dimstr = self.get_dimensions_url_string(kwargs['dimensions'])
             kwargs['dimensions'] = dimstr
         if kwargs:
             url_str = url_str + '?%s' % parse.urlencode(kwargs, True)
-        resp, body = self.client.json_request('GET', url_str,
-                                              headers=newheaders)
+        resp, body = self.client.json_request('GET', url_str)
         return body['elements'] if type(body) is dict else body
