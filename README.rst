@@ -102,7 +102,7 @@ You'll find complete documentation on the shell by running
                [--os-password OS_PASSWORD] [--os-project-id OS_PROJECT_ID]
                [--os-user-domain-id OS_USER_DOMAIN_ID] [--os-user-domain-name OS_USER_DOMAIN_NAME]
                [--os-project-name OS_PROJECT_NAME]
-               [--os-domain-id OS_DOMAIN_ID] [--os-domain-name OS_DOMAIN_NAME]
+               [--os-project-domain-id OS_PROJECT_DOMAIN_ID] [--os-project-domain-name OS_PROJECT_DOMAIN_NAME]
                [--os-auth-url OS_AUTH_URL] [--os-region-name OS_REGION_NAME]
                [--os-auth-token OS_AUTH_TOKEN] [--os-no-client-auth]
                [--monasca-api-url MONASCA_API_URL]
