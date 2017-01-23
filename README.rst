@@ -355,7 +355,7 @@ The Client class takes these parameters: api_version, endpoint, and token.
 The Client class is used to call all monasca-api resource commands (i.e.
 client.Client.metrics.create(fields)).
 
-Long running users of the Client will recieve an indication
+Long running users of the Client will receive an indication
 that the keystone token has expired when they receive an HTTP response
 code of 401 Unauthorized from the monasca-API.  In this case, it is
 up to the user to get a new token from keystone which can be passed
