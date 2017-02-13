@@ -1,4 +1,4 @@
-# (C) Copyright 2014-2016 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2014-2017 Hewlett Packard Enterprise Development LP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -758,7 +758,8 @@ def do_notification_patch(mc, args):
     if args.name:
         fields['name'] = args.name
 
-    fields['type'] = args.type
+    if args.type:
+        fields['type'] = args.type
     if args.address:
         fields['address'] = args.address
     if args.period or args.period == 0:
