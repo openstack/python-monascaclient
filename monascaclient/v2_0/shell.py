@@ -1,4 +1,4 @@
-# (C) Copyright 2014-2016 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2014-2017 Hewlett Packard Enterprise Development LP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -65,8 +65,7 @@ notification_types = ['EMAIL', 'WEBHOOK', 'PAGERDUTY']
            help='Metric timestamp in milliseconds. Default: current timestamp.')
 @utils.arg('--project-id', metavar='<CROSS_PROJECT_ID>',
            help='The Project ID to create metric on behalf of. '
-           'Requires monitoring-delegate role in keystone.',
-           action='append')
+           'Requires monitoring-delegate role in keystone.')
 @utils.arg('value', metavar='<METRIC_VALUE>',
            type=float,
            help='Metric value.')
