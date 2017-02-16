@@ -19,16 +19,22 @@ import sys
 import fixtures
 from keystoneclient.v3 import client as ksclient
 from mox3 import mox
+from oslotest import base
 from requests_mock.contrib import fixture as requests_mock_fixture
 import six
-import testtools
 
 from monascaclient import exc
 import monascaclient.shell
 from monascaclient.tests import fakes
 
 
-class TestCase(testtools.TestCase):
+class TestCase(base.BaseTestCase):
+
+    def setUp(self):
+        super(TestCase, self).setUp()
+
+    def tearDown(self):
+        super(TestCase, self).tearDown()
 
     def set_fake_env(self, fake_env):
         client_env = ('OS_USERNAME', 'OS_PASSWORD', 'OS_USER_DOMAIN_ID',
