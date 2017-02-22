@@ -1,4 +1,4 @@
-# (C) Copyright 2014-2016 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2014-2017 Hewlett Packard Enterprise Development LP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -272,6 +272,31 @@ class ShellTestMonascaCommands(ShellBase):
         self.assertEqual(data, self.requests_mock.last_request.json())
 
     def test_good_notifications_patch(self):
+        args = '--type EMAIL --address john.doe@hpe.com --period 0'
+        data = {'type': 'EMAIL',
+                'address': 'john.doe@hpe.com',
+                'period': 0}
+        self.run_notification_patch_test(args, data)
+
+    def test_good_notifications_patch_just_name(self):
+        name = 'fred'
+        args = '--name ' + name
+        data = {'name': name}
+        self.run_notification_patch_test(args, data)
+
+    def test_good_notifications_patch_just_address(self):
+        address = 'fred@fl.com'
+        args = '--address ' + address
+        data = {'address': address}
+        self.run_notification_patch_test(args, data)
+
+    def test_good_notifications_patch_just_period(self):
+        period = 0
+        args = '--period ' + str(period)
+        data = {'period': period}
+        self.run_notification_patch_test(args, data)
+
+    def run_notification_patch_test(self, args, data):
         self._script_keystone_client()
         self.m.ReplayAll()
 
@@ -285,14 +310,9 @@ class ShellTestMonascaCommands(ShellBase):
                                  headers=headers,
                                  json='id')
 
-        argstring = 'notification-patch {0} --type EMAIL --address' \
-                    ' john.doe@hpe.com --period 0'.format(id_str)
+        argstring = 'notification-patch {0} {1}'.format(id_str, args)
         retvalue = self.shell(argstring)
         self.assertRegexpMatches(retvalue, "id")
-
-        data = {'type': 'EMAIL',
-                'address': 'john.doe@hpe.com',
-                'period': 0}
 
         self.assertHeaders()
         self.assertEqual(data, self.requests_mock.last_request.json())
