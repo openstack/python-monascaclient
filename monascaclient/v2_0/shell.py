@@ -65,8 +65,7 @@ notification_types = ['EMAIL', 'WEBHOOK', 'PAGERDUTY']
            help='Metric timestamp in milliseconds. Default: current timestamp.')
 @utils.arg('--project-id', metavar='<CROSS_PROJECT_ID>',
            help='The Project ID to create metric on behalf of. '
-           'Requires monitoring-delegate role in keystone.',
-           action='append')
+           'Requires monitoring-delegate role in keystone.')
 @utils.arg('value', metavar='<METRIC_VALUE>',
            type=float,
            help='Metric value.')
