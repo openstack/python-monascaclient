@@ -24,6 +24,8 @@ import logging
 import string
 import sys
 
+from six.moves.urllib.parse import urljoin
+
 import monascaclient
 from monascaclient import client as monasca_client
 from monascaclient.common import utils
@@ -153,6 +155,13 @@ class MonascaShell(object):
                             help='Defaults to env[OS_AUTH_URL].')
 
         parser.add_argument('--os_auth_url',
+                            help=argparse.SUPPRESS)
+
+        parser.add_argument('--os-auth-version',
+                            default=utils.env('OS_AUTH_VERSION'),
+                            help='Defaults to env[OS_AUTH_VERSION].')
+
+        parser.add_argument('--os_auth_version',
                             help=argparse.SUPPRESS)
 
         parser.add_argument('--os-region-name',
@@ -326,6 +335,11 @@ class MonascaShell(object):
                 raise exc.CommandError("You must provide an auth url via"
                                        " either --os-auth-url or via"
                                        " env[OS_AUTH_URL]")
+
+        auth_vars_present = args.os_auth_url and args.os_auth_version
+        versioned = 'v2.0' in args.os_auth_url or 'v3' in args.os_auth_url
+        if auth_vars_present and not versioned:
+            args.os_auth_url = urljoin(args.os_auth_url, args.os_auth_version)
 
         if args.os_auth_url and 'v2.0' in args.os_auth_url:
             args.os_auth_url = string.replace(args.os_auth_url, 'v2.0', 'v3')
