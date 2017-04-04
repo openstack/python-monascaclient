@@ -91,6 +91,8 @@ When using Keystone to obtain the token and endpoint::
   export OS_PROJECT_NAME=
   export OS_AUTH_URL=
   export OS_REGION_NAME=
+  # Optional(specific version added to OS_AUTH_URL if (v2.0 or v3) not present already)
+  export OS_AUTH_VERSION=
 
 When OS_USER_DOMAIN_NAME is not set, then 'Default' is assumed. Alternatively IDs can be used instead of names.
 
@@ -112,7 +114,7 @@ You'll find complete documentation on the shell by running
                [--os-user-domain-id OS_USER_DOMAIN_ID] [--os-user-domain-name OS_USER_DOMAIN_NAME]
                [--os-project-name OS_PROJECT_NAME]
                [--os-project-domain-id OS_PROJECT_DOMAIN_ID] [--os-project-domain-name OS_PROJECT_DOMAIN_NAME]
-               [--os-auth-url OS_AUTH_URL] [--os-region-name OS_REGION_NAME]
+               [--os-auth-url OS_AUTH_URL] [--os-auth-version OS_AUTH_VERSION] [--os-region-name OS_REGION_NAME]
                [--os-auth-token OS_AUTH_TOKEN] [--os-no-client-auth]
                [--monasca-api-url MONASCA_API_URL]
                [--monasca-api-version MONASCA_API_VERSION]
@@ -187,6 +189,8 @@ You'll find complete documentation on the shell by running
     --os-domain-name OS_DOMAIN_NAME
                                Defaults to env[OS_DOMAIN_NAME].
     --os-auth-url OS_AUTH_URL  Defaults to env[OS_AUTH_URL].
+  --os-auth-version OS_AUTH_VERSION
+                               Defaults to env[OS_AUTH_VERSION].
     --os-region-name OS_REGION_NAME
                                Defaults to env[OS_REGION_NAME].
     --os-auth-token OS_AUTH_TOKEN
