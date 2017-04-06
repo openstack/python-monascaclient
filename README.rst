@@ -95,6 +95,8 @@ When using Keystone to obtain the token and endpoint::
   export OS_AUTH_VERSION=
 
 When OS_USER_DOMAIN_NAME is not set, then 'Default' is assumed. Alternatively IDs can be used instead of names.
+Although *deprecated*, but OS_TENANT_NAME and OS_TENANT_ID can be used for
+OS_PROEJCT_NAME and OS_PROJECT_ID respectively.
 
 When using Vagrant Environment with middleware disabled::
 
