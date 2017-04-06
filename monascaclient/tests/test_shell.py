@@ -15,6 +15,7 @@
 
 import re
 import sys
+import warnings
 
 import fixtures
 from keystoneclient.v3 import client as ksclient
@@ -148,6 +149,15 @@ class ShellTestCommon(ShellBase):
             help_text = self.shell(argstr)
             for r in required:
                 self.assertRegexpMatches(help_text, r)
+
+    def test_deprecated_warning(self):
+        argrequired = [('--help --os-tenant-name=this', '--os-tenant-name is deprecated'),
+                       ('--help --os-tenant-id=this', '--os-tenant-id is deprecated')]
+        for argstr, required in argrequired:
+            with warnings.catch_warnings(record=True) as w:
+                self.shell(argstr)
+                self.assertEqual(str(w[0].message), required)
+                self.assertEqual(w[0].category, DeprecationWarning)
 
 
 class ShellTestMonascaCommands(ShellBase):
