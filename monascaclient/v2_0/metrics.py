@@ -1,4 +1,5 @@
 # (C) Copyright 2014-2016 Hewlett Packard Enterprise Development LP
+# Copyright 2017 FUJITSU LIMITED
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,36 +14,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from copy import deepcopy
-
-from monascaclient.apiclient import base
 from monascaclient.common import monasca_manager
 
 
-class Metrics(base.Resource):
-
-    def __repr__(self):
-        return "<Metrics %s>" % self._info
-
-
 class MetricsManager(monasca_manager.MonascaManager):
-    resource_class = Metrics
     base_url = '/metrics'
 
     def create(self, **kwargs):
-        local_kwargs = deepcopy(kwargs)
         """Create a metric."""
         url_str = self.base_url
-        if 'tenant_id' in local_kwargs:
-            url_str = url_str + '?tenant_id=%s' % local_kwargs['tenant_id']
-            del local_kwargs['tenant_id']
-        if 'jsonbody' in local_kwargs:
-            resp, body = self.client.json_request('POST', url_str,
-                                                  data=local_kwargs['jsonbody'])
-        else:
-            resp, body = self.client.json_request('POST', url_str,
-                                                  data=local_kwargs)
-        return resp
+        if 'tenant_id' in kwargs:
+            url_str = url_str + '?tenant_id=%s' % kwargs['tenant_id']
+            del kwargs['tenant_id']
+
+        data = kwargs['jsonbody'] if 'jsonbody' in kwargs else kwargs
+        body = self.client.create(url=url_str, json=data)
+        return body
 
     def list(self, **kwargs):
         """Get a list of metrics."""

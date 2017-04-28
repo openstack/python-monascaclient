@@ -1,4 +1,5 @@
 # (C) Copyright 2014-2017 Hewlett Packard Enterprise Development LP
+# Copyright 2017 FUJITSU LIMITED
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,12 +19,12 @@ import json
 import numbers
 import time
 
+from keystoneauth1 import exceptions as k_exc
+from osc_lib import exceptions as osc_exc
 
 from monascaclient.common import utils
-import monascaclient.exc as exc
 
 from oslo_serialization import jsonutils
-from six.moves import xrange
 
 # Alarm valid types
 severity_types = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
@@ -83,10 +84,8 @@ def do_metric_create(mc, args):
         fields['tenant_id'] = args.project_id
     try:
         mc.metrics.create(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         print('Successfully created metric')
 
@@ -96,14 +95,10 @@ def do_metric_create(mc, args):
            help='The raw JSON body in single quotes. See api doc.')
 def do_metric_create_raw(mc, args):
     '''Create metric from raw json body.'''
-    fields = {}
-    fields['jsonbody'] = args.jsonbody
     try:
-        mc.metrics.create(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+        mc.metrics.create(**args.jsonbody)
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         print('Successfully created metric')
 
@@ -136,17 +131,14 @@ def do_metric_name_list(mc, args):
 
     try:
         metric_names = mc.metrics.list_names(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
-
-    if args.json:
-        print(utils.json_formatter(metric_names))
-        return
-
-    if isinstance(metric_names, list):
-        utils.print_list(metric_names, ['Name'], formatters={'Name': lambda x: x['name']})
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
+    else:
+        if args.json:
+            print(utils.json_formatter(metric_names))
+            return
+        if isinstance(metric_names, list):
+            utils.print_list(metric_names, ['Name'], formatters={'Name': lambda x: x['name']})
 
 
 @utils.arg('--name', metavar='<METRIC_NAME>',
@@ -190,10 +182,8 @@ def do_metric_list(mc, args):
 
     try:
         metric = mc.metrics.list(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         if args.json:
             print(utils.json_formatter(metric))
@@ -241,10 +231,8 @@ def do_dimension_name_list(mc, args):
 
     try:
         dimension_names = mc.metrics.list_dimension_names(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
 
     if args.json:
         print(utils.json_formatter(dimension_names))
@@ -283,10 +271,8 @@ def do_dimension_value_list(mc, args):
 
     try:
         dimension_values = mc.metrics.list_dimension_values(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
 
     if args.json:
         print(utils.json_formatter(dimension_values))
@@ -429,10 +415,8 @@ def do_measurement_list(mc, args):
 
     try:
         metric = mc.metrics.list_measurements(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         if args.json:
             print(utils.json_formatter(metric))
@@ -496,8 +480,8 @@ def do_metric_statistics(mc, args):
         if stat.upper() not in statistic_types:
             errmsg = ('Invalid type, not one of [' +
                       ', '.join(statistic_types) + ']')
-            print(errmsg)
-            return
+            raise osc_exc.CommandError(errmsg)
+
     fields = {}
     fields['name'] = args.name
     if args.dimensions:
@@ -522,10 +506,8 @@ def do_metric_statistics(mc, args):
 
     try:
         metric = mc.metrics.list_statistics(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         if args.json:
             print(utils.json_formatter(metric))
@@ -598,10 +580,8 @@ def do_notification_create(mc, args):
         fields['period'] = args.period
     try:
         notification = mc.notifications.create(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         print(jsonutils.dumps(notification, indent=2))
 
@@ -614,10 +594,8 @@ def do_notification_show(mc, args):
     fields['notification_id'] = args.id
     try:
         notification = mc.notifications.get(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         if args.json:
             print(utils.json_formatter(notification))
@@ -665,9 +643,9 @@ def do_notification_list(mc, args):
 
     try:
         notification = mc.notifications.list(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
+    except osc_exc.ClientException as he:
+        raise osc_exc.CommandError(
+            'ClientException code=%s message=%s' %
             (he.code, he.message))
     else:
         if args.json:
@@ -701,10 +679,8 @@ def do_notification_delete(mc, args):
     fields['notification_id'] = args.id
     try:
         mc.notifications.delete(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         print('Successfully deleted notification')
 
@@ -732,10 +708,8 @@ def do_notification_update(mc, args):
     fields['period'] = args.period
     try:
         notification = mc.notifications.update(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         print(jsonutils.dumps(notification, indent=2))
 
@@ -768,10 +742,8 @@ def do_notification_patch(mc, args):
         fields['period'] = args.period
     try:
         notification = mc.notifications.patch(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         print(jsonutils.dumps(notification, indent=2))
 
@@ -832,10 +804,8 @@ def do_alarm_definition_create(mc, args):
         fields['match_by'] = args.match_by.split(',')
     try:
         alarm = mc.alarm_definitions.create(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         print(jsonutils.dumps(alarm, indent=2))
 
@@ -848,10 +818,8 @@ def do_alarm_definition_show(mc, args):
     fields['alarm_id'] = args.id
     try:
         alarm = mc.alarm_definitions.get(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         if args.json:
             print(utils.json_formatter(alarm))
@@ -923,10 +891,8 @@ def do_alarm_definition_list(mc, args):
         fields['offset'] = args.offset
     try:
         alarm = mc.alarm_definitions.list(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         if args.json:
             print(utils.json_formatter(alarm))
@@ -957,10 +923,8 @@ def do_alarm_definition_delete(mc, args):
     fields['alarm_id'] = args.id
     try:
         mc.alarm_definitions.delete(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         print('Successfully deleted alarm definition')
 
@@ -1014,10 +978,8 @@ def do_alarm_definition_update(mc, args):
     fields['severity'] = args.severity
     try:
         alarm = mc.alarm_definitions.update(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         print(jsonutils.dumps(alarm, indent=2))
 
@@ -1075,10 +1037,8 @@ def do_alarm_definition_patch(mc, args):
         fields['severity'] = args.severity
     try:
         alarm = mc.alarm_definitions.patch(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         print(jsonutils.dumps(alarm, indent=2))
 
@@ -1159,10 +1119,8 @@ def do_alarm_list(mc, args):
         fields['sort_by'] = args.sort_by
     try:
         alarm = mc.alarms.list(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         if args.json:
             print(utils.json_formatter(alarm))
@@ -1202,10 +1160,8 @@ def do_alarm_show(mc, args):
     fields['alarm_id'] = args.id
     try:
         alarm = mc.alarms.get(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         if args.json:
             print(utils.json_formatter(alarm))
@@ -1243,10 +1199,8 @@ def do_alarm_update(mc, args):
     fields['link'] = args.link
     try:
         alarm = mc.alarms.update(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         print(jsonutils.dumps(alarm, indent=2))
 
@@ -1276,10 +1230,8 @@ def do_alarm_patch(mc, args):
         fields['link'] = args.link
     try:
         alarm = mc.alarms.patch(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         print(jsonutils.dumps(alarm, indent=2))
 
@@ -1292,10 +1244,8 @@ def do_alarm_delete(mc, args):
     fields['alarm_id'] = args.id
     try:
         mc.alarms.delete(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         print('Successfully deleted alarm')
 
@@ -1397,17 +1347,15 @@ def do_alarm_count(mc, args):
         fields['offset'] = args.offset
     try:
         counts = mc.alarms.count(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         if args.json:
             print(utils.json_formatter(counts))
             return
         cols = counts['columns']
 
-        utils.print_list(counts['counts'], [i for i in xrange(len(cols))],
+        utils.print_list(counts['counts'], [i for i in range(len(cols))],
                          field_labels=cols)
 
 
@@ -1427,10 +1375,8 @@ def do_alarm_history(mc, args):
         fields['offset'] = args.offset
     try:
         alarm = mc.alarms.history(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         output_alarm_history(args, alarm)
 
@@ -1466,10 +1412,8 @@ def do_alarm_history_list(mc, args):
         fields['offset'] = args.offset
     try:
         alarm = mc.alarms.history_list(**fields)
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         output_alarm_history(args, alarm)
 
@@ -1479,10 +1423,8 @@ def do_notification_type_list(mc, args):
 
     try:
         notification_types = mc.notificationtypes.list()
-    except exc.HTTPException as he:
-        raise exc.CommandError(
-            'HTTPException code=%s message=%s' %
-            (he.code, he.message))
+    except (osc_exc.ClientException, k_exc.HttpError) as he:
+        raise osc_exc.CommandError('%s\n%s' % (he.message, he.details))
     else:
         if args.json:
             print(utils.json_formatter(notification_types))

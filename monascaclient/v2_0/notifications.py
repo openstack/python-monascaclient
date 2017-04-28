@@ -1,4 +1,5 @@
 # (C) Copyright 2014-2016 Hewlett Packard Enterprise Development LP
+# Copyright 2017 FUJITSU LIMITED
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,33 +14,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from copy import deepcopy
-
-from monascaclient.apiclient import base
 from monascaclient.common import monasca_manager
 
 
-class Notifications(base.Resource):
-
-    def __repr__(self):
-        return "<Notifications %s>" % self._info
-
-
 class NotificationsManager(monasca_manager.MonascaManager):
-    resource_class = Notifications
     base_url = '/notification-methods'
 
     def create(self, **kwargs):
         """Create a notification."""
-        resp, body = self.client.json_request('POST', self.base_url,
-                                              data=kwargs)
+        body = self.client.create(url=self.base_url,
+                                  json=kwargs)
         return body
 
     def get(self, **kwargs):
         """Get the details for a specific notification."""
-        url_str = self.base_url + '/%s' % kwargs['notification_id']
-        resp, body = self.client.json_request('GET', url_str)
-        return body
+
+        # NOTE(trebskit) should actually be find_one, but
+        # monasca does not support expected response format
+
+        url = '%s/%s' % (self.base_url, kwargs['notification_id'])
+        resp = self.client.list(path=url)
+        return resp
 
     def list(self, **kwargs):
         """Get a list of notifications."""
@@ -47,24 +42,27 @@ class NotificationsManager(monasca_manager.MonascaManager):
 
     def delete(self, **kwargs):
         """Delete a notification."""
-        url_str = self.base_url + '/%s' % kwargs['notification_id']
-        resp, body = self.client.json_request('DELETE', url_str)
+        url = self.base_url + '/%s' % kwargs['notification_id']
+        resp = self.client.delete(url=url)
         return resp
 
     def update(self, **kwargs):
-        local_kwargs = deepcopy(kwargs)
         """Update a notification."""
-        url_str = self.base_url + '/%s' % local_kwargs['notification_id']
-        del local_kwargs['notification_id']
-        resp, body = self.client.json_request('PUT', url_str,
-                                              data=local_kwargs)
-        return body
+        url_str = self.base_url + '/%s' % kwargs['notification_id']
+        del kwargs['notification_id']
+
+        resp = self.client.create(url=url_str,
+                                  method='PUT',
+                                  json=kwargs)
+        return resp
 
     def patch(self, **kwargs):
-        local_kwargs = deepcopy(kwargs)
         """Patch a notification."""
-        url_str = self.base_url + '/%s' % local_kwargs['notification_id']
-        del local_kwargs['notification_id']
-        resp, body = self.client.json_request('PATCH', url_str,
-                                              data=local_kwargs)
-        return body
+        url_str = self.base_url + '/%s' % kwargs['notification_id']
+        del kwargs['notification_id']
+
+        resp = self.client.create(url=url_str,
+                                  method='PATCH',
+                                  json=kwargs)
+
+        return resp

@@ -1,4 +1,5 @@
 # (C) Copyright 2016 Hewlett Packard Enterprise Development LP
+# Copyright 2017 FUJITSU LIMITED
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,18 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from monascaclient.apiclient import base
 from monascaclient.common import monasca_manager
 
 
-class NotificationTypes(base.Resource):
-
-    def __repr__(self):
-        return "<NotificationTypes %s>" % self._info
-
-
 class NotificationTypesManager(monasca_manager.MonascaManager):
-    resource_class = NotificationTypes
     base_url = '/notification-methods/types'
 
     def list(self, **kwargs):

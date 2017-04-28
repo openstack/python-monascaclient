@@ -1,4 +1,5 @@
 # (C) Copyright 2014-2015 Hewlett Packard Enterprise Development Company LP
+# Copyright 2017 FUJITSU LIMITED
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,31 +14,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from monascaclient.apiclient import base
 from monascaclient.common import monasca_manager
 
 
-class AlarmDefinitions(base.Resource):
-
-    def __repr__(self):
-        return "<AlarmDefinitions %s>" % self._info
-
-
 class AlarmDefinitionsManager(monasca_manager.MonascaManager):
-    resource_class = AlarmDefinitions
     base_url = '/alarm-definitions'
 
     def create(self, **kwargs):
         """Create an alarm definition."""
-        resp, body = self.client.json_request('POST', self.base_url,
-                                              data=kwargs)
-        return body
+        resp = self.client.create(url=self.base_url,
+                                  json=kwargs)
+        return resp
 
     def get(self, **kwargs):
         """Get the details for a specific alarm definition."""
-        url_str = self.base_url + '/%s' % kwargs['alarm_id']
-        resp, body = self.client.json_request('GET', url_str)
-        return body
+
+        # NOTE(trebskit) should actually be find_one, but
+        # monasca does not support expected response format
+
+        url = '%s/%s' % (self.base_url, kwargs['alarm_id'])
+        resp = self.client.list(path=url)
+        return resp
 
     def list(self, **kwargs):
         """Get a list of alarm definitions."""
@@ -46,19 +43,27 @@ class AlarmDefinitionsManager(monasca_manager.MonascaManager):
     def delete(self, **kwargs):
         """Delete a specific alarm definition."""
         url_str = self.base_url + '/%s' % kwargs['alarm_id']
-        resp, body = self.client.json_request('DELETE', url_str)
+        resp = self.client.delete(url_str)
         return resp
 
     def update(self, **kwargs):
         """Update a specific alarm definition."""
         url_str = self.base_url + '/%s' % kwargs['alarm_id']
         del kwargs['alarm_id']
-        resp, body = self.client.json_request('PUT', url_str, data=kwargs)
-        return body
+
+        resp = self.client.create(url=url_str,
+                                  method='PUT',
+                                  json=kwargs)
+
+        return resp
 
     def patch(self, **kwargs):
         """Patch a specific alarm definition."""
         url_str = self.base_url + '/%s' % kwargs['alarm_id']
         del kwargs['alarm_id']
-        resp, body = self.client.json_request('PATCH', url_str, data=kwargs)
-        return body
+
+        resp = self.client.create(url=url_str,
+                                  method='PATCH',
+                                  json=kwargs)
+
+        return resp
