@@ -23,6 +23,7 @@ import argparse
 import logging
 import string
 import sys
+import warnings
 
 from six.moves.urllib.parse import urljoin
 
@@ -34,6 +35,17 @@ from monascaclient import ksclient
 
 
 logger = logging.getLogger(__name__)
+
+
+class DeprecatedStore(argparse._StoreAction):
+    def __init__(self, *args, **kwargs):
+        super(DeprecatedStore, self).__init__(*args, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        warnings.filterwarnings(action='default', category=DeprecationWarning, module='.*monascaclient.*')
+        warnings.warn("{} is deprecated".format(",".join(self.option_strings)),
+                      DeprecationWarning)
+        setattr(namespace, self.dest, values)
 
 
 class MonascaShell(object):
@@ -140,6 +152,30 @@ class MonascaShell(object):
                             help='Defaults to env[OS_PROJECT_NAME].')
 
         parser.add_argument('--os_project_name',
+                            help=argparse.SUPPRESS)
+
+        parser.add_argument('--os-tenant-name',
+                            dest='os_project_name',
+                            action=DeprecatedStore,
+                            default=utils.env('OS_TENANT_NAME'),
+                            help='(Deprecated, use --os-project_name) '
+                            'Defaults to env[OS_TENANT_NAME].')
+
+        parser.add_argument('--os_tenant_name',
+                            dest='os_project_name',
+                            action=DeprecatedStore,
+                            help=argparse.SUPPRESS)
+
+        parser.add_argument('--os-tenant-id',
+                            dest='os_project_id',
+                            action=DeprecatedStore,
+                            default=utils.env('OS_TENANT_ID'),
+                            help='(Deprecated, use --os-project_id) '
+                            'Defaults to env[OS_TENANT_ID].')
+
+        parser.add_argument('--os_tenant_id',
+                            dest='os_project_id',
+                            action=DeprecatedStore,
                             help=argparse.SUPPRESS)
 
         parser.add_argument('--os-project-domain-id',
