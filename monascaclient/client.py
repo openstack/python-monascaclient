@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import warnings
+
 from keystoneauth1 import identity
 from keystoneauth1 import session
 
@@ -21,7 +23,12 @@ from monascaclient.osc import migration
 from monascaclient import version
 
 
-def Client(api_version, **kwargs):
+_NO_VALUE_MARKER = object()
+
+
+def Client(api_version, *args,  **kwargs):
+
+    handle_deprecated(args, kwargs)
 
     auth = _get_auth_handler(kwargs)
     sess = _get_session(auth, kwargs)
@@ -36,15 +43,69 @@ def Client(api_version, **kwargs):
     return client
 
 
+def handle_deprecated(args, kwargs):
+    """Handles all deprecations
+
+    Method goes through passed args and kwargs
+    and handles all values that are invalid from POV
+    of current client but:
+
+    * has their counterparts
+    * are candidates to be dropped
+
+    """
+    kwargs.update(_handle_deprecated_args(args))
+    _handle_deprecated_kwargs(kwargs)
+
+
+def _handle_deprecated_kwargs(kwargs):
+
+    depr_map = {
+        'tenant_name': ('project_name', lambda x: x),
+        'insecure': ('verify', lambda x: not x)
+    }
+
+    for key, new_key_transform in depr_map.items():
+        val = kwargs.get(key, _NO_VALUE_MARKER)
+        if val != _NO_VALUE_MARKER:
+            new_key = new_key_transform[0]
+            new_handler = new_key_transform[1]
+
+            warnings.warn(
+                'Usage of {old_key} has been deprecated in favour '
+                'of {new_key}. monascaclient will place value of {old_key} '
+                'under {new_key}'.format(old_key=key, new_key=new_key),
+                DeprecationWarning
+            )
+
+            kwargs[new_key] = new_handler(val)
+            del kwargs[key]
+
+
+def _handle_deprecated_args(args):
+    kwargs_update = {}
+    if args is not None and len(args) > 0:
+        warnings.warn(
+            'Usage or args is deprecated for the sake of '
+            'explicit configuration of the client using '
+            'named arguments (**kwargs). '
+            'That argument will be removed in future releases.',
+            DeprecationWarning
+        )
+        # have all permissible args set here
+        kwargs_update.update({
+            'endpoint': args[0]
+        })
+    return kwargs_update
+
+
 def _get_session(auth, kwargs):
     return session.Session(auth=auth,
                            app_name='monascaclient',
                            app_version=version.version_string,
                            cert=kwargs.get('cert', None),
                            timeout=kwargs.get('timeout', None),
-                           verify=kwargs.get('verify',
-                                             not kwargs.get('insecure',
-                                                            False)))
+                           verify=kwargs.get('verify', True))
 
 
 def _get_auth_handler(kwargs):
