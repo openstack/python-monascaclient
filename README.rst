@@ -362,7 +362,7 @@ In order to use the python api directly, you must pass in a valid auth token and
 monasca api endpoint, or you can pass in the credentials required by the keystone
 client and let the Python API do the authentication.  The user can obtain the token
 and endpoint using the keystone client api:
-http://docs.openstack.org/developer/python-keystoneclient/.
+http://docs.openstack.org/python-keystoneclient/latest/.
 The service catalog name for our API endpoint is "monasca".
 
 Start using the monascaclient API by constructing the monascaclient client.Client class.
