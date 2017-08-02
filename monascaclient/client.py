@@ -14,15 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import warnings
 
 from keystoneauth1 import identity
-from keystoneauth1 import session
+from keystoneauth1 import session as k_session
+from osc_lib import session as o_session
 
 from monascaclient.osc import migration
 from monascaclient import version
 
 
+LOG = logging.getLogger(__name__)
 _NO_VALUE_MARKER = object()
 
 
@@ -30,12 +33,9 @@ def Client(api_version, *args,  **kwargs):
 
     handle_deprecated(args, kwargs)
 
-    auth = _get_auth_handler(kwargs)
-    sess = _get_session(auth, kwargs)
-
     client = migration.make_client(
         api_version=api_version,
-        session=sess,
+        session=_session(kwargs),
         endpoint=kwargs.get('endpoint'),
         service_type=kwargs.get('service_type', 'monitoring')
     )
@@ -43,8 +43,36 @@ def Client(api_version, *args,  **kwargs):
     return client
 
 
+def _session(kwargs):
+    """Returns or reuses session.
+
+    Method takes care of providing instance of
+    session object for the client.
+
+    :param kwargs: all params (without api_version) client was initialized with
+    :type kwargs: dict
+
+    :returns: session object
+    :rtype union(keystoneauth1.session.Session, osc_lib.session.TimingSession)
+
+    """
+    if 'session' in kwargs:
+        LOG.debug('Reusing session')
+        sess = kwargs.get('session')
+        expected_cls = (k_session.Session, o_session.TimingSession)
+        if not isinstance(sess, expected_cls):
+            msg = ('session should be an instance of [%s, %s]' % expected_cls)
+            LOG.error(msg)
+            raise RuntimeError(msg)
+    else:
+        LOG.debug('Initializing new session')
+        auth = _get_auth_handler(kwargs)
+        sess = _get_session(auth, kwargs)
+    return sess
+
+
 def handle_deprecated(args, kwargs):
-    """Handles all deprecations
+    """Handles all deprecations.
 
     Method goes through passed args and kwargs
     and handles all values that are invalid from POV
@@ -100,12 +128,12 @@ def _handle_deprecated_args(args):
 
 
 def _get_session(auth, kwargs):
-    return session.Session(auth=auth,
-                           app_name='monascaclient',
-                           app_version=version.version_string,
-                           cert=kwargs.get('cert', None),
-                           timeout=kwargs.get('timeout', None),
-                           verify=kwargs.get('verify', True))
+    return k_session.Session(auth=auth,
+                             app_name='monascaclient',
+                             app_version=version.version_string,
+                             cert=kwargs.get('cert', None),
+                             timeout=kwargs.get('timeout', None),
+                             verify=kwargs.get('verify', True))
 
 
 def _get_auth_handler(kwargs):
