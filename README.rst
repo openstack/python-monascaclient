@@ -63,8 +63,6 @@ Usage:
 
   monasca help <command>
 
-  monasca -j <command>
-
     This outputs the results in json format.  Normally output is in table format.
 
 
@@ -73,7 +71,7 @@ Monasca API RESTful interface.  This is provided through environment or CLI
 parameters.
 
 Environmental Variables
-~~~~~~~~~~~~~~~~~~~~~~~
+=======================
 
 Environmental variables can be sourced, or optionally passed in as CLI arguments.
 It is easiest to source them first and then use the CLI.
@@ -106,121 +104,356 @@ When using Vagrant Environment with middleware disabled::
 
 The Monasca API will treat the auth token as the tenant ID when Keystone is not enabled.
 
+Usage
+=====
+
 You'll find complete documentation on the shell by running
+
 ``monasca help``::
 
-  usage: monasca [-j] [--version] [-d] [-v] [-k] [--cert-file CERT_FILE]
-               [--key-file KEY_FILE] [--os-cacert OS_CACERT]
-               [--timeout TIMEOUT] [--os-username OS_USERNAME]
-               [--os-password OS_PASSWORD] [--os-project-id OS_PROJECT_ID]
-               [--os-user-domain-id OS_USER_DOMAIN_ID] [--os-user-domain-name OS_USER_DOMAIN_NAME]
-               [--os-project-name OS_PROJECT_NAME]
-               [--os-project-domain-id OS_PROJECT_DOMAIN_ID] [--os-project-domain-name OS_PROJECT_DOMAIN_NAME]
-               [--os-auth-url OS_AUTH_URL] [--os-auth-version OS_AUTH_VERSION] [--os-region-name OS_REGION_NAME]
-               [--os-auth-token OS_AUTH_TOKEN] [--os-no-client-auth]
+  usage: monasca [--version] [-v | -q] [--log-file LOG_FILE] [-h] [--debug]
+               [--os-cloud <cloud-config-name>]
+               [--os-region-name <auth-region-name>]
+               [--os-cacert <ca-bundle-file>] [--os-cert <certificate-file>]
+               [--os-key <key-file>] [--verify | --insecure]
+               [--os-default-domain <auth-domain>]
+               [--os-interface <interface>] [--timing] [--os-beta-command]
+               [--os-auth-type <auth-type>] [--os-code <auth-code>]
+               [--os-protocol <auth-protocol>]
+               [--os-project-name <auth-project-name>]
+               [--os-trust-id <auth-trust-id>]
+               [--os-domain-name <auth-domain-name>]
+               [--os-user-domain-id <auth-user-domain-id>]
+               [--os-access-token-type <auth-access-token-type>]
+               [--os-default-domain-name <auth-default-domain-name>]
+               [--os-access-token-endpoint <auth-access-token-endpoint>]
+               [--os-access-token <auth-access-token>]
+               [--os-domain-id <auth-domain-id>]
+               [--os-user-domain-name <auth-user-domain-name>]
+               [--os-openid-scope <auth-openid-scope>]
+               [--os-user-id <auth-user-id>]
+               [--os-identity-provider <auth-identity-provider>]
+               [--os-username <auth-username>] [--os-auth-url <auth-auth-url>]
+               [--os-client-secret <auth-client-secret>]
+               [--os-default-domain-id <auth-default-domain-id>]
+               [--os-discovery-endpoint <auth-discovery-endpoint>]
+               [--os-client-id <auth-client-id>]
+               [--os-project-domain-name <auth-project-domain-name>]
+               [--os-project-domain-id <auth-project-domain-id>]
+               [--os-password <auth-password>]
+               [--os-redirect-uri <auth-redirect-uri>]
+               [--os-endpoint <auth-endpoint>] [--os-token <auth-token>]
+               [--os-passcode <auth-passcode>]
+               [--os-project-id <auth-project-id>]
                [--monasca-api-url MONASCA_API_URL]
                [--monasca-api-version MONASCA_API_VERSION]
-               [--os-service-type OS_SERVICE_TYPE]
-               [--os-endpoint-type OS_ENDPOINT_TYPE]
-               <subcommand> ...
 
-  Command-line interface to the monasca-client API.
-
-  positional arguments:
-    <subcommand>
-      alarm-definition-create  Create an alarm definition.
-      alarm-definition-delete  Delete the alarm definition.
-      alarm-definition-list    List alarm definitions for this tenant.
-      alarm-definition-patch   Patch the alarm definition.
-      alarm-definition-show    Describe the alarm definition.
-      alarm-definition-update  Update the alarm definition.
-      alarm-delete             Delete the alarm.
-      alarm-history            Alarm state history.
-      alarm-history-list       List alarms state history.
-      alarm-list               List alarms for this tenant.
-      alarm-patch              Patch the alarm.
-      alarm-show               Describe the alarm.
-      alarm-update             Update the alarm.
-      dimension-name-list      List names of dimensions.
-      dimension-value-list     List the dimension values for a given dimension name.
-      measurement-list         List measurements for the specified metric.
-      metric-create            Create metric.
-      metric-create-raw        Create metric from raw json body.
-      metric-list              List metrics for this tenant.
-      metric-name-list         List names of metrics.
-      metric-statistics        List measurement statistics for the specified metric.
-      notification-create      Create notification.
-      notification-delete      Delete notification.
-      notification-list        List notifications for this tenant.
-      notification-patch       Patch notification.
-      notification-show        Describe the notification.
-      notification-update      Update notification.
-      bash-completion          Prints all of the commands and options to stdout.
-      help                     Display help about this program or one of its
-                               subcommands.
+  Command-line interface to the OpenStack APIs
 
   optional arguments:
-    -j, --json                 output raw json response
-    --version                  Shows the client version and exits.
-    -d, --debug                Defaults to env[MONASCA_DEBUG].
-    -v, --verbose              Print more verbose output.
-    -k, --insecure             Explicitly allow the client to perform "insecure" SSL
-                               (https) requests. The server's certificate will not
-                               be verified against any certificate authorities. This
-                               option should be used with caution.
-    --cert-file CERT_FILE      Path of certificate file to use in SSL connection.
-                               This file can optionally be prepended with the
-                               private key.
-    --key-file KEY_FILE        Path of client key to use in SSL connection.This
-                               option is not necessary if your key is prepended to
-                               your cert file.
-    --os-cacert OS_CACERT      Specify a CA bundle file to use in verifying a
-                               TLS (https) server certificate. Defaults to
-                               env[OS_CACERT]. Without either of these, the
-                               client looks for the default system CA
-                               certificates.
-    --timeout TIMEOUT          Number of seconds to wait for a response.
-    --os-username OS_USERNAME  Defaults to env[OS_USERNAME].
-    --os-password OS_PASSWORD  Defaults to env[OS_PASSWORD].
-    --os-project-id OS_PROJECT_ID
-                               Defaults to env[OS_PROJECT_ID].
-    --os-project-name OS_PROJECT_NAME
-                               Defaults to env[OS_PROJECT_NAME].
-    --os-domain-id OS_DOMAIN_ID
-                               Defaults to env[OS_DOMAIN_ID].
-    --os-domain-name OS_DOMAIN_NAME
-                               Defaults to env[OS_DOMAIN_NAME].
-    --os-auth-url OS_AUTH_URL  Defaults to env[OS_AUTH_URL].
-  --os-auth-version OS_AUTH_VERSION
-                               Defaults to env[OS_AUTH_VERSION].
-    --os-region-name OS_REGION_NAME
-                               Defaults to env[OS_REGION_NAME].
-    --os-auth-token OS_AUTH_TOKEN
-                               Defaults to env[OS_AUTH_TOKEN].
-    --os-no-client-auth        Do not contact keystone for a token. Defaults to
-                               env[OS_NO_CLIENT_AUTH].
+    --version             show program's version number and exit
+    -v, --verbose         Increase verbosity of output. Can be repeated.
+    -q, --quiet           Suppress output except warnings and errors.
+    --log-file LOG_FILE   Specify a file to log output. Disabled by default.
+    -h, --help            Show help message and exit.
+    --debug               Show tracebacks on errors.
+    --os-cloud <cloud-config-name>
+                          Cloud name in clouds.yaml (Env: OS_CLOUD)
+    --os-region-name <auth-region-name>
+                          Authentication region name (Env: OS_REGION_NAME)
+    --os-cacert <ca-bundle-file>
+                          CA certificate bundle file (Env: OS_CACERT)
+    --os-cert <certificate-file>
+                          Client certificate bundle file (Env: OS_CERT)
+    --os-key <key-file>   Client certificate key file (Env: OS_KEY)
+    --verify              Verify server certificate (default)
+    --insecure            Disable server certificate verification
+    --os-default-domain <auth-domain>
+                          Default domain ID, default=default. (Env:
+                          OS_DEFAULT_DOMAIN)
+    --os-interface <interface>
+                          Select an interface type. Valid interface types:
+                          [admin, public, internal]. (Env: OS_INTERFACE)
+    --timing              Print API call timing info
+    --os-beta-command     Enable beta commands which are subject to change
+    --os-auth-type <auth-type>
+                          Select an authentication type. Available types:
+                          v2token, admin_token, v3oidcauthcode, v2password,
+                          v3password, v3oidcaccesstoken, v3oidcpassword, token,
+                          v3oidcclientcredentials, v3tokenlessauth, v3token,
+                          v3totp, password. Default: selected based on --os-
+                          username/--os-token (Env: OS_AUTH_TYPE)
+    --os-code <auth-code>
+                          With v3oidcauthcode: OAuth 2.0 Authorization Code
+                          (Env: OS_CODE)
+    --os-protocol <auth-protocol>
+                          With v3oidcauthcode: Protocol for federated plugin
+                          With v3oidcaccesstoken: Protocol for federated plugin
+                          With v3oidcpassword: Protocol for federated plugin
+                          With v3oidcclientcredentials: Protocol for federated
+                          plugin (Env: OS_PROTOCOL)
+    --os-project-name <auth-project-name>
+                          With v3oidcauthcode: Project name to scope to With
+                          v3password: Project name to scope to With
+                          v3oidcaccesstoken: Project name to scope to With
+                          v3oidcpassword: Project name to scope to With token:
+                          Project name to scope to With v3oidcclientcredentials:
+                          Project name to scope to With v3tokenlessauth: Project
+                          name to scope to With v3token: Project name to scope
+                          to With v3totp: Project name to scope to With
+                          password: Project name to scope to (Env:
+                          OS_PROJECT_NAME)
+    --os-trust-id <auth-trust-id>
+                          With v2token: Trust ID With v3oidcauthcode: Trust ID
+                          With v2password: Trust ID With v3password: Trust ID
+                          With v3oidcaccesstoken: Trust ID With v3oidcpassword:
+                          Trust ID With token: Trust ID With
+                          v3oidcclientcredentials: Trust ID With v3token: Trust
+                          ID With v3totp: Trust ID With password: Trust ID (Env:
+                          OS_TRUST_ID)
+    --os-domain-name <auth-domain-name>
+                          With v3oidcauthcode: Domain name to scope to With
+                          v3password: Domain name to scope to With
+                          v3oidcaccesstoken: Domain name to scope to With
+                          v3oidcpassword: Domain name to scope to With token:
+                          Domain name to scope to With v3oidcclientcredentials:
+                          Domain name to scope to With v3tokenlessauth: Domain
+                          name to scope to With v3token: Domain name to scope to
+                          With v3totp: Domain name to scope to With password:
+                          Domain name to scope to (Env: OS_DOMAIN_NAME)
+    --os-user-domain-id <auth-user-domain-id>
+                          With v3password: User's domain id With v3totp: User's
+                          domain id With password: User's domain id (Env:
+                          OS_USER_DOMAIN_ID)
+    --os-access-token-type <auth-access-token-type>
+                          With v3oidcauthcode: OAuth 2.0 Authorization Server
+                          Introspection token type, it is used to decide which
+                          type of token will be used when processing token
+                          introspection. Valid values are: "access_token" or
+                          "id_token" With v3oidcpassword: OAuth 2.0
+                          Authorization Server Introspection token type, it is
+                          used to decide which type of token will be used when
+                          processing token introspection. Valid values are:
+                          "access_token" or "id_token" With
+                          v3oidcclientcredentials: OAuth 2.0 Authorization
+                          Server Introspection token type, it is used to decide
+                          which type of token will be used when processing token
+                          introspection. Valid values are: "access_token" or
+                          "id_token" (Env: OS_ACCESS_TOKEN_TYPE)
+    --os-default-domain-name <auth-default-domain-name>
+                          With token: Optional domain name to use with v3 API
+                          and v2 parameters. It will be used for both the user
+                          and project domain in v3 and ignored in v2
+                          authentication. With password: Optional domain name to
+                          use with v3 API and v2 parameters. It will be used for
+                          both the user and project domain in v3 and ignored in
+                          v2 authentication. (Env: OS_DEFAULT_DOMAIN_NAME)
+    --os-access-token-endpoint <auth-access-token-endpoint>
+                          With v3oidcauthcode: OpenID Connect Provider Token
+                          Endpoint. Note that if a discovery document is being
+                          passed this option will override the endpoint provided
+                          by the server in the discovery document. With
+                          v3oidcpassword: OpenID Connect Provider Token
+                          Endpoint. Note that if a discovery document is being
+                          passed this option will override the endpoint provided
+                          by the server in the discovery document. With
+                          v3oidcclientcredentials: OpenID Connect Provider Token
+                          Endpoint. Note that if a discovery document is being
+                          passed this option will override the endpoint provided
+                          by the server in the discovery document. (Env:
+                          OS_ACCESS_TOKEN_ENDPOINT)
+    --os-access-token <auth-access-token>
+                          With v3oidcaccesstoken: OAuth 2.0 Access Token (Env:
+                          OS_ACCESS_TOKEN)
+    --os-domain-id <auth-domain-id>
+                          With v3oidcauthcode: Domain ID to scope to With
+                          v3password: Domain ID to scope to With
+                          v3oidcaccesstoken: Domain ID to scope to With
+                          v3oidcpassword: Domain ID to scope to With token:
+                          Domain ID to scope to With v3oidcclientcredentials:
+                          Domain ID to scope to With v3tokenlessauth: Domain ID
+                          to scope to With v3token: Domain ID to scope to With
+                          v3totp: Domain ID to scope to With password: Domain ID
+                          to scope to (Env: OS_DOMAIN_ID)
+    --os-user-domain-name <auth-user-domain-name>
+                          With v3password: User's domain name With v3totp:
+                          User's domain name With password: User's domain name
+                          (Env: OS_USER_DOMAIN_NAME)
+    --os-openid-scope <auth-openid-scope>
+                          With v3oidcauthcode: OpenID Connect scope that is
+                          requested from authorization server. Note that the
+                          OpenID Connect specification states that "openid" must
+                          be always specified. With v3oidcpassword: OpenID
+                          Connect scope that is requested from authorization
+                          server. Note that the OpenID Connect specification
+                          states that "openid" must be always specified. With
+                          v3oidcclientcredentials: OpenID Connect scope that is
+                          requested from authorization server. Note that the
+                          OpenID Connect specification states that "openid" must
+                          be always specified. (Env: OS_OPENID_SCOPE)
+    --os-user-id <auth-user-id>
+                          With v2password: User ID to login with With
+                          v3password: User ID With v3totp: User ID With
+                          password: User id (Env: OS_USER_ID)
+    --os-identity-provider <auth-identity-provider>
+                          With v3oidcauthcode: Identity Provider's name With
+                          v3oidcaccesstoken: Identity Provider's name With
+                          v3oidcpassword: Identity Provider's name With
+                          v3oidcclientcredentials: Identity Provider's name
+                          (Env: OS_IDENTITY_PROVIDER)
+    --os-username <auth-username>
+                          With v2password: Username to login with With
+                          v3password: Username With v3oidcpassword: Username
+                          With v3totp: Username With password: Username (Env:
+                          OS_USERNAME)
+    --os-auth-url <auth-auth-url>
+                          With v2token: Authentication URL With v3oidcauthcode:
+                          Authentication URL With v2password: Authentication URL
+                          With v3password: Authentication URL With
+                          v3oidcaccesstoken: Authentication URL With
+                          v3oidcpassword: Authentication URL With token:
+                          Authentication URL With v3oidcclientcredentials:
+                          Authentication URL With v3tokenlessauth:
+                          Authentication URL With v3token: Authentication URL
+                          With v3totp: Authentication URL With password:
+                          Authentication URL (Env: OS_AUTH_URL)
+    --os-client-secret <auth-client-secret>
+                          With v3oidcauthcode: OAuth 2.0 Client Secret With
+                          v3oidcpassword: OAuth 2.0 Client Secret With
+                          v3oidcclientcredentials: OAuth 2.0 Client Secret (Env:
+                          OS_CLIENT_SECRET)
+    --os-default-domain-id <auth-default-domain-id>
+                          With token: Optional domain ID to use with v3 and v2
+                          parameters. It will be used for both the user and
+                          project domain in v3 and ignored in v2 authentication.
+                          With password: Optional domain ID to use with v3 and
+                          v2 parameters. It will be used for both the user and
+                          project domain in v3 and ignored in v2 authentication.
+                          (Env: OS_DEFAULT_DOMAIN_ID)
+    --os-discovery-endpoint <auth-discovery-endpoint>
+                          With v3oidcauthcode: OpenID Connect Discovery Document
+                          URL. The discovery document will be used to obtain the
+                          values of the access token endpoint and the
+                          authentication endpoint. This URL should look like
+                          https://idp.example.org/.well-known/openid-
+                          configuration With v3oidcpassword: OpenID Connect
+                          Discovery Document URL. The discovery document will be
+                          used to obtain the values of the access token endpoint
+                          and the authentication endpoint. This URL should look
+                          like https://idp.example.org/.well-known/openid-
+                          configuration With v3oidcclientcredentials: OpenID
+                          Connect Discovery Document URL. The discovery document
+                          will be used to obtain the values of the access token
+                          endpoint and the authentication endpoint. This URL
+                          should look like https://idp.example.org/.well-known
+                          /openid-configuration (Env: OS_DISCOVERY_ENDPOINT)
+    --os-client-id <auth-client-id>
+                          With v3oidcauthcode: OAuth 2.0 Client ID With
+                          v3oidcpassword: OAuth 2.0 Client ID With
+                          v3oidcclientcredentials: OAuth 2.0 Client ID (Env:
+                          OS_CLIENT_ID)
+    --os-project-domain-name <auth-project-domain-name>
+                          With v3oidcauthcode: Domain name containing project
+                          With v3password: Domain name containing project With
+                          v3oidcaccesstoken: Domain name containing project With
+                          v3oidcpassword: Domain name containing project With
+                          token: Domain name containing project With
+                          v3oidcclientcredentials: Domain name containing
+                          project With v3tokenlessauth: Domain name containing
+                          project With v3token: Domain name containing project
+                          With v3totp: Domain name containing project With
+                          password: Domain name containing project (Env:
+                          OS_PROJECT_DOMAIN_NAME)
+    --os-project-domain-id <auth-project-domain-id>
+                          With v3oidcauthcode: Domain ID containing project With
+                          v3password: Domain ID containing project With
+                          v3oidcaccesstoken: Domain ID containing project With
+                          v3oidcpassword: Domain ID containing project With
+                          token: Domain ID containing project With
+                          v3oidcclientcredentials: Domain ID containing project
+                          With v3tokenlessauth: Domain ID containing project
+                          With v3token: Domain ID containing project With
+                          v3totp: Domain ID containing project With password:
+                          Domain ID containing project (Env:
+                          OS_PROJECT_DOMAIN_ID)
+    --os-password <auth-password>
+                          With v2password: Password to use With v3password:
+                          User's password With v3oidcpassword: Password With
+                          password: User's password (Env: OS_PASSWORD)
+    --os-redirect-uri <auth-redirect-uri>
+                          With v3oidcauthcode: OpenID Connect Redirect URL (Env:
+                          OS_REDIRECT_URI)
+    --os-endpoint <auth-endpoint>
+                          With admin_token: The endpoint that will always be
+                          used (Env: OS_ENDPOINT)
+    --os-token <auth-token>
+                          With v2token: Token With admin_token: The token that
+                          will always be used With token: Token to authenticate
+                          with With v3token: Token to authenticate with (Env:
+                          OS_TOKEN)
+    --os-passcode <auth-passcode>
+                          With v3totp: User's TOTP passcode (Env: OS_PASSCODE)
+    --os-project-id <auth-project-id>
+                          With v3oidcauthcode: Project ID to scope to With
+                          v3password: Project ID to scope to With
+                          v3oidcaccesstoken: Project ID to scope to With
+                          v3oidcpassword: Project ID to scope to With token:
+                          Project ID to scope to With v3oidcclientcredentials:
+                          Project ID to scope to With v3tokenlessauth: Project
+                          ID to scope to With v3token: Project ID to scope to
+                          With v3totp: Project ID to scope to With password:
+                          Project ID to scope to (Env: OS_PROJECT_ID)
     --monasca-api-url MONASCA_API_URL
-                               Defaults to env[MONASCA_API_URL].
+                          Defaults to env[MONASCA_API_URL].
     --monasca-api-version MONASCA_API_VERSION
-                               Defaults to env[MONASCA_API_VERSION] or 2_0
-    --os-service-type OS_SERVICE_TYPE
-                               Defaults to env[OS_SERVICE_TYPE].
-    --os-endpoint-type OS_ENDPOINT_TYPE
-                               Defaults to env[OS_ENDPOINT_TYPE].
+                          Defaults to env[MONASCA_API_VERSION] or 2_0
 
-  See "mon help COMMAND" for help on a specific command.
+  Commands:
+    alarm-count    Count alarms.
+    alarm-definition-create  Create an alarm definition.
+    alarm-definition-delete  Delete the alarm definition.
+    alarm-definition-list  List alarm definitions for this tenant.
+    alarm-definition-patch  Patch the alarm definition.
+    alarm-definition-show  Describe the alarm definition.
+    alarm-definition-update  Update the alarm definition.
+    alarm-delete   Delete the alarm.
+    alarm-history  Alarm state transition history.
+    alarm-history-list  List alarms state history.
+    alarm-list     List alarms for this tenant.
+    alarm-patch    Patch the alarm state.
+    alarm-show     Describe the alarm.
+    alarm-update   Update the alarm state.
+    complete       print bash completion command
+    dimension-name-list  List names of metric dimensions.
+    dimension-value-list  List names of metric dimensions.
+    help           print detailed help for another command
+    measurement-list  List measurements for the specified metric.
+    metric-create  Create metric.
+    metric-create-raw  Create metric from raw json body.
+    metric-list    List metrics for this tenant.
+    metric-name-list  List names of metrics.
+    metric-statistics  List measurement statistics for the specified metric.
+    notification-create  Create notification.
+    notification-delete  Delete notification.
+    notification-list  List notifications for this tenant.
+    notification-patch  Patch notification.
+    notification-show  Describe the notification.
+    notification-type-list  List notification types supported by monasca.
+    notification-update  Update notification.
 
 
 Bash Completion
-~~~~~~~~~~~~~~~
+---------------
+
 Basic command tab completion can be enabled by sourcing the bash completion script.
 ::
 
-  source /usr/local/share/monasca.bash_completion
+  monasca completion >> /usr/local/share/monasca.bash_completion
 
 
 Metrics Examples
-~~~~~~~~~~~~~~~~
+----------------
+
 Note:  To see complete usage: 'monasca help' and 'monasca help <command>'
 
 metric-create::
@@ -354,74 +587,90 @@ alarm-patch::
 
 
 Python API
-----------
+==========
 
 There's also a complete Python API.
 
-In order to use the python api directly, you must pass in a valid auth token and
+There are three possible approaches, at the moment, you can take to use the client
+directly. On high level, these approaches can be described as:
+
+* using **username** and **password**
+* using **token**
+* using existing <session `https://github.com/openstack/keystoneauth/blob/master/keystoneauth1/session.py>_`
+
+Username & password
+-------------------
+
+Following approach allows to initialize the monascaclient in a traditional way.
+It requires **username** and  **password**. Initialization of the client
+can be threfore executed with::
+
+  c = mon_client.Client(api_version='2_0',
+                        username=os.environ.get('OS_USERNAME', 'mini-mon'),
+                        password=os.environ.get('OS_PASSWORD', 'password'),
+                        auth_url=os.environ.get('OS_AUTH_URL', 'http://127.0.0.1/identity'),
+                        project_name=os.environ.get('OS_PROJECT_NAME', 'mini-mon'),
+                        endpoint='http://127.0.0.1:8070/v2.0')
+
+Token
+-----
+
+In order to use the monasclient directly, you must pass in a valid auth token and
 monasca api endpoint, or you can pass in the credentials required by the keystone
 client and let the Python API do the authentication.  The user can obtain the token
 and endpoint using the keystone client api:
-http://docs.openstack.org/python-keystoneclient/latest/.
-The service catalog name for our API endpoint is "monasca".
+http://docs.openstack.org/developer/python-keystoneclient/. Once **token**
+is available, a monascaclient can be initialized with following code::
 
-Start using the monascaclient API by constructing the monascaclient client.Client class.
-The Client class takes these parameters: api_version, endpoint, and token.
-The Client class is used to call all monasca-api resource commands (i.e.
-client.Client.metrics.create(fields)).
+  c = mon_client.Client(api_version='2_0',
+                        endpoint='http://127.0.0.1:8070/v2.0'
+                        token=token_id,
+                        auth_url=os.environ.get('OS_AUTH_URL', 'http://127.0.0.1/identity'),
+                        project_name=os.environ.get('OS_PROJECT_NAME', 'mini-mon'))
 
-Long running users of the Client will receive an indication
-that the keystone token has expired when they receive an HTTP response
-code of 401 Unauthorized from the monasca-API.  In this case, it is
-up to the user to get a new token from keystone which can be passed
-into the client.Client.replace_token(token) method.  If you constructed
-the Client with all the keystone credentials needed to authenticate,
-then the API will automatically try one time to re-authenticate with
-keystone whenever the token expires.
-
-The api_version matches the version of the Monasca API.  Currently it is 'v2_0'.
-
-When calling the commands, refer to monascaclient.v2_0.shell.py 'do_<command>'
-to see the required and optional fields for each command.
-https://github.com/openstack/python-monascaclient/blob/master/monascaclient/v2_0/shell.py
-
-Refer to the example in python-monascaclient/client_api_example.py for more detail::
-
-  from monascaclient import client
-  from monascaclient import ksclient
-  import monascaclient.exc as exc
-  import time
-
-  api_version = '2_0'
-
-  # Authenticate to Keystone
-  keystone_url = 'http://keystone:5000/v3'
-  ks = ksclient.KSClient(auth_url=keystone_url, username='user', password='password')
-
-  # construct the mon client
-  monasca_client = client.Client(api_version, ks.monasca_url, token=ks.token)
-
-  # call the metric-create command
-  dimensions = {'instance_id': '12345', 'service': 'hello'}
-  fields = {}
-  fields['name'] = 'cindy1'
-  fields['dimensions'] = dimensions
-  fields['timestamp'] = time.time() * 1000
-  fields['value'] = 222.333
-  try:
-      resp = monasca_client.metrics.create(**fields)
-  except exc.HTTPException as he:
-      print(he.code)
-      print(he.message)
-  else:
-      print(resp)
-
-
-
-License
+Session
 -------
 
+Usage of the monasclient with existing session can be expressed
+with following code::
+
+  from keystoneauth1 import session
+  from keystoneauth1 import identity
+
+  auth = identity.Token(auth_url=os.environ.get('OS_AUTH_URL', 'http://127.0.0.1/identity'),
+                        token=token_id,
+                        project_name=os.environ.get('OS_PROJECT_NAME', 'mini-mon'))
+  sess = session.Session(auth=auth)
+
+  c = client.Client(api_version='2_0',
+                    endpoint='http://127.0.0.1:8070/v2.0'
+                    session=sess)
+
+The session object construction is much broader topic. It involves picking
+one of the following authorization methods:
+
+* Password
+* Token
+
+Alternatively, if Keystone version is known, you may choose:
+
+* V2Password or V3Password
+* V2Token of V3Token
+* V3OidcClientCredentials
+* V3OidcPassword
+* V3OidcAuthorizationCode
+* V3OidcAccessToken
+* V3TOTP
+* V3TokenlessAuth
+
+For more details about each one of those methods, please visit
+`official documentation <https://docs.openstack.org/keystoneauth/latest/authentication-plugins.html>`_.
+
+License
+=======
+
 (C) Copyright 2014-2016 Hewlett Packard Enterprise Development LP
+Copyright 2017 Fujitsu LIMITED
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
