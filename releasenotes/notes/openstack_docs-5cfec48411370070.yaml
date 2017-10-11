@@ -1,0 +1,11 @@
+---
+prelude: >
+    Documentation done right by Openstack process.
+issues:
+  - |
+    Removed the case where command documentation (held previously in markdown)
+    is out-of-sync with the command itself.
+upgrade:
+  - |
+    Added details about using the CLI variant. Documented the usage
+    of Python API.

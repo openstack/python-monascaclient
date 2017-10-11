@@ -8,9 +8,10 @@ dist
 run_tests.err.log
 .tox
 doc/source/api
-*.egg
+doc/build/
+releasenotes/build/
+*.egg*
 monclient/versioninfo
-*.egg-info
 *.log
 .testrepository
 .pydevproject
