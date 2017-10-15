@@ -55,6 +55,7 @@ class MonascaShell(shell.OpenStackShell):
             description,
             version
         )
+        parser.set_defaults(cloud=None)
         parser = auth.build_auth_plugins_option_parser(parser)
         parser = self._append_monasca_args(parser)
         return parser
