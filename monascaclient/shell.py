@@ -25,7 +25,7 @@ import sys
 from osc_lib.api import auth
 from osc_lib.cli import client_config as cloud_config
 from osc_lib import shell
-from osc_lib import utils as utils
+from osc_lib import utils
 from oslo_utils import importutils
 import six
 
