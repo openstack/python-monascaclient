@@ -25,7 +25,7 @@ A pseudo-code would be similar to this::
   from monascaclient import client
 
   auth = identity.Password(
-    auth_url='http://my.keystone.com:5000/v3',
+    auth_url='http://my.keystone.com/identity',
     username='mini-mon',
     password='password',
     project_name='mini-mon',
@@ -34,13 +34,13 @@ A pseudo-code would be similar to this::
   )
   sess = session.Session(auth=auth)
 
-  endpoint = 'http://monasca:8070/'
+  endpoint = 'http://monasca:8070/v2.0'
   api_version = '2_0'
 
   c = client.Client(
     api_version=api_version,
     endpoint=endpoint,
-    session=session
+    session=sess
   )
 
   c.alarms.list()
@@ -68,10 +68,10 @@ A pseudo-code would be similar to this::
 
   c = client.Client(
     api_version='2_0',
-    endpoint='http://monasca:8070/',
+    endpoint='http://monasca:8070/v2.0',
     token='3bcc3d3a03f44e3d8377f9247b0ad155',
     project_name='mini-mon',
-    auth_url='http://my.keystone.com:5000/v3'
+    auth_url='http://my.keystone.com/identity'
   )
 
   c.alarms.list()
@@ -86,11 +86,11 @@ A pseudo-code would be similar to this::
 
   c = client.Client(
     api_version='2_0',
-    endpoint='http://monasca:8070/',
+    endpoint='http://monasca:8070/v2.0',
     username='mini-mon',
     password='password',
     project_name='mini-mon',
-    auth_url='http://my.keystone.com:5000/v3'
+    auth_url='http://my.keystone.com/identity'
   )
 
   c.alarms.list()
