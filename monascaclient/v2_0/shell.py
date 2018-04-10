@@ -151,7 +151,8 @@ def do_metric_name_list(mc, args):
            'that confuse the CLI parser.',
            action='append')
 @utils.arg('--starttime', metavar='<UTC_START_TIME>',
-           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z. OR Format: -120 (previous 120 minutes).')
+           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z. OR'
+                ' Format: -120 (previous 120 minutes).')
 @utils.arg('--endtime', metavar='<UTC_END_TIME>',
            help='measurements <= UTC time. format: 2014-01-01T00:00:00Z.')
 @utils.arg('--offset', metavar='<OFFSET LOCATION>',
@@ -376,7 +377,8 @@ def format_metric_dimensions(metrics):
            'that confuse the CLI parser.',
            action='append')
 @utils.arg('starttime', metavar='<UTC_START_TIME>',
-           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z. OR Format: -120 (previous 120 minutes).')
+           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z.'
+                ' OR Format: -120 (previous 120 minutes).')
 @utils.arg('--endtime', metavar='<UTC_END_TIME>',
            help='measurements <= UTC time. format: 2014-01-01T00:00:00Z.')
 @utils.arg('--offset', metavar='<OFFSET LOCATION>',
@@ -455,7 +457,8 @@ def do_measurement_list(mc, args):
            'that confuse the CLI parser.',
            action='append')
 @utils.arg('starttime', metavar='<UTC_START_TIME>',
-           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z. OR Format: -120 (previous 120 minutes).')
+           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z. OR'
+                ' Format: -120 (previous 120 minutes).')
 @utils.arg('--endtime', metavar='<UTC_END_TIME>',
            help='measurements <= UTC time. format: 2014-01-01T00:00:00Z.')
 @utils.arg('--period', metavar='<PERIOD>',
@@ -880,7 +883,8 @@ def do_alarm_definition_list(mc, args):
             if len(field_values) > 2:
                 print("Invalid sort_by value {}".format(field))
             if field_values[0] not in allowed_definition_sort_by:
-                print("Sort-by field name {} is not in [{}]".format(field_values[0], allowed_definition_sort_by))
+                print("Sort-by field name {} is not in [{}]".format(field_values[0],
+                                                                    allowed_definition_sort_by))
                 return
             if len(field_values) > 1 and field_values[1] not in ['asc', 'desc']:
                 print("Invalid value {}, must be asc or desc".format(field_values[1]))
@@ -1023,7 +1027,8 @@ def do_alarm_definition_patch(mc, args):
     if args.ok_actions:
         fields['ok_actions'] = _arg_split_patch_update(args.ok_actions, patch=True)
     if args.undetermined_actions:
-        fields['undetermined_actions'] = _arg_split_patch_update(args.undetermined_actions, patch=True)
+        fields['undetermined_actions'] = _arg_split_patch_update(args.undetermined_actions,
+                                                                 patch=True)
     if args.actions_enabled:
         if args.actions_enabled not in enabled_types:
             errmsg = ('Invalid value, not one of [' +
@@ -1112,7 +1117,8 @@ def do_alarm_list(mc, args):
             if len(field_values) > 2:
                 print("Invalid sort_by value {}".format(field))
             if field_values[0] not in allowed_alarm_sort_by:
-                print("Sort-by field name {} is not in [{}]".format(field_values[0], allowed_alarm_sort_by))
+                print("Sort-by field name {} is not in [{}]".format(field_values[0],
+                                                                    allowed_alarm_sort_by))
                 return
             if len(field_values) > 1 and field_values[1] not in ['asc', 'desc']:
                 print("Invalid value {}, must be asc or desc".format(field_values[1]))
@@ -1125,9 +1131,9 @@ def do_alarm_list(mc, args):
         if args.json:
             print(utils.json_formatter(alarm))
             return
-        cols = ['id', 'alarm_definition_id', 'alarm_definition_name', 'metric_name', 'metric_dimensions',
-                'severity', 'state', 'lifecycle_state', 'link', 'state_updated_timestamp',
-                'updated_timestamp', "created_timestamp"]
+        cols = ['id', 'alarm_definition_id', 'alarm_definition_name', 'metric_name',
+                'metric_dimensions', 'severity', 'state', 'lifecycle_state', 'link',
+                'state_updated_timestamp', 'updated_timestamp', "created_timestamp"]
         formatters = {
             'id': lambda x: x['id'],
             'alarm_definition_id': lambda x: x['alarm_definition']['id'],
@@ -1389,7 +1395,8 @@ def do_alarm_history(mc, args):
            'that confuse the CLI parser.',
            action='append')
 @utils.arg('--starttime', metavar='<UTC_START_TIME>',
-           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z. OR format: -120 (previous 120 minutes).')
+           help='measurements >= UTC time. format: 2014-01-01T00:00:00Z. OR'
+                ' format: -120 (previous 120 minutes).')
 @utils.arg('--endtime', metavar='<UTC_END_TIME>',
            help='measurements <= UTC time. format: 2014-01-01T00:00:00Z.')
 @utils.arg('--offset', metavar='<OFFSET LOCATION>',
