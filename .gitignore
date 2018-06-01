@@ -17,3 +17,4 @@ monclient/versioninfo
 .pydevproject
 .project
 .idea
+.stestr/
