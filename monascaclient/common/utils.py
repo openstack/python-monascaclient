@@ -18,6 +18,7 @@ from __future__ import print_function
 import numbers
 
 import prettytable
+import six
 import yaml
 
 from osc_lib import exceptions as exc
@@ -192,7 +193,7 @@ def format_dict(dict):
 def format_list(in_list):
     string_list = list()
     for k in in_list:
-        if isinstance(k, unicode):
+        if isinstance(k, six.text_type):
             key = k.encode('utf-8')
         else:
             key = k
