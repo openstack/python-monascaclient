@@ -13,7 +13,6 @@ releasenotes/build/
 *.egg*
 monclient/versioninfo
 *.log
-.testrepository
 .pydevproject
 .project
 .idea
