@@ -19,7 +19,6 @@ import warnings
 
 from keystoneauth1 import identity
 from keystoneauth1 import session as k_session
-from osc_lib import session as o_session
 
 from monascaclient.osc import migration
 from monascaclient import version
@@ -53,15 +52,14 @@ def _session(kwargs):
     :type kwargs: dict
 
     :returns: session object
-    :rtype union(keystoneauth1.session.Session, osc_lib.session.TimingSession)
+    :rtype keystoneauth1.session.Session
 
     """
     if 'session' in kwargs:
         LOG.debug('Reusing session')
         sess = kwargs.get('session')
-        expected_cls = (k_session.Session, o_session.TimingSession)
-        if not isinstance(sess, expected_cls):
-            msg = ('session should be an instance of [%s, %s]' % expected_cls)
+        if not isinstance(sess, k_session.Session):
+            msg = ('session should be an instance of %s' % k_session.Session)
             LOG.error(msg)
             raise RuntimeError(msg)
     else:
