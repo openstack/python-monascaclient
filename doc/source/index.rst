@@ -25,6 +25,7 @@ User Documentation
 .. toctree::
    :maxdepth: 2
 
+   installation
    cli/index
    reference/index
 
