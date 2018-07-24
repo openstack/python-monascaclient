@@ -1,86 +1,107 @@
-==========
+================
+Using Python API
+================
+
+Python bindings to the OpenStack Monasca API
+============================================
+
+This is a client for the OpenStack Monasca API. It includes a Python
+API (the :mod:`monascaclient` module) and a command-line script
+(installed as :program:`monasca`).
+
 Python API
 ==========
 
-There are currently three possible approaches for using the client
-directly. On a high level, these approaches can be described as:
+To use python-monascaclient in a project, you need to create a client instance
+first. There are couple ways of doing this properly.
 
-* using **username** and **password**
-* using **token**
-* using existing <session `https://github.com/openstack/keystoneauth/blob/master/keystoneauth1/session.py>_`
+With session
+------------
 
-There are currently three possible approaches for using the client
-directly. On a high level, these approaches can be described as:
+A pseudo-code would be similar to this::
 
-* using **username** and **password**
-* using **token**
-* using existing <session `https://github.com/openstack/keystoneauth/blob/master/keystoneauth1/session.py>_`
-
-Username & password
--------------------
-
-The following approach allows to initialize the monascaclient in a traditional
-way.
-It requires **username** and  **password**. Initialization of the client
-can therefore be executed with::
-
-  c = mon_client.Client(api_version='2_0',
-                        username=os.environ.get('OS_USERNAME', 'mini-mon'),
-                        password=os.environ.get('OS_PASSWORD', 'password'),
-                        auth_url=os.environ.get('OS_AUTH_URL', 'http://127.0.0.1/identity'),
-                        project_name=os.environ.get('OS_PROJECT_NAME', 'mini-mon'),
-                        endpoint='http://127.0.0.1:8070/v2.0')
-
-Token
------
-
-In order to use monascaclient directly, you must pass in a valid auth token and
-monasca api endpoint, or you can pass in the credentials required by the
-keystoneclient and let the Python API do the authentication.  The user can
-obtain the token and endpoint using the keystone client api:
-http://docs.openstack.org/developer/python-keystoneclient/. Once **token**
-is available, a monascaclient can be initialized with following code::
-
-  c = mon_client.Client(api_version='2_0',
-                        endpoint='http://127.0.0.1:8070/v2.0'
-                        token=token_id,
-                        auth_url=os.environ.get('OS_AUTH_URL', 'http://127.0.0.1/identity'),
-                        project_name=os.environ.get('OS_PROJECT_NAME', 'mini-mon'))
-
-Session
--------
-
-Usage of the monasclient with existing session can be expressed
-with following code::
-
-  from keystoneauth1 import session
   from keystoneauth1 import identity
+  from keystoneauth1 import session
+  from monascaclient import client
 
-  auth = identity.Token(auth_url=os.environ.get('OS_AUTH_URL', 'http://127.0.0.1/identity'),
-                        token=token_id,
-                        project_name=os.environ.get('OS_PROJECT_NAME', 'mini-mon'))
+  auth = identity.Password(
+    auth_url='http://my.keystone.com/identity',
+    username='mini-mon',
+    password='password',
+    project_name='mini-mon',
+    user_domain_id='default',
+    project_domain_id='default'
+  )
   sess = session.Session(auth=auth)
 
-  c = client.Client(api_version='2_0',
-                    endpoint='http://127.0.0.1:8070/v2.0'
-                    session=sess)
+  endpoint = 'http://monasca:8070/v2.0'
+  api_version = '2_0'
 
-The session object construction is a much broader topic. It involves picking
-one of the following authorization methods:
+  c = client.Client(
+    api_version=api_version,
+    endpoint=endpoint,
+    session=sess
+  )
 
-* Password
-* Token
+  c.alarms.list()
 
-Alternatively, if the Keystone version is known, you may choose:
+For more information on keystoneauth API, see `Using Sessions`_. We also
+suggest taking closer look at `Keystone Auth Plugins`_. Each of the plugin
+can be used to properly instantiate new session and pass it into the client.
 
-* V2Password or V3Password
-* V2Token of V3Token
-* V3OidcClientCredentials
-* V3OidcPassword
-* V3OidcAuthorizationCode
-* V3OidcAccessToken
-* V3TOTP
-* V3TokenlessAuth
+  .. note:: This is recommended way to setup a client.
+     Other cases, described below, create sessions internally.
 
-For more details about each one of these methods, please visit
-`official documentation <https://docs.openstack.org/keystoneauth/latest/authentication-plugins.html>`_.
+
+Without session
+---------------
+
+If you do not want to use a session or simply prefer client to instantiate
+one on its own, there are two supported ways
+
+With token
+~~~~~~~~~~
+
+A pseudo-code would be similar to this::
+
+  from monascaclient import client
+
+  c = client.Client(
+    api_version='2_0',
+    endpoint='http://monasca:8070/v2.0',
+    token='3bcc3d3a03f44e3d8377f9247b0ad155',
+    project_name='mini-mon',
+    auth_url='http://my.keystone.com/identity'
+  )
+
+  c.alarms.list()
+
+
+With username & password
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+A pseudo-code would be similar to this::
+
+  from monascaclient import client
+
+  c = client.Client(
+    api_version='2_0',
+    endpoint='http://monasca:8070/v2.0',
+    username='mini-mon',
+    password='password',
+    project_name='mini-mon',
+    auth_url='http://my.keystone.com/identity'
+  )
+
+  c.alarms.list()
+
+Examples
+========
+
+* `Monasca Agent Example`_ - with session
+* `Monasca UI Example`_ - with token
+
+.. _Monasca Agent Example: https://github.com/openstack/monasca-agent/blob/master/monasca_agent/forwarder/api/monasca_api.py
+.. _Monasca UI Example: https://github.com/openstack/monasca-ui/blob/master/monitoring/api/client.py
+.. _Using Sessions: https://docs.openstack.org/keystoneauth/latest/using-sessions.html
+.. _Keystone Auth Plugins: https://docs.openstack.org/keystoneauth/latest/authentication-plugins.html
