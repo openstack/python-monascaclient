@@ -3,17 +3,17 @@
       - openstack-python-jobs
       - openstack-python35-jobs
       - check-requirements
-      - release-notes-jobs
+      - release-notes-jobs-python3
     check:
       jobs:
         - openstack-tox-lower-constraints
         - openstack-tox-cover
-        - build-openstack-sphinx-docs
+        - openstack-tox-docs
     gate:
       jobs:
         - openstack-tox-lower-constraints
         - openstack-tox-cover
-        - build-openstack-sphinx-docs
+        - openstack-tox-docs
     post:
       jobs:
         - publish-openstack-sphinx-docs
