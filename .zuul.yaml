@@ -1,7 +1,19 @@
 - project:
+    templates:
+      - openstack-python-jobs
+      - openstack-python35-jobs
+      - check-requirements
+      - release-notes-jobs
     check:
       jobs:
         - openstack-tox-lower-constraints
+        - openstack-tox-cover
+        - build-openstack-sphinx-docs
     gate:
       jobs:
         - openstack-tox-lower-constraints
+        - openstack-tox-cover
+        - build-openstack-sphinx-docs
+    post:
+      jobs:
+        - publish-openstack-sphinx-docs
