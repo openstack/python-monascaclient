@@ -13,6 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = ['Client']
-
 from monascaclient.v2_0.client import Client
+
+__all__ = ['Client']
