@@ -106,7 +106,7 @@ def main(args=None):
                 encoding = locale.getpreferredencoding()
                 if encoding:
                     args = map(lambda arg: arg.decode(encoding), args)
-        MonascaShell().run(args)
+        return MonascaShell().run(args)
     except Exception as e:
         if '--debug' in args or '-d' in args:
             raise
