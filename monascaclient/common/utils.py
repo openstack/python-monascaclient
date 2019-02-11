@@ -198,4 +198,4 @@ def format_list(in_list):
         else:
             key = k
         string_list.append(key)
-    return '\n'.join(string_list)
+    return b'\n'.join(string_list)

@@ -72,6 +72,37 @@ class TestAlarmDefinitionShellV2(base.BaseTestCase):
         )
 
     @mock.patch('monascaclient.osc.migration.make_client')
+    def test_alarm_definitions_list(self, mc):
+        mc.return_value = c = FakeV2Client()
+
+        c.alarm_definitions.list.return_value = [{
+            "name": "ntp_sync_check",
+            "id": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+            "expression": "(max(ntp.offset{}, deterministic)>=1)",
+            "match_by": ['hostname'],
+            "description": "NTP time sync check",
+            "actions_enabled": True,
+            "deterministic": True,
+            "alarm_actions": ['aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'],
+            "ok_actions": [],
+            "undetermined_actions": [],
+            "severity": "HIGH",
+        }]
+
+        name, cmd_class = migr.create_command_class(
+            'do_alarm_definition_list',
+            shell
+        )
+        cmd = cmd_class(mock.Mock(), mock.Mock())
+
+        parser = cmd.get_parser(name)
+        raw_args = []
+        parsed_args = parser.parse_args(raw_args)
+        cmd.run(parsed_args)
+
+        c.alarm_definitions.list.assert_called_once()
+
+    @mock.patch('monascaclient.osc.migration.make_client')
     def test_should_patch_name(self, mc):
         ad_id = '0495340b-58fd-4e1c-932b-5e6f9cc96490'
         ad_name = 'patch_name'
