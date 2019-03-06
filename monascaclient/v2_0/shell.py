@@ -15,7 +15,6 @@
 # limitations under the License.
 
 import datetime
-import json
 import numbers
 import time
 
@@ -91,7 +90,7 @@ def do_metric_create(mc, args):
 
 
 @utils.arg('jsonbody', metavar='<JSON_BODY>',
-           type=json.loads,
+           type=jsonutils.loads,
            help='The raw JSON body in single quotes. See api doc.')
 def do_metric_create_raw(mc, args):
     '''Create metric from raw json body.'''
