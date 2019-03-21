@@ -42,7 +42,8 @@ def arg(*args, **kwargs):
 
 
 def json_formatter(js):
-    return (jsonutils.dumps(js, indent=2, ensure_ascii=False)).encode('utf-8')
+    formatter = (jsonutils.dumps(js, indent=2, ensure_ascii=False))
+    return formatter if six.PY3 else formatter.encode('utf-8')
 
 
 def print_list(objs, fields, field_labels=None, formatters=None, sortby=None):
@@ -65,10 +66,9 @@ def print_list(objs, fields, field_labels=None, formatters=None, sortby=None):
                 data = getattr(o, field, None) or ''
                 row.append(data)
         pt.add_row(row)
-    if sortby is None:
-        print(pt.get_string().encode('utf-8'))
-    else:
-        print(pt.get_string(sortby=field_labels[sortby]).encode('utf-8'))
+    field_to_sort_by = field_labels[sortby] if sortby else None
+    pt_string = pt.get_string(sortby=field_to_sort_by)
+    print(pt_string if six.PY3 else pt_string.encode('utf-8'))
 
 
 def print_dict(d, formatters=None):
@@ -83,7 +83,9 @@ def print_dict(d, formatters=None):
             pt.add_row([field, formatters[field](d[field])])
         else:
             pt.add_row([field, d[field]])
-    print(pt.get_string(sortby='Property').encode('utf-8'))
+
+    pt_string = pt.get_string(sortby='Property')
+    print(pt_string if six.PY3 else pt_string.encode('utf-8'))
 
 
 def format_parameters(params):
