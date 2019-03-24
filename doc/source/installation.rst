@@ -14,7 +14,7 @@ Or, if you have virtualenvwrapper installed::
 Or, you can build it manually::
 
     $ mkvirtualenv python-monascaclient
-    $ git clone git://git.openstack.org/openstack/python-monascaclient
+    $ git clone https://git.openstack.org/openstack/python-monascaclient
     $ cd python-monascaclient
     $ pip install -r ./requirements.txt
     $ python setup.py install
