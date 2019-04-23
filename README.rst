@@ -27,4 +27,4 @@ It provides a Python API (the ``monascaclient`` module) and a command-line tool
 .. _PyPi: https://pypi.python.org/pypi/python-monascaclient
 .. _Online Documentation: https://docs.openstack.org/python-monascaclient/latest/
 .. _Bugs: https://storyboard.openstack.org/#!/project/880
-.. _Source: https://git.openstack.org/cgit/openstack/python-monascaclient
+.. _Source: https://opendev.org/openstack/python-monascaclient
