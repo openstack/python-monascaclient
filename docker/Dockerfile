@@ -1,5 +1,5 @@
 ARG DOCKER_IMAGE=monasca/client
-ARG APP_REPO=https://git.openstack.org/openstack/python-monascaclient
+ARG APP_REPO=https://review.opendev.org/openstack/python-monascaclient
 
 # Branch, tag or git hash to build from.
 ARG REPO_VERSION=master
