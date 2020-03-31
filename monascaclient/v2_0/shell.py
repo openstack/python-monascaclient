@@ -1195,10 +1195,10 @@ def do_alarm_update(mc, args):
     fields = {}
     fields['alarm_id'] = args.id
     if args.state.upper() not in state_types:
-            errmsg = ('Invalid state, not one of [' +
-                      ', '.join(state_types) + ']')
-            print(errmsg)
-            return
+        errmsg = ('Invalid state, not one of [' +
+                  ', '.join(state_types) + ']')
+        print(errmsg)
+        return
     fields['state'] = args.state
     fields['lifecycle_state'] = args.lifecycle_state
     fields['link'] = args.link
@@ -1257,8 +1257,8 @@ def do_alarm_delete(mc, args):
 
 def output_alarm_history(args, alarm_history):
     if args.json:
-            print(utils.json_formatter(alarm_history))
-            return
+        print(utils.json_formatter(alarm_history))
+        return
     # format output
     cols = ['alarm_id', 'new_state', 'old_state', 'reason',
             'reason_data', 'metric_name', 'metric_dimensions', 'timestamp']
