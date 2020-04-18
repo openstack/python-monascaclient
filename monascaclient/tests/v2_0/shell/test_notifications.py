@@ -98,21 +98,12 @@ class TestNotificationsShellV2(base.BaseTestCase):
         self._patch_test(mc, args, data)
 
     @mock.patch('monascaclient.osc.migration.make_client')
-    def test_bad_notifications_patch(self, mc):
-        mc.return_value = c = FakeV2Client()
-
-        id_str = '0495340b-58fd-4e1c-932b-5e6f9cc96490'
-        raw_args = ('{0} --type EMAIL --address john.doe@hpe.com '
-                    '--period 60').format(id_str).split(' ')
-        name, cmd_clazz = migr.create_command_class('do_notification_patch',
-                                                    shell)
-        cmd = cmd_clazz(mock.Mock(), mock.Mock())
-
-        parser = cmd.get_parser(name)
-        parsed_args = parser.parse_args(raw_args)
-        cmd.run(parsed_args)
-
-        c.notifications.patch.assert_not_called()
+    def test_good_notifications_patch_recurring_email(self, mc):
+        args = '--type EMAIL --address john.doe@hpe.com --period 60'
+        data = {'type': 'EMAIL',
+                'address': 'john.doe@hpe.com',
+                'period': 60}
+        self._patch_test(mc, args, data)
 
     @mock.patch('monascaclient.osc.migration.make_client')
     def test_good_notifications_update(self, mc):
