@@ -40,9 +40,6 @@ allowed_alarm_sort_by = {'alarm_id', 'alarm_definition_id',
                          'created_timestamp'}
 allowed_definition_sort_by = {'id', 'name', 'severity', 'updated_at', 'created_at'}
 
-# Notification valid types
-notification_types = ['EMAIL', 'WEBHOOK', 'PAGERDUTY']
-
 
 @utils.arg('name', metavar='<METRIC_NAME>',
            help='Name of the metric to create.')
@@ -557,7 +554,7 @@ def do_metric_statistics(mc, args):
 @utils.arg('name', metavar='<NOTIFICATION_NAME>',
            help='Name of the notification to create.')
 @utils.arg('type', metavar='<TYPE>',
-           help='The notification type. Type must be EMAIL, WEBHOOK, or PAGERDUTY.')
+           help='The notification type. See monasca notification-type-list for supported types.')
 @utils.arg('address', metavar='<ADDRESS>',
            help='A valid EMAIL Address, URL, or SERVICE KEY.')
 @utils.arg('--period', metavar='<PERIOD>', type=int, default=0,
@@ -683,7 +680,7 @@ def do_notification_delete(mc, args):
 @utils.arg('name', metavar='<NOTIFICATION_NAME>',
            help='Name of the notification.')
 @utils.arg('type', metavar='<TYPE>',
-           help='The notification type. Type must be either EMAIL, WEBHOOK, or PAGERDUTY.')
+           help='The notification type. See monasca notification-type-list for supported types.')
 @utils.arg('address', metavar='<ADDRESS>',
            help='A valid EMAIL Address, URL, or SERVICE KEY.')
 @utils.arg('period', metavar='<PERIOD>', type=int,
@@ -710,7 +707,7 @@ def do_notification_update(mc, args):
 @utils.arg('--name', metavar='<NOTIFICATION_NAME>',
            help='Name of the notification.')
 @utils.arg('--type', metavar='<TYPE>',
-           help='The notification type. Type must be either EMAIL, WEBHOOK, or PAGERDUTY.')
+           help='The notification type. See monasca notification-type-list for supported types.')
 @utils.arg('--address', metavar='<ADDRESS>',
            help='A valid EMAIL Address, URL, or SERVICE KEY.')
 @utils.arg('--period', metavar='<PERIOD>', type=int,
