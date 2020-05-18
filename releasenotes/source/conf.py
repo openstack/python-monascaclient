@@ -36,30 +36,26 @@ source_encoding = 'utf-8'
 master_doc = 'index'
 
 # General information about the project.
-repository_name = u'openstack/python-monascaclient'
+openstackdocs_repo_name = u'openstack/python-monascaclient'
 project = u'Monasca Client ReleaseNotes Docs'
 
 # Release notes do not need a version number in the title, they
 # cover multiple releases.
 version = ''
 release = ''
-bug_project = u'880'
-bug_tag = u''
+openstackdocs_use_storyboard = True
+openstackdocs_auto_name = False
 copyright = u'2014-present, OpenStack Foundation'
 author = u'OpenStack Foundation'
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'native'
 
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 html_theme = 'openstackdocs'
-
-# If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
-# using the given strftime format.
-html_last_updated_fmt = '%Y-%m-%d %H:%M'
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'MonascaClientReleaseNotesDoc'
