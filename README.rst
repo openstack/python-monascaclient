@@ -23,8 +23,10 @@ It provides a Python API (the ``monascaclient`` module) and a command-line tool
 * `Online Documentation`_
 * `Bugs`_ - issue tracking (we use *bug* tag to differentiate from new features)
 * `Source`_
+* `Release Notes`_
 
 .. _PyPi: https://pypi.python.org/pypi/python-monascaclient
 .. _Online Documentation: https://docs.openstack.org/python-monascaclient/latest/
 .. _Bugs: https://storyboard.openstack.org/#!/project/880
 .. _Source: https://opendev.org/openstack/python-monascaclient
+.. _Release Notes: https://docs.openstack.org/releasenotes/python-monascaclient
