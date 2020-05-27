@@ -13,8 +13,6 @@
 import os
 import sys
 
-from monascaclient.version import version_info
-
 sys.path = [
     os.path.abspath('../..'),
     os.path.abspath('../../bin')
@@ -23,7 +21,7 @@ sys.path = [
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = '1.6'
+needs_sphinx = '2.0'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -37,14 +35,12 @@ extensions = [
 ]
 
 # geeneral information about project
-repository_name = u'openstack/python-monascaclient'
+openstackdocs_repo_name = u'openstack/python-monascaclient'
 project = u'Monasca Client Dev Docs'
-version = version_info.canonical_version_string()
-release = version_info.version_string_with_vcs()
-bug_project = u'880'
-bug_tag = u''
+openstackdocs_use_storyboard = True
 copyright = u'2014-present, OpenStack Foundation'
 author = u'OpenStack Foundation'
+openstackdocs_auto_name = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -80,17 +76,13 @@ add_module_names = True
 show_authors = True
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'native'
 
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 html_theme = 'openstackdocs'
-
-# If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
-# using the given strftime format.
-html_last_updated_fmt = '%Y-%m-%d %H:%M'
 
 # If false, no index is generated.
 html_use_index = True
@@ -130,6 +122,3 @@ texinfo_documents = [
    author, 'python-monascaclient', 'Rest-API to collect logs from your cloud.',
    'Miscellaneous'),
 ]
-
-# Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://doc.python.org/': None}
