@@ -19,7 +19,6 @@ Command-line interface to the monasca-client API.
 """
 
 import argparse
-import locale
 import sys
 
 from osc_lib.api import auth
@@ -27,7 +26,6 @@ from osc_lib.cli import client_config as cloud_config
 from osc_lib import shell
 from osc_lib import utils
 from oslo_utils import importutils
-import six
 
 from monascaclient.osc import migration
 from monascaclient import version as mc_version
@@ -100,12 +98,6 @@ def main(args=None):
     try:
         if args is None:
             args = sys.argv[1:]
-            if six.PY2:
-                # Emulate Py3, decode argv into Unicode based on locale so that
-                # commands always see arguments as text instead of binary data
-                encoding = locale.getpreferredencoding()
-                if encoding:
-                    args = map(lambda arg: arg.decode(encoding), args)
         return MonascaShell().run(args)
     except Exception as e:
         if '--debug' in args or '-d' in args:

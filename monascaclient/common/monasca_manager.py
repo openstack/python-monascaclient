@@ -15,7 +15,7 @@
 # limitations under the License.
 
 
-from six.moves.urllib import parse
+from urllib import parse
 
 
 class MonascaManager(object):
