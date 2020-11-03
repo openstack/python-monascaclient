@@ -16,7 +16,6 @@
 import numbers
 
 import prettytable
-import six
 import yaml
 
 from osc_lib import exceptions as exc
@@ -41,7 +40,7 @@ def arg(*args, **kwargs):
 
 def json_formatter(js):
     formatter = (jsonutils.dumps(js, indent=2, ensure_ascii=False))
-    return formatter if six.PY3 else formatter.encode('utf-8')
+    return formatter
 
 
 def print_list(objs, fields, field_labels=None, formatters=None, sortby=None):
@@ -66,7 +65,7 @@ def print_list(objs, fields, field_labels=None, formatters=None, sortby=None):
         pt.add_row(row)
     field_to_sort_by = field_labels[sortby] if sortby else None
     pt_string = pt.get_string(sortby=field_to_sort_by)
-    print(pt_string if six.PY3 else pt_string.encode('utf-8'))
+    print(pt_string)
 
 
 def print_dict(d, formatters=None):
@@ -83,7 +82,7 @@ def print_dict(d, formatters=None):
             pt.add_row([field, d[field]])
 
     pt_string = pt.get_string(sortby='Property')
-    print(pt_string if six.PY3 else pt_string.encode('utf-8'))
+    print(pt_string)
 
 
 def format_parameters(params):
@@ -193,7 +192,7 @@ def format_dict(dict):
 def format_list(in_list):
     string_list = list()
     for k in in_list:
-        if isinstance(k, six.text_type):
+        if isinstance(k, str):
             key = k.encode('utf-8')
         else:
             key = k

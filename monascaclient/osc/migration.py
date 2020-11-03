@@ -13,7 +13,6 @@
 # under the License.
 
 import logging
-import six
 
 from osc_lib.command import command
 from osc_lib import utils
@@ -95,8 +94,7 @@ class MigratingCommandMeta(command.CommandMeta):
                                                         bases, cls_dict)
 
 
-@six.add_metaclass(MigratingCommandMeta)
-class MigratingCommand(command.Command):
+class MigratingCommand(command.Command, metaclass=MigratingCommandMeta):
     """MigratingCommand is temporary command.
 
     MigratingCommand allows to map function defined
