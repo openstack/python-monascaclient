@@ -9,8 +9,8 @@ coverage==4.0
 debtcollector==1.2.0
 decorator==3.4.0
 deprecation==1.0
-doc8==0.6.0
-docutils==0.11
+doc8==0.8.1
+docutils==0.12
 dogpile.cache==0.6.2
 dulwich==0.15.0
 extras==1.0.0
@@ -27,7 +27,7 @@ jsonpointer==1.13
 keystoneauth1==3.4.0
 linecache2==1.0.0
 MarkupSafe==1.0
-mccabe==0.2.1
+mccabe==0.6.0
 monotonic==0.6
 mox3==0.20.0
 msgpack-python==0.4.0
@@ -46,7 +46,7 @@ oslo.utils==3.33.0
 oslotest==3.2.0
 pbr==2.0.0
 prettytable==0.7.2
-pyflakes==0.8.1
+pyflakes==2.1.0
 Pygments==2.2.0
 pyparsing==2.1.0
 pyperclip==1.5.27
