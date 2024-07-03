@@ -7,7 +7,7 @@
       - release-notes-jobs-python3
     check:
       jobs:
-        - docker-build-monasca-service
+        - build-monasca-docker-image
     post:
       jobs:
         - publish-monasca-client-docker-image
