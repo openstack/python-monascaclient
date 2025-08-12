@@ -1,32 +1,9 @@
-========================
-Team and repository tags
-========================
+This project is no longer maintained.
 
-.. image:: https://governance.openstack.org/tc/badges/python-monascaclient.svg
-    :target: https://governance.openstack.org/tc/reference/tags/index.html
+The contents of this repository are still available in the Git
+source code management system. To see the contents of this
+repository before it reached its end of life, please check out the
+previous commit with "git checkout HEAD^1".
 
-.. Change things from this point on
-
-Python bindings to the Monasca API
-==================================
-
-.. image:: https://img.shields.io/pypi/v/python-monascaclient.svg
-    :target: https://pypi.python.org/pypi/python-monascaclient/
-    :alt: Latest Version
-
-This is a client library for Monasca built to interface with the Monasca API.
-It provides a Python API (the ``monascaclient`` module) and a command-line tool
-(``monasca``).
-
-* License: Apache License, Version 2.0
-* `PyPi`_ - package installation
-* `Online Documentation`_
-* `Bugs`_ - issue tracking (we use *bug* tag to differentiate from new features)
-* `Source`_
-* `Release Notes`_
-
-.. _PyPi: https://pypi.python.org/pypi/python-monascaclient
-.. _Online Documentation: https://docs.openstack.org/python-monascaclient/latest/
-.. _Bugs: https://storyboard.openstack.org/#!/project/880
-.. _Source: https://opendev.org/openstack/python-monascaclient
-.. _Release Notes: https://docs.openstack.org/releasenotes/python-monascaclient
+For any further questions, please email openstack-discuss@lists.openstack.org
+or join #openstack-dev on OFTC.
